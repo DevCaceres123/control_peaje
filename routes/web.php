@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Configuracion\PuestoControlador;
+use App\Http\Controllers\Configuracion\TarifaControlador;
 use App\Http\Controllers\Usuario\Controlador_login;
 use App\Http\Controllers\Usuario\Controlador_permisos;
 use App\Http\Controllers\Usuario\Controlador_rol;
@@ -53,4 +54,9 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function(){
     //PARA LA ADMINISTRACION DE PUESTO
     Route::resource('puesto', PuestoControlador::class);
     Route::post('/puesto/listar', [PuestoControlador::class, 'listar'])->name('puesto.listar');
+
+
+    //PARA LA ADMINISTRACION DE TARIFAS
+    Route::resource('tarifas', TarifaControlador::class);
+    Route::post('/tarifas/listar', [TarifaControlador::class, 'listar'])->name('tarifas.listar');
 });

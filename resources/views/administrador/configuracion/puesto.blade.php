@@ -69,7 +69,7 @@
 
 @section('scripts')
 <script>
-    const rutas = {
+    let rutas = {
         listar      : "{{ route('puesto.listar') }}",
         crear       : "{{ route('puesto.store') }}",
         editar      : "{{ route('puesto.edit', ':id') }}",

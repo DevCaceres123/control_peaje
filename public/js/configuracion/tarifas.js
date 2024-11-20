@@ -1,23 +1,23 @@
-let modal_puesto = new bootstrap.Modal(document.getElementById("modal_puesto"));
-let form_puesto = document.getElementById("form_puesto");
-let btn_guardar_puesto = document.getElementById("btn_guardar_puesto");
-let errores_msj = ["_nombre"];
+let modal_tarifa        = new bootstrap.Modal(document.getElementById("modal_tarifa"));
+let form_tarifa         = document.getElementById("form_tarifa");
+let btn_guardar_tarifa  = document.getElementById("btn_guardar_tarifa");
+let errores_msj = ["_nombre", "_precio", "_descripcion"];
 
-function abrirModalPuesto(id = null) {
+function abrirModalTarifa(id = null) {
     vaciar_errores(errores_msj);
-    form_puesto.reset();
-    document.getElementById("puesto_id").value = id;
-    document.getElementById("puestoModalLabel").textContent = id
-        ? "Editar Puesto"
-        : "Nuevo Puesto";
+    form_tarifa.reset();
+    document.getElementById("tarifa_id").value = id;
+    document.getElementById("tarifaModalLabel").textContent = id
+        ? "Editar Tarifa"
+        : "Nuevo Tarifa";
 
     if (id) {
-        cargarDatosPuesto(id);
+        cargarDatosTarifa(id);
     }
-    modal_puesto.show();
+    modal_tarifa.show();
 }
 
-async function cargarDatosPuesto(id) {
+async function cargarDatosTarifa(id) {
     try {
         let url = rutas.editar.replace(":id", id);
         let respuesta = await fetch(url, {
@@ -29,7 +29,9 @@ async function cargarDatosPuesto(id) {
         });
         let data = await respuesta.json();
         if (data.tipo === "success") {
-            document.getElementById("nombre").value = data.mensaje.nombre;
+            document.getElementById("nombre").value         = data.mensaje.nombre;
+            document.getElementById("precio").value         = data.mensaje.precio;
+            document.getElementById("descripcion").value    = data.mensaje.descripcion;
         } else {
             alerta_top(data.tipo, data.mensaje);
         }
@@ -38,19 +40,19 @@ async function cargarDatosPuesto(id) {
     }
 }
 
-function cerrarModelPuesto() {
-    form_puesto.reset();
-    modal_puesto.hide();
+function cerrarModelTarifa() {
+    form_tarifa.reset();
+    modal_tarifa.hide();
     vaciar_errores(errores_msj);
 }
 
-btn_guardar_puesto.addEventListener("click", async () => {
-    let datos = Object.fromEntries(new FormData(form_puesto).entries());
-    let url = datos.puesto_id
-        ? rutas.actualizar.replace(":id", datos.puesto_id)
+btn_guardar_tarifa.addEventListener("click", async () => {
+    let datos = Object.fromEntries(new FormData(form_tarifa).entries());
+    let url = datos.tarifa_id
+        ? rutas.actualizar.replace(":id", datos.tarifa_id)
         : rutas.crear;
-    let metodo = datos.puesto_id ? "PUT" : "POST";
-    validar_boton(true, "Validando . . .", btn_guardar_puesto);
+    let metodo = datos.tarifa_id ? "PUT" : "POST";
+    validar_boton(true, "Validando . . .", btn_guardar_tarifa);
 
     try {
         let respuesta = await fetch(url, {
@@ -68,17 +70,17 @@ btn_guardar_puesto.addEventListener("click", async () => {
         } else {
             alerta_top(data.tipo, data.mensaje);
             if (data.tipo === "success") {
-                listar_puesto();
-                cerrarModelPuesto();
+                listar_tarifa();
+                cerrarModelTarifa();
             }
         }
-        validar_boton(false, "Guardar", btn_guardar_puesto);
+        validar_boton(false, "Guardar", btn_guardar_tarifa);
     } catch (error) {
         console.log("Ocurrió un error:", error);
     }
 });
 
-async function listar_puesto() {
+async function listar_tarifa() {
     try {
         let respuesta = await fetch(rutas.listar, {
             method: "POST",
@@ -88,25 +90,27 @@ async function listar_puesto() {
             },
         });
         let data = await respuesta.json();
-        puesto_tabla(data);
+        tarifa_tabla(data);
     } catch (error) {
         console.log("Error al obtener los datos:", error);
     }
 }
 
-function puesto_tabla(data) {
-    $("#tabla_puesto").DataTable({
+function tarifa_tabla(data) {
+    $("#tabla_tarifa").DataTable({
         responsive: true,
         data: data,
         columns: [
             { data: null, render: (data, type, row, meta) => meta.row + 1 },
             { data: "nombre", className: "table-td" },
+            { data: "precio", className: "table-td" },
+            { data: "descripcion", className: "table-td" },
             {
                 data: null,
                 className: "table-td",
                 render: (data, type, row) => `
                     <div class="form-check form-switch form-switch-dark">
-                        <input class="form-check-input" onclick="estado_puesto('${ row.id }')" type="checkbox"  id="customSwitchDark" ${ row.estado === "activo" ? "checked" : "" }>
+                        <input class="form-check-input" onclick="estado_tarifa('${ row.id }')" type="checkbox"  id="customSwitchDark" ${ row.estado === "activo" ? "checked" : "" }>
                     </div>
                 `,
             },
@@ -114,10 +118,10 @@ function puesto_tabla(data) {
                 data: null,
                 className: "table-td",
                 render: (data, type, row) => `
-                    <button class="btn rounded-pill btn-sm btn-warning p-0.5" onclick="abrirModalPuesto('${row.id}')">
+                    <button class="btn rounded-pill btn-sm btn-warning p-0.5" onclick="abrirModalTarifa('${row.id}')">
                         <i class="las la-pen fs-18"></i>
                     </button>
-                    <button class="btn rounded-pill btn-sm btn-danger p-0.5" onclick="eliminarPuesto('${row.id}')">
+                    <button class="btn rounded-pill btn-sm btn-danger p-0.5" onclick="eliminarTarifa('${row.id}')">
                         <i class="las la-trash-alt fs-18"></i>
                     </button>
                 `,
@@ -127,9 +131,9 @@ function puesto_tabla(data) {
     });
 }
 
-listar_puesto();
+listar_tarifa();
 
-async function estado_puesto(id) {
+async function estado_tarifa(id) {
     Swal.fire({
         title: "NOTA!",
         text: "¿Está seguro de cambiar el estado?",
@@ -150,17 +154,17 @@ async function estado_puesto(id) {
                 });
                 let data = await respuesta.json();
                 alerta_top(data.tipo, data.mensaje);
-                listar_puesto();
+                listar_tarifa();
             } catch (error) {
                 console.log("Error al cambiar el estado:", error);
             }
         }else{
-            listar_puesto();
+            listar_tarifa();
         }
     });
 }
 
-async function eliminarPuesto(id) {
+async function eliminarTarifa(id) {
     Swal.fire({
         title: "NOTA!",
         text: "¿Está seguro de eliminar?",
@@ -181,12 +185,13 @@ async function eliminarPuesto(id) {
                 });
                 let data = await respuesta.json();
                 alerta_top(data.tipo, data.mensaje);
-                listar_puesto();
+                listar_tarifa();
             } catch (error) {
                 console.log("Error al eliminar:", error);
+                listar_tarifa();
             }
         }else{
-            listar_puesto();
+            listar_tarifa();
         }
     });
 }

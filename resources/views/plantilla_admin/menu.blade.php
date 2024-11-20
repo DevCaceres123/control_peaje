@@ -71,7 +71,7 @@
                                     <a class="nav-link" href="{{ route('puesto.index') }}">Puesto</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#">Tarifas</a>
+                                    <a class="nav-link" href="{{ route('tarifas.index') }}">Tarifas</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="#">Tipo Vehiculos</a>
