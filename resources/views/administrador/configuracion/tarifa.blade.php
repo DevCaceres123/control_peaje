@@ -1,5 +1,5 @@
 @extends('principal')
-@section('titulo', 'PUESTO')
+@section('titulo', 'TARIFA')
 @section('contenido')
 <div class="row">
     <div class="col-12">
@@ -7,7 +7,7 @@
             <div class="card-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h4 class="card-title">PUESTOS</h4>
+                        <h4 class="card-title">TARIFA</h4>
                     </div>
                     <div class="col-auto">
                         <button class="btn btn-primary" onclick="abrirModalTarifa()">
@@ -42,7 +42,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 class="modal-title m-0" id="tarifaModalLabel">Permiso</h6>
+                <h6 class="modal-title m-0" id="tarifaModalLabel">Tarifa</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                     onclick="cerrarModelTarifa()"></button>
             </div>
@@ -53,7 +53,7 @@
                         <label for="nombre" class="col-sm-2 col-form-label">Nombre</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="nombre" name="nombre"
-                                placeholder="Ingrese el nombre del puesto" required>
+                                placeholder="Ingrese el nombre de la tarifa" required>
                             <div id="_nombre"></div>
                         </div>
                     </div>
