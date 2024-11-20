@@ -39,23 +39,50 @@
 
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('user.index') }}">Usuarios</a>
-                                </li><!--end nav-item-->
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('roles.index') }}">Roles</a>
-                                </li><!--end nav-item-->
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('permisos.index') }}">Permisos</a>
-                                </li><!--end nav-item-->
-                            </ul><!--end nav-->
-                        </div><!--end startbarApplications-->
-                    </li><!--end nav-item-->
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
                     <li class="menu-label mt-2">
                         <small class="label-border">
                             <div class="border_left hidden-xs"></div>
                             <div class="border_right"></div>
                         </small>
-                        <span>NEGOCIO</span>
+                        <span>CONFIGURACIÓN</span>
                     </li>
+
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#configuracion" data-bs-toggle="collapse" role="button"
+                            aria-expanded="false" aria-controls="configuracion">
+                            <i class="iconoir-compact-disc menu-icon"></i>
+                            <span>CONFIGURACION</span>
+                        </a>
+                        <div class="collapse " id="configuracion">
+                            <ul class="nav flex-column">
+
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('puesto.index') }}">Puesto</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">Tarifas</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">Tipo Vehiculos</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">Colores</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
                     {{-- <li class="nav-item">
                         <a class="nav-link" href="#sidebarElements" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarElements">

@@ -14,6 +14,6 @@ class BasePrincipalRequest extends FormRequest
         throw (new ValidationException($validator, response()->json([
             'tipo' => 'errores',
             'mensaje' => $validator->errors(),
-        ], 422)));
+        ])));
     }
 }
