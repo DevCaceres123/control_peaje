@@ -16,13 +16,12 @@ return new class extends Migration
             $table->dateTime("fecha_hora");
             $table->date('fecha');
             $table->time('hora');
-            $table->text('codigo_unico');
-            $table->string('destino');
-            $table->string('descripcion');
+            $table->string('destino')->nullable();
+            $table->string('descripcion')->nullable();
             $table->unsignedBigInteger('puesto_id');
             $table->unsignedBigInteger('tarifa_id');
             $table->unsignedBigInteger('usuario_id');
-            $table->unsignedBigInteger('vehiculo_id');
+            $table->unsignedBigInteger('vehiculo_id')->nullable();
             $table->timestamps();
 
 

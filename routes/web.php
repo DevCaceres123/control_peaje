@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Configuracion\ColorControlador;
 use App\Http\Controllers\Configuracion\PuestoControlador;
 use App\Http\Controllers\Configuracion\TarifaControlador;
 use App\Http\Controllers\Configuracion\TipoVehiculoControlador;
@@ -64,4 +65,8 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function(){
     //PARA LA ADMINISTRACION DE TIPOS DE BEHICULOS
     Route::resource('/tipoVehiculos', TipoVehiculoControlador::class);
     Route::post('/tipoVehiculos/listar', [TipoVehiculoControlador::class, 'listar'])->name('tipoVehiculos.listar');
+
+    //PARA LA ADMINISTRACION DE LOS COLORES
+    Route::resource('/color', ColorControlador::class);
+    Route::post('/color/listar', [ColorControlador::class, 'listar'])->name('color.listar');
 });

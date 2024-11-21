@@ -50,7 +50,7 @@
                     <div class="mb-3 row">
                         <label for="nombre" class="col-sm-2 col-form-label">Nombre</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="nombre" name="nombre"
+                            <input type="text" class="form-control uppercase-input" id="nombre" name="nombre"
                                 placeholder="Ingrese el nombre del Tipo de Vehiculo" required>
                             <div id="_nombre"></div>
                         </div>

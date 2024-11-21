@@ -77,7 +77,7 @@
                                     <a class="nav-link" href="{{ route('tipoVehiculos.index') }}">Tipo Vehiculos</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#">Colores</a>
+                                    <a class="nav-link" href="{{ route('color.index') }}">Colores</a>
                                 </li>
                             </ul>
                         </div>

@@ -10,7 +10,7 @@
                         <h4 class="card-title">PUESTOS</h4>
                     </div>
                     <div class="col-auto">
-                        <button class="btn btn-primary" onclick="abrirModalPuesto()">
+                        <button class="btn btn-primary" onclick="abrirModalColor()">
                             <i class="fas fa-plus me-1"></i> Nuevo
                         </button>
                     </div>
@@ -18,12 +18,12 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table" id="tabla_puesto">
+                    <table class="table" id="tabla_color">
                         <thead class="table-light">
                             <tr>
                                 <th>Nº</th>
                                 <th>NOMBRE</th>
-                                <th>ESTADO</th>
+                                <th>COLOR</th>
                                 <th>ACCION</th>
                             </tr>
                         </thead>
@@ -35,32 +35,38 @@
 </div>
 
 <!-- Modal para nuevo y editar -->
-<div class="modal fade" id="modal_puesto" data-bs-backdrop="static" tabindex="-1" role="dialog"
-    aria-labelledby="puestoModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal_color" data-bs-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="colorModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 class="modal-title m-0" id="puestoModalLabel">Puesto</h6>
+                <h6 class="modal-title m-0" id="colorModalLabel">Color</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                     onclick="cerrarModelPuesto()"></button>
             </div>
             <div class="modal-body">
-                <form id="form_puesto" autocomplete="off" method="POST">
-                    <input type="hidden" id="puesto_id" name="puesto_id">
+                <form id="form_color" autocomplete="off" method="POST">
+                    <input type="hidden" id="color_id" name="color_id">
                     <div class="mb-3 row">
-                        <label for="nombre" class="col-sm-2 col-form-label">Puesto</label>
+                        <label for="nombre" class="col-sm-2 col-form-label text-end">Nombre</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control uppercase-input" id="nombre" name="nombre"
-                                placeholder="Ingrese el nombre del puesto">
-                            <div id="_nombre"></div>
+                            <input type="text" class="form-control uppercase-input" id="nombre" name="nombre">
                         </div>
-                    </div>
+                        <div id="_nombre" ></div>
+                    </div> 
+                    <div class="mb-3 row">
+                        <label for="color" class="col-sm-2 col-form-label text-end">Color</label>
+                        <div class="col-sm-10">
+                            <input type="color" class="form-control" id="color" name="color">
+                        </div>
+                        <div id="_color" ></div>
+                    </div> 
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal"
-                    onclick="cerrarModelPuesto()">Cerrar</button>
-                <button type="button" id="btn_guardar_puesto" class="btn btn-dark btn-sm">Guardar</button>
+                    onclick="cerrarModelColor()">Cerrar</button>
+                <button type="button" id="btn_guardar_color" class="btn btn-dark btn-sm">Guardar</button>
             </div>
         </div>
     </div>
@@ -70,13 +76,13 @@
 @section('scripts')
 <script>
     let rutas = {
-        listar      : "{{ route('puesto.listar') }}",
-        crear       : "{{ route('puesto.store') }}",
-        editar      : "{{ route('puesto.edit', ':id') }}",
-        actualizar: "{{ route('puesto.update', ':id') }}",
-        eliminar: "{{ route('puesto.destroy', ':id') }}",
-        cambiarEstado: "{{ route('puesto.show', ':id') }}"
+        listar      : "{{ route('color.listar') }}",
+        crear       : "{{ route('color.store') }}",
+        editar      : "{{ route('color.edit', ':id') }}",
+        actualizar: "{{ route('color.update', ':id') }}",
+        eliminar: "{{ route('color.destroy', ':id') }}",
+        cambiarEstado: "{{ route('color.show', ':id') }}"
     };
 </script>
-<script src="{{ asset('js/configuracion/puestos.js') }}"></script>
+<script src="{{ asset('js/configuracion/colores.js') }}"></script>
 @endsection

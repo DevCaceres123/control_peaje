@@ -52,7 +52,7 @@
                     <div class="mb-3 row">
                         <label for="nombre" class="col-sm-2 col-form-label">Nombre</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="nombre" name="nombre"
+                            <input type="text" class="form-control uppercase-input" id="nombre" name="nombre"
                                 placeholder="Ingrese el nombre de la tarifa" required>
                             <div id="_nombre"></div>
                         </div>
@@ -66,7 +66,7 @@
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label for="precio" class="col-sm-2 col-form-label">Descripción</label>
+                        <label for="precio" class="col-sm-2 col-form-label uppercase-input">Descripción</label>
                         <div class="col-sm-10">
                             <textarea class="form-control" id="descripcion" name="descripcion" cols="30" rows="3" placeholder="Ingrese la descripcion" required></textarea>
                             <div id="_descripcion"></div>
