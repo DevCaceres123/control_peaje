@@ -4,6 +4,8 @@ use App\Http\Controllers\Configuracion\ColorControlador;
 use App\Http\Controllers\Configuracion\PuestoControlador;
 use App\Http\Controllers\Configuracion\TarifaControlador;
 use App\Http\Controllers\Configuracion\TipoVehiculoControlador;
+use App\Http\Controllers\Peaje\Controlador_registro;
+use App\Http\Controllers\Puesto\Controlador_puesto;
 use App\Http\Controllers\Usuario\Controlador_login;
 use App\Http\Controllers\Usuario\Controlador_permisos;
 use App\Http\Controllers\Usuario\Controlador_rol;
@@ -15,28 +17,28 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::prefix('/')->middleware([No_autenticados::class])->group(function(){
-    Route::get('/', function(){
+Route::prefix('/')->middleware([No_autenticados::class])->group(function () {
+    Route::get('/', function () {
         return view('login');
     })->name('login');
 
-    Route::get('/login', function(){
+    Route::get('/login', function () {
         return view('login', ['fromHome' => true]);
     })->name('login_home');
 
-    Route::controller(Controlador_login::class)->group(function(){
+    Route::controller(Controlador_login::class)->group(function () {
         Route::post('ingresar', 'ingresar')->name('log_ingresar');
     });
 });
 
 
-Route::prefix('/admin')->middleware([Autenticados::class])->group(function(){
-    Route::controller(Controlador_login::class)->group(function(){
+Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
+    Route::controller(Controlador_login::class)->group(function () {
         Route::get('inicio', 'inicio')->name('inicio');
         Route::post('cerrar_session', 'cerrar_session')->name('salir');
     });
 
-    Route::controller(Controlador_usuario::class)->group(function(){
+    Route::controller(Controlador_usuario::class)->group(function () {
         Route::get('perfil', 'perfil')->name('perfil');
         Route::post('pwd_guardar', 'password_guardar')->name('pwd_guardar');
     });
@@ -52,6 +54,16 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function(){
     Route::resource('user', Controlador_user::class);
     Route::post('/user/listar', [Controlador_user::class, 'listar'])->name('user.listar');
 
+
+    // PARA LA ADMINISTRACION DE CONTROL PEAJE
+    Route::controller(Controlador_registro::class)->group(function () {
+        Route::resource('permisos', Controlador_registro::class);
+    });
+
+    // PARA LA ADMINISTRACION DE PUESTOS
+    Route::controller(Controlador_puesto::class)->group(function () {
+        Route::resource('permisos', Controlador_puesto::class);
+    });
 
     //PARA LA ADMINISTRACION DE PUESTO
     Route::resource('puesto', PuestoControlador::class);
