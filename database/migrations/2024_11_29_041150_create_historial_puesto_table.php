@@ -11,22 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('registros', function (Blueprint $table) {
+        Schema::create('historial_puesto', function (Blueprint $table) {
             $table->id();
-            $table->string('destino', 100)->nullable();
-            $table->string('descripcion', 200)->nullable();
-            $table->string('codigo_qr')->nullable();
+            $table->string('descripcion_edicion',100)->nullable();
             $table->unsignedBigInteger('puesto_id');
-            $table->unsignedBigInteger('tarifa_id');
             $table->unsignedBigInteger('usuario_id');
-            $table->unsignedBigInteger('vehiculo_id')->nullable();
-            $table->timestamps();
-
-
+            
             $table->foreign('puesto_id')->references('id')->on('puestos')->onDelete('restrict');
-            $table->foreign('tarifa_id')->references('id')->on('tarifas')->onDelete('restrict');
             $table->foreign('usuario_id')->references('id')->on('users')->onDelete('restrict');
-            $table->foreign('vehiculo_id')->references('id')->on('vehiculos')->onDelete('restrict');
+            $table->timestamps();
         });
     }
 
@@ -35,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('registros');
+        Schema::dropIfExists('historial_puesto');
     }
 };

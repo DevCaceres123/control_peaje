@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('puestos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
+            $table->string('nombre',200);
             $table->enum('estado', ['activo','inactivo']);
             $table->timestamps();
         });

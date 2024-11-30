@@ -56,23 +56,33 @@ class User extends Authenticatable
         ];
     }
 
-    protected function nombres():Attribute{
+    protected function nombres(): Attribute
+    {
         return new Attribute(
-            set: fn ($value) => mb_strtoupper($value),
-            get: fn ($value) => mb_strtoupper($value),
+            set: fn($value) => mb_strtoupper($value),
+            get: fn($value) => mb_strtoupper($value),
         );
     }
 
-    protected function apellidos():Attribute{
+    protected function apellidos(): Attribute
+    {
         return new Attribute(
-            set: fn ($value) => mb_strtoupper($value),
-            get: fn ($value) => mb_strtoupper($value),
+            set: fn($value) => mb_strtoupper($value),
+            get: fn($value) => mb_strtoupper($value),
         );
     }
 
     //relacion revesa
-    public function roles(){
+    public function roles()
+    {
         return $this->belongsToMany(Role::class, 'model_has_roles', 'model_id', 'role_id');
     }
 
+
+    public function puestos()
+    {
+        return $this->belongsToMany('App\Models\Puesto', 'historial_puesto', 'puesto_id', 'usuario_id')
+            ->withPivot('created_at', 'descripcion_edicion')
+            ->withTimestamps();
+    }
 }

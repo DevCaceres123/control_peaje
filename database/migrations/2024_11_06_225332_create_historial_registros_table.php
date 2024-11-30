@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('historial_registros', function (Blueprint $table) {
             $table->id();
-            $table->timestamp('fecha_hora');
-            $table->date("fecha");
-            $table->time("hora");
-            $table->unsignedBigInteger('usuario_id');
-            $table->unsignedBigInteger('registro_id');
+            $table->string('cod_qr',255);
+            $table->string('puesto',200);
+            $table->unsignedBigInteger('id_usuario');
+            $table->string('nombre usuario',200);
+            $table->double('precio',10,2);
+
             $table->timestamps();
 
-            $table->foreign('usuario_id')->references('id')->on('users')->onDelete('restrict');
-            $table->foreign('registro_id')->references('id')->on('registros')->onDelete('restrict');
+            
         });
     }
 
