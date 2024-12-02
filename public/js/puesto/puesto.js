@@ -251,7 +251,7 @@ $(document).on('click', '.terminar_reunion', function () {
 
     Swal.fire({
         title: '¿Eliminar Registro?',
-        text: "Estas seguro que quiere eliminar el registro!",
+        text: "Estas seguro que quiere desvincular el puesto!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
