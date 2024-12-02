@@ -60,10 +60,16 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
         Route::resource('permisos', Controlador_registro::class);
     });
 
-    // PARA LA ADMINISTRACION DE PUESTOS
+    // PARA LA ADMINISTRACION DE PUESTOS EN ADICIONAR A UN USUARIO 
     Route::controller(Controlador_puesto::class)->group(function () {
-        Route::resource('permisos', Controlador_puesto::class);
+        Route::resource('puesto_asignar', Controlador_puesto::class);
+        Route::get('/buscar_encargado/{id_encargado}','buscar_encargado')->name('peaje.buscar_ci');
+      
+        
     });
+
+
+
 
     //PARA LA ADMINISTRACION DE PUESTO
     Route::resource('puesto', PuestoControlador::class);

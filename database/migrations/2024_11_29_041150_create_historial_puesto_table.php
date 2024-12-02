@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreign('puesto_id')->references('id')->on('puestos')->onDelete('restrict');
             $table->foreign('usuario_id')->references('id')->on('users')->onDelete('restrict');
             $table->timestamps();
+            
         });
     }
 

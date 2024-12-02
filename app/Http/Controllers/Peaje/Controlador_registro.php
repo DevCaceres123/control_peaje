@@ -3,16 +3,29 @@
 namespace App\Http\Controllers\Peaje;
 
 use App\Http\Controllers\Controller;
+use App\Models\Puesto;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+
+use function Laravel\Prompts\select;
 
 class Controlador_registro extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        //
+        $fecha_actual= new Carbon();
+        $puestos = Puesto::with(['users' => function ($query,$fecha_actual) {
+            $query->wherePivot('created_at', '=', $fecha_actual);
+        }])->with(['users' => function ($query) {
+
+            $query->select('users.id', 'nombres','apellidos');
+        }])
+        ->where('estado','activo')
+        ->get();
+
+     
+        return view("administrador.puestos.asignar_puesto", compact('puestos'));
     }
 
     /**

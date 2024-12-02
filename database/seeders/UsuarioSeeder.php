@@ -24,18 +24,65 @@ class UsuarioSeeder extends Seeder
         $rol1->name = 'administrador';
         $rol1->save();
 
+        $rol2       = new Role();
+        $rol2->name = 'encargado_puesto';
+        $rol2->save();
+
         $usuario = new User();
         $usuario->usuario = 'admin';
         $usuario->password = Hash::make('1234');
         $usuario->ci = '10028685';
-        $usuario->nombres = 'Admin';
-        $usuario->apellidos = 'admin admin';
+        $usuario->nombres = 'Michael';
+        $usuario->apellidos = 'Caceres Quina';
         $usuario->estado = 'activo';
         $usuario->email = 'rodrigo@gmail.com';
         $usuario->save();
 
         $usuario->syncRoles(['administrador']);
 
+
+
+        
+        $usuario2 = new User();
+        $usuario2->usuario = '123456';
+        $usuario2->password = Hash::make('1234');
+        $usuario2->ci = '123456';
+        $usuario2->nombres = 'pepe';
+        $usuario2->apellidos = 'casas davalos';
+        $usuario2->estado = 'activo';
+        $usuario2->email = 'pepe@gmail.com';
+        $usuario2->save();
+
+        $usuario2->syncRoles(['encargado_puesto']);
+
+
+
+
+        $usuario3 = new User();
+        $usuario3->usuario = '7894561';
+        $usuario3->password = Hash::make('1234');
+        $usuario3->ci = '7894561';
+        $usuario3->nombres = 'Maria';
+        $usuario3->apellidos = 'quina davalos';
+        $usuario3->estado = 'activo';
+        $usuario3->email = 'Maria@gmail.com';
+        $usuario3->save();
+
+        $usuario3->syncRoles(['encargado_puesto']);
+
+
+
+        $usuario3 = new User();
+        $usuario3->usuario = '741852';
+        $usuario3->password = Hash::make('1234');
+        $usuario3->ci = '741852';
+        $usuario3->nombres = 'gloria';
+        $usuario3->apellidos = 'ramos davalos';
+        $usuario3->estado = 'activo';
+        $usuario3->email = 'gloria@gmail.com';
+        $usuario3->save();
+
+        $usuario3->syncRoles(['encargado_puesto']);
 
 
         /* $usuario1 = new User();

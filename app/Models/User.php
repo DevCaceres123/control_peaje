@@ -59,16 +59,16 @@ class User extends Authenticatable
     protected function nombres(): Attribute
     {
         return new Attribute(
-            set: fn($value) => mb_strtoupper($value),
-            get: fn($value) => mb_strtoupper($value),
+            // set: fn($value) => mb_strtoupper($value),
+            // get: fn($value) => mb_strtoupper($value),
         );
     }
 
     protected function apellidos(): Attribute
     {
         return new Attribute(
-            set: fn($value) => mb_strtoupper($value),
-            get: fn($value) => mb_strtoupper($value),
+            // set: fn($value) => mb_strtoupper($value),
+            // get: fn($value) => mb_strtoupper($value),
         );
     }
 
@@ -81,7 +81,7 @@ class User extends Authenticatable
 
     public function puestos()
     {
-        return $this->belongsToMany('App\Models\Puesto', 'historial_puesto', 'puesto_id', 'usuario_id')
+        return $this->belongsToMany('App\Models\Puesto', 'historial_puesto', 'usuario_id', 'puesto_id')
             ->withPivot('created_at', 'descripcion_edicion')
             ->withTimestamps();
     }
