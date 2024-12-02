@@ -63,7 +63,11 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
     // PARA LA ADMINISTRACION DE PUESTOS EN ADICIONAR A UN USUARIO 
     Route::controller(Controlador_puesto::class)->group(function () {
         Route::resource('puesto_asignar', Controlador_puesto::class);
-        Route::get('/buscar_encargado/{id_encargado}','buscar_encargado')->name('peaje.buscar_ci');
+        Route::get('/historial','historial')->name('puesto_asignar.historial');
+        Route::get('/listar_historial','listar_historial');
+
+
+        // Route::get('/buscar_encargado/{id_encargado}','buscar_encargado')->name('peaje.buscar_ci');
       
         
     });

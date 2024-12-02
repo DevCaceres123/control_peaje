@@ -53,6 +53,86 @@ class Controlador_puesto extends Controller
         return view("administrador.puestos.asignar_puesto", compact('puestos', 'encargados_sin_registro'));
     }
 
+    // redirigue a la vista de historial
+    public function historial()
+    {
+        return view("administrador.puestos.historial");
+    }
+
+    // listar el historial de los puestos
+
+    public function listar_historial(Request $request)
+    {
+        // Obtén la fecha del request o usa la fecha actual como predeterminada
+        $fecha_actual = $request->input('fecha') ? Carbon::parse($request->input('fecha'))->toDateString() : null;
+
+        // Inicia la consulta con los usuarios y sus puestos
+        $usuariosQuery = User::with(['puestos' => function ($query) use ($fecha_actual) {
+            if ($fecha_actual) {
+                $query->whereDate('historial_puesto.created_at', '=', $fecha_actual);
+            }
+        }])
+            ->role('encargado_puesto');
+
+
+
+        // Filtro de búsqueda: Filtra por los campos correctos en la tabla User
+        if (!empty($request->search['value'])) {
+            $usuariosQuery->where(function ($query) use ($request) {
+                $query->where('nombres', 'like', '%' . $request->search['value'] . '%')
+                    ->orWhere('apellidos', 'like', '%' . $request->search['value'] . '%')
+                    ->orWhere('ci', 'like', '%' . $request->search['value'] . '%')
+                    ->orWhere('email', 'like', '%' . $request->search['value'] . '%');
+            });
+        }
+
+        // Obtener usuarios con puestos asociados filtrados por fecha
+         $usuarios = $usuariosQuery->get()
+            ->flatMap(function ($usuario) {
+                return $usuario->puestos->map(function ($puesto) use ($usuario) {
+                    return [
+                        'ci' => $usuario->ci,
+                        'nombres' => $usuario->nombres . " " . $usuario->apellidos,
+                        'puesto_nombre' => $puesto->nombre,
+                        'fecha_asignado' => Carbon::parse($puesto->pivot->created_at)
+                            ->locale('es') // Establecer el idioma a español
+                            ->translatedFormat('d \d\e F \d\e Y'), // Formato con el mes en español
+                        'fecha_asignado_raw' => $puesto->pivot->created_at, // Fecha en formato crudo para ordenar
+                    ];
+                });
+            })
+            ->sortByDesc('fecha_asignado_raw') // Ordena por la fecha cruda en forma descendente
+            ->values(); // Reindexa la colección para evitar huecos en los índices
+
+        // Total de registros antes del filtrado
+        $recordsTotal = User::count();
+
+        // Total de registros filtrados
+        $recordsFilter = $usuarios->count();
+
+        // Paginación y orden
+        $datos_usuarios = $usuarios
+            ->skip($request->start)
+            ->take($request->length); // Usamos take() para limitar la cantidad de registros por página
+
+        // Permisos (para el frontend, si es necesario)
+        $permissions = [
+            'desactivar' => auth()->user()->can('admin.usuario.desactivar'),
+            'reset' => auth()->user()->can('admin.usuario.reset'),
+            'editarRol' => auth()->user()->can('admin.usuario.editarRol'),
+            'editarTargeta' => auth()->user()->can('admin.usuario.editarTargeta'),
+        ];
+
+        return response()->json([
+            'draw' => $request->draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFilter, // Ajustar si hay filtros
+            'usuarios' => $datos_usuarios,
+            'permissions' => $permissions,
+        ]);
+    }
+
+
     /**
      * Show the form for creating a new resource.
      */
@@ -161,7 +241,7 @@ class Controlador_puesto extends Controller
                 ->where('puesto_id', $id)
                 ->whereDate('created_at', $fecha_actual)
                 ->delete();
-            
+
             DB::commit();
 
             $this->mensaje('exito', "El puesto fue desvinculado correctamente");

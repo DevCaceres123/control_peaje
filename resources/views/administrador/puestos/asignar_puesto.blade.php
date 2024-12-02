@@ -1,6 +1,25 @@
 @extends('principal')
 @section('titulo', 'PERFIL')
 @section('contenido')
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h4 class="card-title">PUESTOS DISPONIBLES</h4>
+                    </div>
+                    <div class="col-auto">
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     <div class="container">
         <div class="row">
             @foreach ($puestos as $puesto)

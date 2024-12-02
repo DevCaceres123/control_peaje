@@ -92,7 +92,7 @@
                                     <a class="nav-link" href="{{ route('puesto_asignar.index')}} ">Asignar Puestos</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="historial">Historial</a>
+                                    <a class="nav-link" href="{{ route('puesto_asignar.historial')}} ">Historial</a>
                                 </li>
                                
                             </ul>
