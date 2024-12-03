@@ -58,7 +58,7 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
     // PARA LA ADMINISTRACION DE CONTROL PEAJE
     Route::controller(Controlador_registro::class)->group(function () {
         Route::resource('peaje', Controlador_registro::class);
-        Route::post('generar_qr', "generar_qr");
+        Route::get('generar_qr', "generar_qr")->name('peaje.generar_qr');
 
 
     });

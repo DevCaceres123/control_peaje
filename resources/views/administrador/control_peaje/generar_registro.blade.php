@@ -27,15 +27,15 @@
                     </h3>
                     <h3 class="text-center ">
                         <span class="badge bg-warning fs-24" id="precio">
-                           
+
                         </span>
                     </h3>
                     <div class="row">
                         <div class="col-12 d-flex  m-auto justify-content-between mt-1">
-                            <button type="button" class="btn btn-success px-2 d-inline-flex align-items-center mb-2"
-                                id="btn-generarQr">
+                            <a href="{{ route('peaje.generar_qr') }}" type="button"
+                                class="btn btn-success px-2 d-inline-flex align-items-center mb-2" id="btn-generarQr">
                                 <i class="fas fa-qrcode fs-20 me-1"></i>Generar QR
-                            </button>
+                            </a>
                             <button type="button" class="btn btn-primary px-2 d-inline-flex align-items-center mb-2"
                                 id="btn-llenar_informacion">
                                 <i class="fas fa-shipping-fast fs-20 me-1"></i>Llenar informacion
@@ -52,7 +52,7 @@
                     <div class="row p-3">
                         <h4 class="text-center ">REGISTRO DE VEHICULO</h4>
                         <div class="form-group py-2 col-12 col-md-6">
-                           
+
                             <input type="hidden" name="id_tarifa" id="id_tarifa" value>
                             <label for="" class="form-label">DOCUMENTO DE IDENTIDAD</label>
                             <div class="container-validation" id="group_usuarioReset">
@@ -138,8 +138,7 @@
 
                             <label for="" class="form-label">PLACA</label>
                             <div class="container-validation" id="group_usuarioReset">
-                                <input type="text" class="form-control rounded" name="placa"
-                                    id="placa">
+                                <input type="text" class="form-control rounded" name="placa" id="placa">
                                 <div class="_placa">
 
                                 </div>
@@ -149,7 +148,8 @@
 
 
                         <div class="d-flex mt-1">
-                            <button type="button" class="btn btn-danger rounded btn-sm me-2" id="btn-terminar_formulario">
+                            <button type="button" class="btn btn-danger rounded btn-sm me-2"
+                                id="btn-terminar_formulario">
                                 <i class="ri-close-line  align-middle"></i> Terminar</button>
                             <button type="submit" class="btn btn-info rounded btn-sm" id="btnUser_asistencia"><i
                                     class="far fa-save me-1 align-middle"></i> Guardar</button>

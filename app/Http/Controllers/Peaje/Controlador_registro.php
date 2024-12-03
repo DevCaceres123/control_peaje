@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use function Laravel\Prompts\select;
+use Barryvdh\DomPDF\Facade\Pdf; // Asegúrate de importar esta clase
 
 class Controlador_registro extends Controller
 {
@@ -56,9 +57,33 @@ class Controlador_registro extends Controller
         //
     }
     // Generar QR para resivo
-    public function generar_qr(Request $request) {
-        return $request->all();
+    public function generar_qr(Request $request)
+    {
+        $request->all();
+
+        $data = [
+            'titulo' => 'Reporte de Ventas',
+            'contenido' => 'Este es un ejemplo de un PDF generado en Laravel con DOMPDF.'
+        ];
+
+        // Crear instancia del PDF
+        $pdf = Pdf::loadView('administrador/pdf/boletaPago', $data)
+            ->setPaper([0, 0, 226.77, 841.89]); // 80 mm tamaño de papel
+
+        // Activar recursos remotos de forma compatible (si necesario)
+        $pdf->getDomPDF()->setHttpContext(
+            stream_context_create([
+                'ssl' => [
+                    'verify_peer' => FALSE,
+                    'verify_peer_name' => FALSE,
+                ]
+            ])
+        );
+
+        // Retornar el PDF para su visualización
+        return $pdf->stream();
     }
+
 
 
 

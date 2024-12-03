@@ -3,48 +3,48 @@ import { crud } from '../../../funciones_helper/operaciones_crud/crud.js';
 import { vaciar_errores, vaciar_formulario } from '../../../funciones_helper/vistas/formulario.js';
 
 // Generar QR
-$('#btn-generarQr').click(function (e) {
-    e.preventDefault();
-    Swal.fire({
-        title: "Se generara un nuevo registro..!!!",
-        text: "¿Estas seguro?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, Terminar",
-        cancelButtonText: "Cancelar",
-    }).then(async function (result) {
-        if (result.isConfirmed) {
-            let datosFormulario = $('#nuevo_registro').serialize();
+// $('#btn-generarQr').click(function (e) {
+//     e.preventDefault();
+//     Swal.fire({
+//         title: "Se generara un nuevo registro..!!!",
+//         text: "¿Estas seguro?",
+//         icon: "warning",
+//         showCancelButton: true,
+//         confirmButtonColor: "#3085d6",
+//         cancelButtonColor: "#d33",
+//         confirmButtonText: "Sí, Terminar",
+//         cancelButtonText: "Cancelar",
+//     }).then(async function (result) {
+//         if (result.isConfirmed) {
+//             let datosFormulario = $('#nuevo_registro').serialize();
 
-            $("#btn-generarQr").prop("disabled", true);
-            crud("admin/generar_qr", "POST", null, datosFormulario, function (error, response) {
+//             $("#btn-generarQr").prop("disabled", true);
+//             crud("admin/generar_qr", "POST", null, datosFormulario, function (error, response) {
 
-                $("#btn-generarQr").prop("disabled", false);
-                console.log(response);
-                // Verificamos que no haya un error o que todos los campos sean llenados
-                if (response.tipo === "errores") {
+//                 $("#btn-generarQr").prop("disabled", false);
+//                 console.log(response);
+//                 // Verificamos que no haya un error o que todos los campos sean llenados
+//                 if (response.tipo === "errores") {
 
-                    mensajeAlerta(response.mensaje, "errores");
-                    return;
-                }
-                if (response.tipo != "exito") {
-                    mensajeAlerta(response.mensaje, response.tipo);
-                    return;
-                }
+//                     mensajeAlerta(response.mensaje, "errores");
+//                     return;
+//                 }
+//                 if (response.tipo != "exito") {
+//                     mensajeAlerta(response.mensaje, response.tipo);
+//                     return;
+//                 }
 
-                // si todo esta correcto muestra el mensaje de correcto
-                mensajeAlerta(response.mensaje, response.tipo);
+//                 // si todo esta correcto muestra el mensaje de correcto
+//                 mensajeAlerta(response.mensaje, response.tipo);
               
-            })
+//             })
 
 
-        } else {
-            alerta_top('error', 'Se canceló la operacion');
-        }
-    })
-})
+//         } else {
+//             alerta_top('error', 'Se canceló la operacion');
+//         }
+//     })
+// })
 
 // Formulario para llenar informacion
 $('#btn-llenar_informacion').click(function (e) {
