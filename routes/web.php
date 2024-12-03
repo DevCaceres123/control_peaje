@@ -57,7 +57,10 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
 
     // PARA LA ADMINISTRACION DE CONTROL PEAJE
     Route::controller(Controlador_registro::class)->group(function () {
-        Route::resource('permisos', Controlador_registro::class);
+        Route::resource('peaje', Controlador_registro::class);
+        Route::post('generar_qr', "generar_qr");
+
+
     });
 
     // PARA LA ADMINISTRACION DE PUESTOS EN ADICIONAR A UN USUARIO 

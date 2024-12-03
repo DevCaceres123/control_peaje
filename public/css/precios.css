@@ -1,0 +1,63 @@
+.contenedor_precio {
+    /* background-color: rgb(255, 255, 255); */
+    display: flex;
+    padding: 10px;
+    flex-wrap: wrap;
+    gap: 16px; /* Espacio de 16px entre elementos */
+    word-wrap: break-word;
+}
+
+.card_precio {
+    width: 10%;
+    height: 90px;
+    background-color: rgb(33, 36, 41);
+    padding: 15px;
+    border-radius: 10px;
+    color: rgb(255, 249, 243);
+    border: 3px solid rgb(0, 110, 110);
+    font-size: 10px;
+    letter-spacing: 1px;
+    font-weight: bold;
+    position: relative;
+    word-wrap: break-word;
+    box-shadow: 3px 4px 10px 3px rgba(0, 0, 0, 0.8),
+        -5px -6px 6px 4px rgb(217, 218, 224);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+}
+.card_precio .icon {
+    border-bottom: 1px solid wheat;
+}
+.card_precio .icon {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: -7px;
+}
+
+.card_precio:hover {
+    cursor: pointer;
+}
+.card_precio p {
+    text-align: center;
+    margin-top: 9px;
+}
+.card_precio strong {
+    position: absolute;
+    display: block;
+    padding: 5px;
+    top: 0%;
+    left: 100%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    border: 2px solid rgb(0, 110, 110);
+    text-align: center;
+    background-color: rgb(141, 206, 164);
+    color: black;
+    border-radius: 5px;
+}

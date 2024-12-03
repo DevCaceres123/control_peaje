@@ -15,16 +15,22 @@
 <link href="{{ asset('admin_template/libs/datatables/css/datatables.min.css') }}" rel="stylesheet">
 <link href="{{ asset('admin_template/libs/pikaday/pikaday.css') }}" rel="stylesheet">
 
+{{-- Para  dar mas funcionalidad al select css --}}
+<link href="{{ asset('admin_template/libs/mobius1-selectr/selectr.min.css') }}" rel="stylesheet">
+
 <!-- App CSS -->
 <link href="{{ asset('admin_template/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
 <link href="{{ asset('admin_template/css/icons.min.css') }}" rel="stylesheet" type="text/css">
 <link href="{{ asset('admin_template/css/app.min.css') }}" rel="stylesheet" type="text/css">
 
 <link rel="stylesheet" href="{{ asset('admin_template/css/loader.css') }}">
+
+
 <style>
     .uppercase-input {
         text-transform: uppercase;
     }
+
     .uppercase-input::placeholder {
         text-transform: none;
     }
@@ -36,6 +42,5 @@
     .lowercase-input::placeholder {
         text-transform: none;
     }
-
-
 </style>
+

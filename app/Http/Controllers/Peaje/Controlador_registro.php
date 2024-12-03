@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Peaje;
 
 use App\Http\Controllers\Controller;
+use App\Models\Color;
 use App\Models\Puesto;
+use App\Models\Tarifa;
+use App\Models\TipoVehiculo;
+use App\Models\Vehiculo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -12,20 +16,36 @@ use function Laravel\Prompts\select;
 class Controlador_registro extends Controller
 {
 
+    public $mensaje = [];
+    public $fecha;
+
+    public function __construct()
+    {
+        // Asignar la fecha actual a la propiedad pública
+        $this->fecha = Carbon::now();
+    }
+
     public function index()
     {
-        $fecha_actual= new Carbon();
-        $puestos = Puesto::with(['users' => function ($query,$fecha_actual) {
-            $query->wherePivot('created_at', '=', $fecha_actual);
-        }])->with(['users' => function ($query) {
 
-            $query->select('users.id', 'nombres','apellidos');
-        }])
-        ->where('estado','activo')
-        ->get();
+        $fecha_actual = $this->fecha->toDateString();
+        $usuario_actual = auth()->user()->id;
+        $vehiculos = TipoVehiculo::select('id', 'nombre')->get();
+        $colores = Color::select('id', 'nombre')->get();
+        $tarifas = Tarifa::select('id', 'nombre', 'precio')
+            ->where('estado', 'activo')
+            ->get();
 
-     
-        return view("administrador.puestos.asignar_puesto", compact('puestos'));
+
+
+        $puestos_registrado_usuario = Puesto::select('id', 'nombre')
+            ->whereHas('users', function ($query) use ($usuario_actual, $fecha_actual) {
+                $query->where('historial_puesto.usuario_id', '=', $usuario_actual)
+                    ->whereDate('historial_puesto.created_at', '=', $fecha_actual);
+            })
+            ->first();
+
+        return view("administrador.control_peaje.generar_registro", compact('tarifas', 'vehiculos', 'colores', 'puestos_registrado_usuario'));
     }
 
     /**
@@ -35,6 +55,12 @@ class Controlador_registro extends Controller
     {
         //
     }
+    // Generar QR para resivo
+    public function generar_qr(Request $request) {
+        return $request->all();
+    }
+
+
 
     /**
      * Store a newly created resource in storage.

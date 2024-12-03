@@ -8,7 +8,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-12 mb-2">
-                            <h4 class="card-title">PUESTOS</h4>
+                            <h4 class="card-title">HISTORIAL DE PUESTOS</h4>
                         </div>
 
                     </div>

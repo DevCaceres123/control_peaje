@@ -69,7 +69,7 @@
                             <ul class="nav flex-column">
 
                                 <li class="nav-item">
-                                    <a class="nav-link" href="registro">Generar Registro</a>
+                                    <a class="nav-link" href="{{ route('peaje.index')}}">Generar Registro</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="listar">Listar Registros</a>
