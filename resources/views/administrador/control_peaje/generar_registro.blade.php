@@ -32,10 +32,10 @@
                     </h3>
                     <div class="row">
                         <div class="col-12 d-flex  m-auto justify-content-between mt-1">
-                            <a href="{{ route('peaje.generar_qr') }}" type="button"
+                            <button type="button"
                                 class="btn btn-success px-2 d-inline-flex align-items-center mb-2" id="btn-generarQr">
                                 <i class="fas fa-qrcode fs-20 me-1"></i>Generar QR
-                            </a>
+                            </button>
                             <button type="button" class="btn btn-primary px-2 d-inline-flex align-items-center mb-2"
                                 id="btn-llenar_informacion">
                                 <i class="fas fa-shipping-fast fs-20 me-1"></i>Llenar informacion
@@ -45,8 +45,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-12 col-6 col-lg-7 mt-3 ">
-            <div class="card">
+        <div class="col-sm-12 col-6 col-lg-7 mt-3 m-auto">
+            <div class="card m-auto">
 
                 <form id="nuevo_registro" style="display: none;">
                     <div class="row p-3">
@@ -56,8 +56,8 @@
                             <input type="hidden" name="id_tarifa" id="id_tarifa" value>
                             <label for="" class="form-label">DOCUMENTO DE IDENTIDAD</label>
                             <div class="container-validation" id="group_usuarioReset">
-                                <input type="text" class="form-control rounded" name="_ci" id="_ci">
-                                <div class="_ci">
+                                <input type="text" class="form-control rounded" name="ci" id="ci">
+                                <div id="_ci">
 
                                 </div>
                             </div>
@@ -68,7 +68,7 @@
                             <label for="" class="form-label">PATERNO</label>
                             <div class="container-validation" id="group_usuarioReset">
                                 <input type="text" class="form-control rounded" name="ap_paterno" id="ap_paterno">
-                                <div class="_ap_paterno">
+                                <div id="_ap_paterno">
 
                                 </div>
                             </div>
@@ -79,7 +79,7 @@
                             <label for="" class="form-label">MATERNO</label>
                             <div class="container-validation" id="group_usuarioReset">
                                 <input type="text" class="form-control rounded" name="ap_materno" id="ap_materno">
-                                <div class="_ap_materno">
+                                <div id="_ap_materno">
 
                                 </div>
                             </div>
@@ -89,7 +89,7 @@
                             <label for="" class="form-label">NOMBRES</label>
                             <div class="container-validation" id="group_usuarioReset">
                                 <input type="text" class="form-control rounded" name="nombres" id="nombres">
-                                <div class="_nombres">
+                                <div id="_nombres">
 
                                 </div>
                             </div>
@@ -129,7 +129,7 @@
                                 </select>
                             </div>
 
-                            <div id="_role"></div>
+                            <div id="_id_color"></div>
 
                         </div>
 
@@ -138,8 +138,8 @@
 
                             <label for="" class="form-label">PLACA</label>
                             <div class="container-validation" id="group_usuarioReset">
-                                <input type="text" class="form-control rounded" name="placa" id="placa">
-                                <div class="_placa">
+                                <input type="text" class="form-control rounded" name="placa" id="placa" style="text-transform: uppercase">
+                                <div id="_placa">
 
                                 </div>
                             </div>
@@ -151,7 +151,7 @@
                             <button type="button" class="btn btn-danger rounded btn-sm me-2"
                                 id="btn-terminar_formulario">
                                 <i class="ri-close-line  align-middle"></i> Terminar</button>
-                            <button type="submit" class="btn btn-info rounded btn-sm" id="btnUser_asistencia"><i
+                            <button type="submit" class="btn btn-info rounded btn-sm" id="btn-nuevoRegistro"><i
                                     class="far fa-save me-1 align-middle"></i> Guardar</button>
                         </div>
 
@@ -162,10 +162,9 @@
 
                 </form>
 
-
-                <canvas id="" style="display: none">
-
-                </canvas>
+                <div id="pdf-container" style="width: 100%; height: 500px; margin-top: 20px;display:none">
+                    <iframe id="pdf-iframe" style="display:block; width: 70%; height: 80%; margin:auto"></iframe>
+                </div>
             </div>
         </div>
     </div>

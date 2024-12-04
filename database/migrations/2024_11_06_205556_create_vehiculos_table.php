@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('vehiculos', function (Blueprint $table) {
             $table->id();
             $table->string('placa', 25);
-            $table->string('descripcion');
-            $table->unsignedBigInteger('persona_id');
+            $table->string('descripcion')->nullable();
+            $table->unsignedBigInteger('persona_id')->nullable();
             $table->unsignedBigInteger('color_id');
             $table->unsignedBigInteger('tipovehiculo_id');
             $table->timestamps();

@@ -43,10 +43,26 @@ const notificaciones = {
   },
   'errores': (obj) => {
 
+    let isValid = true; // Bandera para verificar si todos los campos están correctos.
 
     for (let key in obj) {
-      document.getElementById('_' + key).innerHTML = `<p class="text-danger">${obj[key]}</p>`;
+      let element = document.getElementById('_' + key);
+
+      if (element) { // Verifica si el elemento existe
+        element.innerHTML = `<p class="text-danger">${obj[key]}</p>`;
+      } else {
+        console.warn(`El campo con id '_${key}' no existe.`);
+        isValid = false; // Marca como no válido si falta algún campo
+      }
     }
+
+    // Si quieres hacer algo solo si todos los campos son válidos
+    // if (isValid) {
+    //   console.log("Todos los campos son correctos.");
+    // } else {
+    //   console.log("Faltan algunos campos o tienen errores.");
+    // }
+
   }
   // Puedes agregar más tipos según sea necesario
 };
