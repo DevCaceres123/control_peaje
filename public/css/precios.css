@@ -8,13 +8,13 @@
 }
 
 .card_precio {
-    width: 10%;
+    width: 13%;
     height: 90px;
-    background-color: rgb(33, 36, 41);
-    padding: 15px;
+    background-color: #002333;
+    padding: 5px;
     border-radius: 10px;
-    color: rgb(255, 249, 243);
-    border: 3px solid rgb(0, 110, 110);
+    margin-top: 15px;
+    border: 3px solid #b4bec9;
     font-size: 10px;
     letter-spacing: 1px;
     font-weight: bold;
@@ -27,37 +27,38 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: auto;
 }
+
 .card_precio .icon {
     border-bottom: 1px solid wheat;
-}
-.card_precio .icon {
-    position: absolute;
-    top: 0%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin-top: -7px;
+    color: #159a9c;
+    margin-top: -15px;
 }
 
 .card_precio:hover {
     cursor: pointer;
 }
 .card_precio p {
+    width: 100%;
     text-align: center;
     margin-top: 9px;
+    height: 40px;
+
+    color: #ffffff;
 }
 .card_precio strong {
     position: absolute;
     display: block;
-    padding: 5px;
+    padding: 5px 35px;
     top: 0%;
-    left: 100%;
+    left: 50%;
     transform: translate(-50%, -50%);
+    margin-top: -7px;
     font-weight: bold;
-    border: 2px solid rgb(0, 110, 110);
+    border: 2px solid #b4bec9;
     text-align: center;
-    background-color: rgb(141, 206, 164);
-    color: black;
-    border-radius: 5px;
+    background-color: #159a9c;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 12px;
 }

@@ -8,8 +8,9 @@
             <div class="contenedor_precio">
                 @foreach ($tarifas as $tarifa)
                     <div class="card_precio " data-id="{{ $tarifa->id }}">
-                        <div class="icon"><i class="fas fa-truck text-primary fs-24"></i></div>
+
                         <p>{{ $tarifa->nombre }}</p>
+                        <div class="icon"><i class="fas fa-truck fs-24"></i></div>
                         <strong>{{ $tarifa->precio }}Bs</strong>
                     </div>
                 @endforeach
@@ -32,8 +33,8 @@
                     </h3>
                     <div class="row">
                         <div class="col-12 d-flex  m-auto justify-content-between mt-1">
-                            <button type="button"
-                                class="btn btn-success px-2 d-inline-flex align-items-center mb-2" id="btn-generarQr">
+                            <button type="button" class="btn btn-success px-2 d-inline-flex align-items-center mb-2"
+                                id="btn-generarQr">
                                 <i class="fas fa-qrcode fs-20 me-1"></i>Generar QR
                             </button>
                             <button type="button" class="btn btn-primary px-2 d-inline-flex align-items-center mb-2"
@@ -138,7 +139,8 @@
 
                             <label for="" class="form-label">PLACA</label>
                             <div class="container-validation" id="group_usuarioReset">
-                                <input type="text" class="form-control rounded" name="placa" id="placa" style="text-transform: uppercase">
+                                <input type="text" class="form-control rounded" name="placa" id="placa"
+                                    style="text-transform: uppercase">
                                 <div id="_placa">
 
                                 </div>
