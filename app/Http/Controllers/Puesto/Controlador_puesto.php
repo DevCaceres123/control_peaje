@@ -13,6 +13,7 @@ use Exception;
 
 use Illuminate\Http\Request;
 use PhpParser\Node\Expr\Cast\String_;
+use PhpParser\Node\Stmt\Return_;
 use PhpParser\Node\Stmt\TryCatch;
 
 use function Laravel\Prompts\select;
@@ -148,6 +149,7 @@ class Controlador_puesto extends Controller
     // DESIGNAMOS UN USUARIO A UN PUESTO
     public function store(PuestoRequest $request)
     {
+        
         try {
             $encargado_id = $request->encargado;
             $puesto_id = $request->puesto_id;
@@ -171,7 +173,7 @@ class Controlador_puesto extends Controller
 
             DB::commit();
 
-            $this->mensaje('exito', "El encargado fue adicionado a un puesto correctamente");
+            $this->mensaje('exito', "Adicionado correctamente....");
             return response()->json($this->mensaje, 200);
         } catch (Exception $e) {
             DB::rollBack();

@@ -55,7 +55,7 @@
                             <!-- Botón para acciones -->
                             <div class="d-flex justify-content-center">
                                 @if (count($puesto->users) == 0)
-                                    <form id="form-asignar_encargado">
+                                    <form class="form-asignar_encargado">
 
                                         <div class="d-flex">
 
