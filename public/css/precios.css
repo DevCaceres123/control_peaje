@@ -62,3 +62,48 @@
     border-radius: 6px;
     font-size: 12px;
 }
+
+/* QUITAR ESTILO A EL INPU */
+
+
+.input_qr {
+    border: none; /* Quitar los bordes */
+    outline: none; /* Quitar el contorno predeterminado del navegador */
+    background: none; /* Quitar fondo predeterminado */
+    box-shadow: none; /* Quitar sombras */
+    font-size: 16px; /* Tamaño de fuente */
+    color: #333; /* Color del texto */
+    padding: 5px; /* Espaciado interno */
+    font-size: 25px;
+    display: block;
+    width: 80%;
+    margin: auto;
+}
+
+.input_qr:focus {
+    outline: none; /* Asegurar que no haya contorno adicional */
+    border-bottom: 2px solid #007bff; /* Línea de enfoque personalizada */
+    color: #000; /* Cambiar color del texto (opcional) */
+}
+#verificarQr{
+    text-align: center;
+}
+#estado_qr{
+    display: inline-block;
+    margin: 15px 0 15px 0;
+    
+}
+
+.contenido_respuesta{
+    width: 80%;
+    height: 40px;
+    border: 1px solid black;
+    margin: auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    border: 1px dashed #007bff;
+    font-size: 15px;
+}

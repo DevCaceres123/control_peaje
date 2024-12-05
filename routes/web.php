@@ -59,7 +59,7 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
     Route::controller(Controlador_registro::class)->group(function () {
         Route::resource('peaje', Controlador_registro::class);
         Route::post('generar_qr', "generar_qr")->name('peaje.generar_qr');
-
+        Route::get('/verificarQr/{id_qr}','verificarQr');
 
     });
 
@@ -68,7 +68,7 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
         Route::resource('puesto_asignar', Controlador_puesto::class);
         Route::get('/historial','historial')->name('puesto_asignar.historial');
         Route::get('/listar_historial','listar_historial');
-
+       
         // Route::get('/buscar_encargado/{id_encargado}','buscar_encargado')->name('peaje.buscar_ci');
       
         

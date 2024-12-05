@@ -187,7 +187,7 @@ class Controlador_registro extends Controller
             $validatedData = $request->validate([
                 'id_tarifa' => 'required|exists:tarifas,id',
             ]);
-        
+
 
             $fecha_actual = $this->fecha->toDateString();
             $usuario_actual = auth()->user()->id;
@@ -228,7 +228,7 @@ class Controlador_registro extends Controller
 
             // guardar el cod_qr generado en la base de datos
 
-           $this->registrarQr($cod_qr_unico,$id_registro);
+            $this->registrarQr($cod_qr_unico, $id_registro);
 
             DB::commit();
 
@@ -318,14 +318,14 @@ class Controlador_registro extends Controller
         return $registro->id;
     }
 
-    public function registrarQr($qr, $id_registro){
+    public function registrarQr($qr, $id_registro)
+    {
 
-        $registro=Registro::find($id_registro);
+        $registro = Registro::find($id_registro);
 
-        $registro->codigo_qr=$qr;
+        $registro->codigo_qr = $qr;
 
         $registro->save();
-
     }
 
     /**
@@ -346,6 +346,45 @@ class Controlador_registro extends Controller
 
             return response()->json($this->mensaje, 200);
         } catch (Exception $e) {
+            $this->mensaje("error", "Error " . $e->getMessage());
+
+            return response()->json($this->mensaje, 200);
+        }
+    }
+
+    // verificamos que el qr enviado haya sido generado por nosotros y que este en rango de fecha
+    public function verificarQr(string $qr)
+    {
+        try {
+
+            $fecha_actual = $this->fecha->toDateString();
+            DB::beginTransaction();
+
+            $registro=Registro::select('codigo_qr','created_at')
+            ->where('codigo_qr',$qr)
+            ->first();
+
+           
+            if(!$registro){
+                throw new Exception('el codigo escaneado no  fue generado en ningun puesto de peaje');
+            }
+
+            $registro_fecha=Carbon::parse($registro->created_at->format('Y-m-d'));
+            
+            if ($registro_fecha->isBefore($fecha_actual)) {
+                throw new Exception('el QR ya nos es valido...!! '.$registro_fecha=Carbon::parse($registro->created_at->format('Y-m-d')));
+            }
+
+
+
+
+            DB::commit();
+
+            $this->mensaje('exito', "El QR escaneado es valido");
+            return response()->json($this->mensaje, 200);
+        } catch (Exception $e) {
+
+            DB::rollBack();
             $this->mensaje("error", "Error " . $e->getMessage());
 
             return response()->json($this->mensaje, 200);

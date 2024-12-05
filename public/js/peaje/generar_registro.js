@@ -2,6 +2,14 @@ import { mensajeAlerta } from '../../../funciones_helper/notificaciones/mensajes
 import { crud } from '../../../funciones_helper/operaciones_crud/crud.js';
 import { vaciar_errores, vaciar_formulario } from '../../../funciones_helper/vistas/formulario.js';
 
+
+// obtenemos el input donde el lector enviara la informacion para  verificar
+let qrInput = $('#cod_qr');
+console.log(qrInput);
+// tiempo de espera que se tomara para leer los datos enviados
+let typingTimer;
+
+
 // buscar cliente por el ci
 $('#ci').keyup(function () {
 
@@ -73,7 +81,8 @@ $('#nuevo_registro').submit(function (e) {
         iframe.src = `data:application/pdf;base64,${response.mensaje}`;
         // activar ventana del generado de pdf
         $('#pdf-container').css('display', 'block');
-        $('#nuevo_registro').css('display', 'none'); // Elimina el color
+        $('#nuevo_registro').css('display', 'none'); // no mostrar formulario
+        $('#verificarQr').css('display', 'none'); // no mostrar el verificar qr
         $("#btn-nuevoRegistro").prop("disabled", false);
 
         //Una ves registrado se le quita los valores a los montos
@@ -123,7 +132,8 @@ $('#btn-generarQr').click(function (e) {
                 iframe.src = `data:application/pdf;base64,${response.mensaje}`;
                 // activar ventana del generado de pdf
                 $('#pdf-container').css('display', 'block');
-                $('#nuevo_registro').css('display', 'none'); // Elimina el color
+                $('#nuevo_registro').css('display', 'none'); // no mostrar el formulario
+                $('#verificarQr').css('display', 'none'); // no mostrar el verificar qr
                 $("#btn-generarQr").prop("disabled", false);
 
                 //    Una ves registrado se le quita los valores a los montos
@@ -140,17 +150,13 @@ $('#btn-generarQr').click(function (e) {
 
 
 
-
-
 // Formulario para llenar informacion
 $('#btn-llenar_informacion').click(function (e) {
     e.preventDefault();
     $('#nuevo_registro').css('display', 'block'); // Elimina el color
     $('#pdf-container').css('display', 'none');
+    $('#verificarQr').css('display', 'none'); // no mostrar el verificar qr
 })
-
-
-
 
 
 // Terminar un registro
@@ -178,6 +184,60 @@ $('#btn-terminar_formulario').click(function (e) {
         }
     })
 })
+
+
+// VERIFICAR EL QR ENVIADO
+
+$('#btn-verificarQr').on('click', function () {
+    // Colocar el cursor en el input
+   
+    $('#verificarQr').css('display', 'block');
+
+
+    $('#pdf-container').css('display', 'none');
+    $('#nuevo_registro').css('display', 'none'); // no mostrar formulario
+
+    qrInput.focus();
+});
+
+
+// Detectar escritura del lector de QR
+qrInput.on('input', function () {
+    clearTimeout(typingTimer); // Reinicia el temporizador
+
+    // Esperar 300 ms después de la última entrada
+    typingTimer = setTimeout(() => {
+        const qrContent = qrInput.val(); // Obtén el contenido del input
+
+        // Si no está vacío, envía los datos al servidor
+        if (qrContent.length > 0) {
+
+            // Empieza a escanear el codigo
+            $('#estado_qr').text("Escaneado QR espere por favor....!");
+
+
+            // enviamos al metodo show para busczar el cliente
+            crud("admin/verificarQr", "GET", qrContent, null, function (error, response) {
+
+                console.log(response);
+
+                $('#estado_qr').text(response.tipo);
+
+                if (response.tipo == "exito") {
+                    $('#respuesta_servidor').html(`<span class="text-success">${response.mensaje}  <i class="fas fa-check-circle ms-1"></i></span>`);
+                }
+                else{
+                    $('#respuesta_servidor').html(`<span class="text-danger">${response.mensaje} <i class="fas fa-exclamation-triangle ms-1"></i></span>`);
+                }
+
+                qrInput.val("");
+            })
+        }
+    }, 300); // Ajusta el tiempo según sea necesario
+});
+
+
+
 
 
 

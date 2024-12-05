@@ -33,6 +33,10 @@
                     </h3>
                     <div class="row">
                         <div class="col-12 d-flex  m-auto justify-content-between mt-1">
+                            <button type="button" class="btn btn-danger px-2 d-inline-flex align-items-center mb-2 me-1"
+                                id="btn-verificarQr">
+                                <i class="far fa-question-circle fs-20 me-1"></i>Verificar QR
+                            </button>
                             <button type="button" class="btn btn-success px-2 d-inline-flex align-items-center mb-2"
                                 id="btn-generarQr">
                                 <i class="fas fa-qrcode fs-20 me-1"></i>Generar QR
@@ -41,6 +45,8 @@
                                 id="btn-llenar_informacion">
                                 <i class="fas fa-shipping-fast fs-20 me-1"></i>Llenar informacion
                             </button>
+
+
                         </div>
                     </div>
                 </div>
@@ -164,11 +170,21 @@
 
                 </form>
 
-                <div id="pdf-container" style="width: 100%; height: 500px; margin-top: 20px;display:none">
-                    <iframe id="pdf-iframe" style="display:block; width: 70%; height: 80%; margin:auto"></iframe>
+                <div id="pdf-container" style="width: 100%; height: 400px; margin-top: 20px;display:none">
+                    <iframe id="pdf-iframe" style="display:block; width: 70%; height: 90%; margin:auto"></iframe>
+                </div>
+
+                <div id="verificarQr" class="row p-3" style="display: none;">
+                    <label for="" class="form-labbel fs-18 text-center text-uppercase text-bold"><b>Escanee el qr  para verificar los datos....</b></label>
+                    <input type="text" name="cod_qr" id="cod_qr" class="input_qr">
+                    <span id="estado_qr" class=" text-primary fs-18 text-uppercase"></span>
+                    <div class="contenido_respuesta" id="respuesta_servidor">
+                     
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 
     <script>
