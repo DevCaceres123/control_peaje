@@ -61,6 +61,9 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
         Route::post('generar_qr', "generar_qr")->name('peaje.generar_qr');
         Route::get('/verificarQr/{id_qr}','verificarQr');
 
+        Route::get('/ver_registros','ver_registros')->name('peaje.ver_registros');
+        Route::get('/listar_registro','listar_registro');
+
     });
 
     // PARA LA ADMINISTRACION DE PUESTOS EN ADICIONAR A UN USUARIO 

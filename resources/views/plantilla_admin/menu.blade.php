@@ -72,7 +72,7 @@
                                     <a class="nav-link" href="{{ route('peaje.index')}}">Generar Registro</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="listar">Listar Registros</a>
+                                    <a class="nav-link" href="{{ route('peaje.ver_registros')}}">Listar Registros</a>
                                 </li>
                                
                             </ul>

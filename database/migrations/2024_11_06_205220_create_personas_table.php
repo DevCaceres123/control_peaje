@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('personas', function (Blueprint $table) {
             $table->id();
             $table->string('ci')->unique();
-            $table->string('nombres');
-            $table->string('ap_paterno');
+            $table->string('nombres')->nullable();
+            $table->string('ap_paterno')->nullable();
             $table->string('ap_materno')->nullable();
             $table->enum('estado', ['activo','inactivo'])->default('activo');
             $table->timestamps();
