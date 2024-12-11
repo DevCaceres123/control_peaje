@@ -444,7 +444,8 @@ class Controlador_registro extends Controller
     {
         try {
 
-            $fecha_actual = $this->fecha->toDateString();
+
+
             DB::beginTransaction();
 
             $registro = Registro::select('codigo_qr', 'created_at')
@@ -456,18 +457,19 @@ class Controlador_registro extends Controller
                 throw new Exception('el codigo escaneado no  fue generado en ningun puesto de peaje');
             }
 
-            $registro_fecha = Carbon::parse($registro->created_at->format('Y-m-d'));
 
-            if ($registro_fecha->isBefore($fecha_actual)) {
-                throw new Exception('el QR ya nos es valido...!! ' . $registro_fecha = Carbon::parse($registro->created_at->format('Y-m-d')));
+            $fecha_actual = $this->fecha;
+            $fecha_vencimiento = Carbon::parse($registro->created_at->endOfDay());
+            $registro_fecha = Carbon::parse($registro->created_at);//feccha de registro del qr
+
+            if ($fecha_actual->isAfter($fecha_vencimiento)) {
+
+                throw new Exception('el QR ya nos es valido...!! ' . $registro_fecha);
             }
-
-
-
 
             DB::commit();
 
-            $this->mensaje('exito', "El QR escaneado es valido");
+            $this->mensaje('exito', "El QR escaneado es valido" . " " . $registro_fecha);
             return response()->json($this->mensaje, 200);
         } catch (Exception $e) {
 
