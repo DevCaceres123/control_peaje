@@ -11,6 +11,7 @@ use App\Models\Puesto;
 use App\Models\Registro;
 use App\Models\Tarifa;
 use App\Models\TipoVehiculo;
+use App\Models\User;
 use App\Models\Vehiculo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -100,7 +101,7 @@ class Controlador_registro extends Controller
             $nuevo_Qr = $this->generar_qrReporte($cod_qr_unico);
 
             // se obtiene el pdf en base 64
-            $resultado = $this->generar_ReportePdf($tarifa, $nuevo_Qr, $fecha_actual, $puesto);
+            $resultado = $this->generar_ReportePdf($tarifa, $nuevo_Qr, $fecha_actual, $puesto, null);
 
             // guardar el cod_qr generado
             $registro->codigo_qr = $cod_qr_unico;
@@ -154,16 +155,41 @@ class Controlador_registro extends Controller
 
     // Nos generara la boleta de pago
 
-    public function generar_ReportePdf($tarifa, $qrCodeBase64, $fecha_actual, $puesto)
+    public function generar_ReportePdf($tarifa, $qrCodeBase64, $fecha_actual, $puesto, $vehiculo)
     {
+        // si el vehiculo es distinto de nullo o vacio
+        $color = "";
+        $tipo_auto = "";
 
-        $data = [
-            'tarifa' => $tarifa,
-            'qrCodeBase64' => $qrCodeBase64,
-            'fecha_actual' => $fecha_actual,
-            'usuario' => auth()->user()->only(['nombres', 'apellidos']),
-            'puesto' => $puesto,
-        ];
+
+        if ($vehiculo) {
+            $color = Color::select('nombre')->where('id', $vehiculo->color_id)->first();
+            $tipo_auto = TipoVehiculo::select('nombre')->where('id', $vehiculo->tipovehiculo_id)->first();
+
+            $data = [
+                'tarifa' => $tarifa,
+                'qrCodeBase64' => $qrCodeBase64,
+                'fecha_finalizacion' => Carbon::now()->endOfDay(), // Obtener la fecha actual con hora 23:59:59
+                'usuario' => auth()->user()->only(['nombres', 'apellidos']),
+                'puesto' => $puesto,
+                'color' => $color->nombre ?? null,
+                'tipo_auto' => $tipo_auto->nombre ?? null,
+                'placa' => $vehiculo->placa ?? null,
+            ];
+        } else {
+            $data = [
+                'tarifa' => $tarifa,
+                'qrCodeBase64' => $qrCodeBase64,
+                'fecha_finalizacion' => Carbon::now()->endOfDay(), // Obtener la fecha actual con hora 23:59:59
+                'usuario' => auth()->user()->only(['nombres', 'apellidos']),
+                'puesto' => $puesto,
+                'color' => null,
+                'tipo_auto' => null,
+                'placa' =>  null,
+            ];
+        }
+
+
         // Crear instancia del PDFhttpsÑ--www.example.com
 
 
@@ -226,7 +252,7 @@ class Controlador_registro extends Controller
 
 
             //  SE REGISTRA LOS DATOS EN LA BASE DE DATOS SI TODO ESTA CORRECTO
-            $id_registro = $this->nuevoRegistro($puesto->id, $tarifa->id, $usuario_actual, $vehiculo->id);
+            $id_registro = $this->nuevoRegistro($puesto->id, $tarifa->id, $usuario_actual, $vehiculo);
 
             // GENERAMOS EL QR ENCRIPTADO Y EL REPORTE 
 
@@ -238,7 +264,7 @@ class Controlador_registro extends Controller
             $nuevo_Qr = $this->generar_qrReporte($cod_qr_unico);
 
             // se obtiene el pdf en base 64
-            $resultado = $this->generar_ReportePdf($tarifa, $nuevo_Qr, $fecha_actual, $puesto);
+            $resultado = $this->generar_ReportePdf($tarifa, $nuevo_Qr, $fecha_actual, $puesto, $vehiculo);
 
             // guardar el cod_qr generado en la base de datos
 
@@ -335,6 +361,8 @@ class Controlador_registro extends Controller
         $vehiculo = [
             'id' => null,
             'placa' => null,
+            'color_id' => null,
+            'tipovehiculo_id' => null,
         ];
         return  $personaObject = json_decode(json_encode($vehiculo));
     }
@@ -347,7 +375,7 @@ class Controlador_registro extends Controller
         $registro->puesto_id = $puesto;
         $registro->tarifa_id = $tarifa;
         $registro->usuario_id  = $usuario_actual;
-        $registro->vehiculo_id   = $vehiculo;
+        $registro->vehiculo_id   = $vehiculo->id;
 
         $registro->save();
 
@@ -455,28 +483,46 @@ class Controlador_registro extends Controller
     public function ver_registros()
     {
 
-        return view("administrador.control_peaje.listar_registro");
+        $encargados_puesto = User::select('id', 'nombres', 'apellidos')
+            ->role('encargado_puesto')
+            ->get();
+
+        return view("administrador.control_peaje.listar_registro", compact('encargados_puesto'));
     }
 
 
     public function listar_registro(Request $request)
     {
 
+        $fecha_actual = $request->input('fecha') ? Carbon::parse($request->input('fecha'))->toDateString() : null;
+        $encargado = $request->input('encargado') ?? null;
+
         // Inicia la consulta con los usuarios y sus puestos
-        $registroQuery = HistorialRegistros::select('puesto', 'nombre_usuario', 'precio', 'placa', 'ci', 'created_at')
-            ->where('usuario_id', auth()->user()->id)
-            ->orderBy('created_at', 'desc') // Ordena por created_at de manera descendente
-            ->get();
-            
+        $registroQuery = HistorialRegistros::select('puesto', 'nombre_usuario', 'precio', 'placa', 'ci', 'created_at');
+
+
+
+        // Se aplica este friltro si la fecha y encargado no son campos vacios
+        if ($fecha_actual && $encargado) {
+            $registroQuery->where('usuario_id', $encargado);
+            $registroQuery->whereDate('created_at', '=', $fecha_actual);
+        }
+
+
+        // Aplica el filtro de fecha solo si se proporciona una fecha
+        if ($fecha_actual  && $encargado == null) {
+            $registroQuery->where('usuario_id', auth()->user()->id);
+            $registroQuery->whereDate('created_at', '=', $fecha_actual);
+        }
 
 
 
 
+        // Ordena los registros
+        $registroQuery->orderBy('created_at', 'desc');
 
 
-
-
-        // Filtro de búsqueda: Filtra por los campos correctos en la tabla User
+        // Filtro de búsqueda: Aplica filtros solo si hay valor de búsqueda
         if (!empty($request->search['value'])) {
             $registroQuery->where(function ($query) use ($request) {
                 $query->where('puesto', 'like', '%' . $request->search['value'] . '%')
@@ -486,17 +532,32 @@ class Controlador_registro extends Controller
             });
         }
 
-
         // Total de registros antes del filtrado
-        $recordsTotal = $registroQuery->count();
+        $recordsTotal = HistorialRegistros::where('usuario_id', auth()->user()->id)->count();
 
         // Total de registros filtrados
         $recordsFilter = $registroQuery->count();
 
-        // Paginación y orden
+        // Paginación: Aplicar `skip` y `take` sobre la consulta
         $datos_registros = $registroQuery
             ->skip($request->start)
-            ->take($request->length); // Usamos take() para limitar la cantidad de registros por página
+            ->take($request->length)
+            ->get();
+
+        // Transformar los datos para formatear `created_at`
+        $datos_registros = $datos_registros->map(function ($registro) {
+            return [
+                'puesto' => $registro->puesto,
+                'nombre_usuario' => $registro->nombre_usuario,
+                'precio' => $registro->precio,
+                'placa' => $registro->placa,
+                'ci' => $registro->ci,
+                'created_at' => Carbon::parse($registro->created_at)
+                    ->locale('es')
+                    ->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i:s'), // Incluye hora y minuto
+            ];
+        });
+
 
         // Permisos (para el frontend, si es necesario)
         $permissions = [
@@ -506,14 +567,17 @@ class Controlador_registro extends Controller
             'editarTargeta' => auth()->user()->can('admin.usuario.editarTargeta'),
         ];
 
+        // Retorna el JSON con los datos y los totales
         return response()->json([
             'draw' => $request->draw,
             'recordsTotal' => $recordsTotal,
-            'recordsFiltered' => $recordsFilter, // Ajustar si hay filtros
+            'recordsFiltered' => $recordsFilter,
             'registros' => $datos_registros,
             'permissions' => $permissions,
         ]);
     }
+
+
     /**
      * Show the form for editing the specified resource.
      */

@@ -49,48 +49,55 @@ $('#ci').keyup(function () {
 
 // CREAR NUEVO REGISTRO CON DATOS
 $('#nuevo_registro').submit(function (e) {
-
     e.preventDefault();
     $("#btn-nuevoRegistro").prop("disabled", true);
     let datosFormulario = $('#nuevo_registro').serialize();
 
-    // se vacian los errores de los formualrios
     vaciar_errores("nuevo_registro");
-    // Se envian los datos ah store para ser procesados
+
     crud("admin/peaje", "POST", null, datosFormulario, function (error, response) {
 
-        // console.log(response);
-        // Verificamos que no haya un error o que todos los campos sean llenados
         if (response.tipo == "errores") {
             $("#btn-nuevoRegistro").prop("disabled", false);
             mensajeAlerta(response.mensaje, "errores");
             return;
-
         }
+
         if (response.tipo != "exito") {
             $("#btn-nuevoRegistro").prop("disabled", false);
             mensajeAlerta(response.mensaje, response.tipo);
             return;
         }
 
-        // si todo esta correcto muestra el mensaje de correcto
         mensajeAlerta("Procesado correctamente.", "exito");
         vaciar_formulario("nuevo_registro");
-        const iframe = document.getElementById('pdf-iframe');
 
-        iframe.src = `data:application/pdf;base64,${response.mensaje}`;
-        // activar ventana del generado de pdf
+
+        let pdfUrl = generarURlBlob(response.mensaje);
+
+        // Cargar el PDF en el iframe
+        const iframe = document.getElementById('pdf-iframe');
+        iframe.src = pdfUrl;
+
+        // Mostrar el contenedor del PDF
         $('#pdf-container').css('display', 'block');
-        $('#nuevo_registro').css('display', 'none'); // no mostrar formulario
-        $('#verificarQr').css('display', 'none'); // no mostrar el verificar qr
+        $('#nuevo_registro').css('display', 'none');
+        $('#verificarQr').css('display', 'none');
+
+        // Esperar a que el iframe termine de cargar antes de imprimir
+        iframe.onload = () => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print(); // Disparar impresión automática desde el iframe
+        };
+
         $("#btn-nuevoRegistro").prop("disabled", false);
 
-        //Una ves registrado se le quita los valores a los montos
+        // Reiniciar valores
         $('#precio').html('');
         $('#id_tarifa').val("");
+    });
+});
 
-    })
-})
 
 // Generar QR sin informacion
 $('#btn-generarQr').click(function (e) {
@@ -129,7 +136,8 @@ $('#btn-generarQr').click(function (e) {
                 vaciar_formulario("nuevo_registro");
                 const iframe = document.getElementById('pdf-iframe');
 
-                iframe.src = `data:application/pdf;base64,${response.mensaje}`;
+                let pdfUrl = generarURlBlob(response.mensaje);
+                iframe.src = pdfUrl;
                 // activar ventana del generado de pdf
                 $('#pdf-container').css('display', 'block');
                 $('#nuevo_registro').css('display', 'none'); // no mostrar el formulario
@@ -139,6 +147,12 @@ $('#btn-generarQr').click(function (e) {
                 //    Una ves registrado se le quita los valores a los montos
                 $('#precio').html('');
                 $('#id_tarifa').val("");
+
+                // Esperar a que el iframe termine de cargar antes de imprimir
+                iframe.onload = () => {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print(); // Disparar impresión automática desde el iframe
+                };
             })
 
 
@@ -190,7 +204,7 @@ $('#btn-terminar_formulario').click(function (e) {
 
 $('#btn-verificarQr').on('click', function () {
     // Colocar el cursor en el input
-   
+
     $('#verificarQr').css('display', 'block');
 
 
@@ -226,7 +240,7 @@ qrInput.on('input', function () {
                 if (response.tipo == "exito") {
                     $('#respuesta_servidor').html(`<span class="text-success">${response.mensaje}  <i class="fas fa-check-circle ms-1"></i></span>`);
                 }
-                else{
+                else {
                     $('#respuesta_servidor').html(`<span class="text-danger">${response.mensaje} <i class="fas fa-exclamation-triangle ms-1"></i></span>`);
                 }
 
@@ -266,3 +280,18 @@ cards.forEach((card) => {
 
     });
 });
+
+
+// nos servira para crear una url para poder visualizar nuestro pdf
+
+function generarURlBlob(pdfbase64) {
+
+    // Convertir Base64 a un Blob
+    const byteCharacters = atob(pdfbase64); // Decodifica el Base64
+    const byteNumbers = Array.from(byteCharacters).map(c => c.charCodeAt(0));
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+    // Crear una URL para el Blob
+    return URL.createObjectURL(blob);
+}

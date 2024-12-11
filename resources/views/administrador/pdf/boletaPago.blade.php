@@ -145,10 +145,10 @@
 
         .qr_code {
 
-            width: 95%;
+            width: 160px;
             margin: auto;
-            height: 230px;
-            background-color: #8b5050;
+            height: 160px;
+            
             margin-top: 15px;
             margin-bottom: 20px;
             box-sizing: border-box;
@@ -162,14 +162,35 @@
             object-fit: cover;
         }
 
+        .vehiculo {
+            width: 100%;
+            text-align: center;
+            font-size: 13px;
+            letter-spacing: 1px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 5px dotted #000;
+            border-bottom: 5px dotted #000
+        }
+
+        .vehiculo h3 {
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .vehiculo h3,
+        p {
+            margin-bottom: 4px;
+        }
+
         .fechas {
             width: 100%;
             text-align: center;
             font-size: 13px;
             letter-spacing: 1px;
-            margin-top: 5px;
+            margin-top: 8px;
             padding-top: 8px;
-            border-top: 5px dotted #000
+
         }
 
         .nota {
@@ -183,7 +204,8 @@
             font-size: 13px;
             text-align: justify;
         }
-        .ley .titulo_creacion{
+
+        .ley .titulo_creacion {
             text-align: center;
             font-weight: 900;
             margin-bottom: 8px;
@@ -199,32 +221,48 @@
             <hr>
             <h2>DIRECCION DE RECAUDACIONES</h2>
 
-          <hr>
-            <p class="usuario">Us: {{ $usuario['nombres'] ?? "NA"}} {{ $usuario['apellidos'] ?? "NA"}}</p>
-            <p class="puesto">Puesto: {{$puesto->nombre ?? "N/A"}}</p>
+            <hr>
+            <p class="usuario">Us: {{ $usuario['nombres'] ?? 'NA' }} {{ $usuario['apellidos'] ?? 'NA' }}</p>
+            <p class="puesto">Puesto: {{ $puesto->nombre ?? 'N/A' }}</p>
 
 
         </div>
 
         <div class="cod_precio">
-            <span class="codigo">{{$tarifa->descripcion ?? "N/A"}}</span>
-            <span class="precio">{{$tarifa->precio ?? "N/A"}} <b>Bs</b></span>
+            <span class="codigo">{{ $tarifa->descripcion ?? 'N/A' }}</span>
+            <span class="precio">{{ $tarifa->precio ?? 'N/A' }} <b>Bs</b></span>
         </div>
 
         <div class="qr_code">
-           
+
             <img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">
         </div>
 
+        <div class="vehiculo">
+            @if ($placa != null)
+                <h3>Datos del Vehiculo</h3>
+                <p><b>Placa: </b> {{ strtoupper($placa) }}</p>
+            @endif
+            @if ($color != null)
+                <p><b>color: </b> {{ $color }}</p>
+            @endif
+
+            @if ($tipo_auto != null)
+                <p><b>Tipo: </b> {{ $tipo_auto }}</p>
+            @endif
+
+
+        </div>
+
         <div class="fechas">
-            <p>Fecha de Reporte: {{ now()->format('d-m-Y') }}</p>
-            <p>Fecha de Vencimiento: {{ now()->format('d-m-Y') }}</p>
+            <p><b> Fecha Generada: </b></p>
+            <p>{{ now()->format('Y-m-d H:i:s') }}</p>
+            <p><b> Valida hasta:</b></p>
+            <p>{{ $fecha_finalizacion }}</p>
 
         </div>
 
-        <div class="nota">
-            <p><span>Nota: </span>La boleta tiene una validez de 24h pasado el tiempo la boleta dejara de funcionar.</p>
-        </div>
+
 
         <div class="ley">
             <p class="titulo_creacion">LEY AUTÓNOMA MUNICIPAL N.º 61/2024</p>

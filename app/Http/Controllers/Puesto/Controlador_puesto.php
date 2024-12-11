@@ -72,12 +72,9 @@ class Controlador_puesto extends Controller
             if ($fecha_actual) {
                 $query->whereDate('historial_puesto.created_at', '=', $fecha_actual);
             }
-        }])
-            ->role('encargado_puesto');
+        }])->role('encargado_puesto');
 
-
-
-        // Filtro de búsqueda: Filtra por los campos correctos en la tabla User
+        // Filtro de búsqueda
         if (!empty($request->search['value'])) {
             $usuariosQuery->where(function ($query) use ($request) {
                 $query->where('nombres', 'like', '%' . $request->search['value'] . '%')
@@ -87,36 +84,34 @@ class Controlador_puesto extends Controller
             });
         }
 
-        // Obtener usuarios con puestos asociados filtrados por fecha
-         $usuarios = $usuariosQuery->get()
-            ->flatMap(function ($usuario) {
-                return $usuario->puestos->map(function ($puesto) use ($usuario) {
-                    return [
-                        'ci' => $usuario->ci,
-                        'nombres' => $usuario->nombres . " " . $usuario->apellidos,
-                        'puesto_nombre' => $puesto->nombre,
-                        'fecha_asignado' => Carbon::parse($puesto->pivot->created_at)
-                            ->locale('es') // Establecer el idioma a español
-                            ->translatedFormat('d \d\e F \d\e Y'), // Formato con el mes en español
-                        'fecha_asignado_raw' => $puesto->pivot->created_at, // Fecha en formato crudo para ordenar
-                    ];
-                });
-            })
-            ->sortByDesc('fecha_asignado_raw') // Ordena por la fecha cruda en forma descendente
-            ->values(); // Reindexa la colección para evitar huecos en los índices
-
         // Total de registros antes del filtrado
-        $recordsTotal = User::count();
+        $recordsTotal = User::role('encargado_puesto')->count();
 
         // Total de registros filtrados
-        $recordsFilter = $usuarios->count();
+        $recordsFilter = $usuariosQuery->count();
 
-        // Paginación y orden
-        $datos_usuarios = $usuarios
+        // Aplicar paginación y obtener datos
+        $usuarios = $usuariosQuery
             ->skip($request->start)
-            ->take($request->length); // Usamos take() para limitar la cantidad de registros por página
+            ->take($request->length)
+            ->get();
 
-        // Permisos (para el frontend, si es necesario)
+        // Transformar datos
+        $datos_usuarios = $usuarios->flatMap(function ($usuario) {
+            return $usuario->puestos->map(function ($puesto) use ($usuario) {
+                return [
+                    'ci' => $usuario->ci,
+                    'nombres' => $usuario->nombres . " " . $usuario->apellidos,
+                    'puesto_nombre' => $puesto->nombre,
+                    'fecha_asignado' => Carbon::parse($puesto->pivot->created_at)
+                        ->locale('es') // Establecer idioma a español
+                        ->translatedFormat('d \d\e F \d\e Y'), // Fecha con mes en español
+                    'fecha_asignado_raw' => $puesto->pivot->created_at, // Fecha en formato crudo para ordenar
+                ];
+            });
+        })->sortByDesc('fecha_asignado_raw')->values(); // Ordena y reindexa
+
+        // Permisos para el frontend
         $permissions = [
             'desactivar' => auth()->user()->can('admin.usuario.desactivar'),
             'reset' => auth()->user()->can('admin.usuario.reset'),
@@ -124,14 +119,16 @@ class Controlador_puesto extends Controller
             'editarTargeta' => auth()->user()->can('admin.usuario.editarTargeta'),
         ];
 
+        // Retorna el JSON
         return response()->json([
             'draw' => $request->draw,
             'recordsTotal' => $recordsTotal,
-            'recordsFiltered' => $recordsFilter, // Ajustar si hay filtros
+            'recordsFiltered' => $recordsFilter,
             'usuarios' => $datos_usuarios,
             'permissions' => $permissions,
         ]);
     }
+
 
 
     /**
@@ -149,7 +146,7 @@ class Controlador_puesto extends Controller
     // DESIGNAMOS UN USUARIO A UN PUESTO
     public function store(PuestoRequest $request)
     {
-        
+
         try {
             $encargado_id = $request->encargado;
             $puesto_id = $request->puesto_id;

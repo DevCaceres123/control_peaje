@@ -16,17 +16,35 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            {{-- <label for="filterFecha" class="mb-2">Filtrar por fecha:</label>
-                            <div class="col-auto ">
 
+                            <div class="col-auto mb-3">
+                                <label for="filterFecha" class="mb-2">Filtrar por fecha:</label>
                                 <input type="date" id="filterFecha" class="form-control"
                                     value="{{ \Carbon\Carbon::now()->toDateString() }}" />
                             </div>
-                            <div class="col-3 mb-2">
-                                <button id="btnListarTodo" class="btn btn-success ">
+
+
+                            <div class="col-auto mb-3">
+                                <label for="filterFecha" class="mb-2">Filtrar por encargados:</label>
+                                <select class="form-select" aria-label="Default select example " name="encargados"
+                                    id="encargados">
+                                    <option selected disabled>Encargados</option>
+                                    @foreach ($encargados_puesto as $item)
+                                        <option value="{{ $item->id }}" class="text-capitalize">
+                                            {{ $item->nombres }} {{ $item->apellidos }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <button id="btnListarTodo" class="btn btn-success mt-1">
                                     <i class="fas fa-clipboard-list me-1"></i>Listar Todo</button>
-                            </div> --}}
+                            </div>
+
+
                         </div>
+
+
+
                         <div class="table-responsive">
                             <table class="table" id="tabla_historialRegistro">
                                 <thead class="table-light">

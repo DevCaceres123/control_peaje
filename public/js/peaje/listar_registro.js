@@ -7,7 +7,7 @@ import { vaciar_errores, vaciar_formulario } from '../../../funciones_helper/vis
 
 let permissions;
 let tabla_historialRegistro;
-
+let valorSeleccionado;
 $(document).ready(function () {
 
     listar_registros();
@@ -24,7 +24,8 @@ function listar_registros() {
             url: 'listar_registro', // Ruta que recibe la solicitud en el servidor
             type: 'GET', // Método de la solicitud (GET o POST)
             data: function (d) {
-                // d.fecha = $('#filterFecha').val(); // Agrega la fecha al request
+                d.fecha = $('#filterFecha').val(); // Agrega la fecha al request
+                d.encargado =valorSeleccionado;
 
             },
             dataSrc: function (json) {
@@ -44,7 +45,7 @@ function listar_registros() {
             },
             {
                 data: 'nombre_usuario',
-                className: 'table-td',
+                className: 'table-td text-capitalize',
                 render: function (data) {
                     return `${data}`;
                 }
@@ -69,9 +70,23 @@ function listar_registros() {
             },
             {
                 data: 'placa',
-                className: 'table-td',
+                className: 'table-td text-uppercase',
                 render: function (data) {
-                    return `${data}`;
+                    if(data != null){
+                        return `
+                  
+                        <span class="badge bg-success fs-6">${data}</span>
+                        `;
+                        
+                    }
+                    else{
+                        return `
+                  
+                        <span class="badge bg-danger fs-6">NINGUNO...</span>
+                        `;
+                        
+                    }
+                    
                 }
             },
 
@@ -79,7 +94,21 @@ function listar_registros() {
                 data: 'ci',
                 className: 'table-td',
                 render: function (data) {
-                    return `${data}`;
+                    if(data != null){
+                        return `
+                  
+                        <span class="badge bg-success fs-6">${data}</span>
+                        `;
+                        
+                    }
+                    else{
+                        return `
+                  
+                        <span class="badge bg-danger fs-6">NINGUNO...</span>
+                        `;
+                        
+                    }
+                    
                 }
             },
 
@@ -97,12 +126,23 @@ function listar_registros() {
 
     // Permite filtrar por una fecha diferente
     $('#filterFecha').on('change', function () {
+        
         tabla_historialRegistro.ajax.reload();
     });
 
     // Listar todos los registros al presionar el botón
     $('#btnListarTodo').on('click', function () {
         $('#filterFecha').val(''); // Limpia el valor del campo de fecha
+        $('#encargados').val(''); // Limpia el valor del campo de fecha
         tabla_historialRegistro.ajax.reload(); // Recarga la tabla sin filtrar
+    });
+
+      // Escuchar el evento change en el select
+      $('#encargados').on('change', function () {
+        // Obtener el valor seleccionado
+        valorSeleccionado = $(this).val(); // Obtiene el valor (attribute value)
+        tabla_historialRegistro.ajax.reload();
+        // Mostrar en la consola los valores obtenidos
+
     });
 }
