@@ -444,11 +444,9 @@ class Controlador_registro extends Controller
     {
         try {
 
-
-
             DB::beginTransaction();
 
-            $registro = Registro::select('codigo_qr', 'created_at')
+            $registro = Registro::select('id', 'codigo_qr', 'created_at')
                 ->where('codigo_qr', $qr)
                 ->first();
 
@@ -460,12 +458,17 @@ class Controlador_registro extends Controller
 
             $fecha_actual = $this->fecha;
             $fecha_vencimiento = Carbon::parse($registro->created_at->endOfDay());
-            $registro_fecha = Carbon::parse($registro->created_at);//feccha de registro del qr
+            $registro_fecha = Carbon::parse($registro->created_at); //feccha de registro del qr
 
             if ($fecha_actual->isAfter($fecha_vencimiento)) {
 
                 throw new Exception('el QR ya nos es valido...!! ' . $registro_fecha);
             }
+
+            // Se aumenta el conteo de las veces que paso el qr
+            $registro_historial = HistorialRegistros::where('registro_id', $registro->id)->first();
+            $registro_historial->num_aprobados =  $registro_historial->num_aprobados + 1;
+            $registro_historial->save();
 
             DB::commit();
 
@@ -500,7 +503,7 @@ class Controlador_registro extends Controller
         $encargado = $request->input('encargado') ?? null;
 
         // Inicia la consulta con los usuarios y sus puestos
-        $registroQuery = HistorialRegistros::select('puesto', 'nombre_usuario', 'precio', 'placa', 'ci', 'created_at');
+        $registroQuery = HistorialRegistros::select('id', 'puesto', 'nombre_usuario', 'precio', 'placa', 'ci', 'created_at', 'num_aprobados');
 
 
 
@@ -549,11 +552,13 @@ class Controlador_registro extends Controller
         // Transformar los datos para formatear `created_at`
         $datos_registros = $datos_registros->map(function ($registro) {
             return [
+                'id' =>  $registro->id,
                 'puesto' => $registro->puesto,
                 'nombre_usuario' => $registro->nombre_usuario,
                 'precio' => $registro->precio,
                 'placa' => $registro->placa,
                 'ci' => $registro->ci,
+                'num_aprobados' => $registro->num_aprobados,
                 'created_at' => Carbon::parse($registro->created_at)
                     ->locale('es')
                     ->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i:s'), // Incluye hora y minuto
@@ -601,7 +606,35 @@ class Controlador_registro extends Controller
      */
     public function destroy(string $id)
     {
-        //
+
+        try {
+
+            $registro_historial = HistorialRegistros::where('id', $id)->first();
+
+            if (!$registro_historial) {
+                throw new Exception("no existe el historial de registro");
+            }
+            $registro = Registro::where('id', $registro_historial->registro_id)->first();
+
+            if (!$registro) {
+                throw new Exception("no existe el registro");
+            }
+
+            DB::beginTransaction();
+
+            $registro_historial->delete();
+            $registro->delete();
+            DB::commit();
+
+            $this->mensaje('exito', "El registro fue eliminado correctamente");
+            return response()->json($this->mensaje, 200);
+        } catch (Exception $e) {
+
+            DB::rollBack();
+            $this->mensaje("error", "Error " . $e->getMessage());
+
+            return response()->json($this->mensaje, 200);
+        }
     }
 
 

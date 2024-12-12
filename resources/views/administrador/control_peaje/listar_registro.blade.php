@@ -56,6 +56,8 @@
                                         <th>PLACA</th>
                                         <th>CI </th>
                                         <th>FECHA REGISTRO</th>
+                                        <th>CONTEO</th>
+                                        <th>ACCION</th>
                                     </tr>
                                 </thead>
                             </table>

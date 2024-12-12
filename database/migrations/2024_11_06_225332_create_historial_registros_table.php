@@ -20,8 +20,10 @@ return new class extends Migration
             $table->string('placa',50)->nullable();
             $table->string('ci',25)->nullable();
             $table->json('reporte_json');
+            $table->string('num_aprobados')->nullable();
             $table->unsignedBigInteger('usuario_id')->nullable();
             $table->unsignedBigInteger('registro_id')->nullable();
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
 
             

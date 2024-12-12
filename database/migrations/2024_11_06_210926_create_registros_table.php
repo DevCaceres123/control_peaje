@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('destino', 100)->nullable();
             $table->string('descripcion', 200)->nullable();
-            $table->string('codigo_qr')->nullable();
+            $table->string('codigo_qr')->nullable();            
             $table->unsignedBigInteger('puesto_id');
             $table->unsignedBigInteger('tarifa_id');
             $table->unsignedBigInteger('usuario_id');
             $table->unsignedBigInteger('vehiculo_id')->nullable();
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
 
 
