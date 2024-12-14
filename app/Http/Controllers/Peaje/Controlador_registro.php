@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Peaje;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\peaje\RegistroPeajeRequest;
 use App\Models\Color;
+use App\Models\DeleteTarifas;
 use App\Models\HistorialRegistros;
 use App\Models\Persona;
 use App\Models\Puesto;
@@ -624,6 +625,15 @@ class Controlador_registro extends Controller
 
             $registro_historial->delete();
             $registro->delete();
+
+
+            $registro_eliminado = new DeleteTarifas();
+            $registro_eliminado->usuario_id = auth()->user()->id;
+            $registro_eliminado->registro_id = $registro_historial->registro_id;
+            $registro_eliminado->tarifa_id = $registro->tarifa_id;
+
+            $registro_eliminado->save();
+
             DB::commit();
 
             $this->mensaje('exito', "El registro fue eliminado correctamente");
@@ -637,6 +647,40 @@ class Controlador_registro extends Controller
         }
     }
 
+
+
+    // Funcion para genearar reportes diarios
+    public function reporteDiario()
+    {
+
+
+
+
+        $usuario_actual = auth()->user()->id;
+        $fecha_actual = $this->fecha->toDateString();
+
+        $puesto = $this->obtenerPuesto($fecha_actual, $usuario_actual);
+
+        $nombreCompletoUsuario = auth()->user()->only(['nombres', 'apellidos']);
+
+        $registros = HistorialRegistros::select('precio', 'placa', 'ci', 'num_aprobados')
+            ->where('usuario_id', "=", $usuario_actual)
+            ->whereDate('created_at', "=", $fecha_actual)
+            ->get();
+
+
+        // listar los registros eliminados
+        $registros_eliminados = DB::table('delete_tarifas')
+            ->join('tarifas', 'tarifas.id', '=', 'delete_tarifas.tarifa_id')
+            ->select('precio', 'delete_tarifas.created_at')
+            ->where('usuario_id', "=", $usuario_actual)
+            ->whereDate('delete_tarifas.created_at', "=", $fecha_actual)
+            ->get();
+
+
+        $pdf = Pdf::loadView('administrador/pdf/reporteRegistroDiario', compact('registros', 'puesto', 'nombreCompletoUsuario','registros_eliminados'));
+        return $pdf->stream();
+    }
 
     public function mensaje($titulo, $mensaje)
     {

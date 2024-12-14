@@ -85,4 +85,9 @@ class User extends Authenticatable
             ->withPivot('created_at', 'descripcion_edicion')
             ->withTimestamps();
     }
+
+
+    public function delete_tarifas(){
+        return $this->hasMany('App\Models\DeleteTarifas','usuario_id');
+    }
 }

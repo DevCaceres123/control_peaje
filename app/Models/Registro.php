@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Registro extends Model
 {
     use SoftDeletes;
+
+    public function delete_tarifas(){
+        return $this->hasMany('App\Models\DeleteTarifas','registro_id');
+    }
+
+    
 }

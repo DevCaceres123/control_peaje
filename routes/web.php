@@ -64,6 +64,8 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
         Route::get('/ver_registros','ver_registros')->name('peaje.ver_registros');
         Route::get('/listar_registro','listar_registro');
 
+        Route::get('/reporteDiario','reporteDiario')->name('peaje.reporte_diario');
+
     });
 
     // PARA LA ADMINISTRACION DE PUESTOS EN ADICIONAR A UN USUARIO 
@@ -71,6 +73,7 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
         Route::resource('puesto_asignar', Controlador_puesto::class);
         Route::get('/historial','historial')->name('puesto_asignar.historial');
         Route::get('/listar_historial','listar_historial');
+       
        
         // Route::get('/buscar_encargado/{id_encargado}','buscar_encargado')->name('peaje.buscar_ci');
       

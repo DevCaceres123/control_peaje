@@ -10,12 +10,12 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-12 mb-2">
-                            <h4 class="card-title">HISTORIAL DE PUESTOS</h4>
+                            <h4 class="card-title">REGISTROS DEL DIA</h4>
                         </div>
 
                     </div>
                     <div class="card-body">
-                        <div class="row">
+                        <div class="row position-relative">
 
                             <div class="col-auto mb-3">
                                 <label for="filterFecha" class="mb-2">Filtrar por fecha:</label>
@@ -38,6 +38,11 @@
                             <div class="col-3 mt-3">
                                 <button id="btnListarTodo" class="btn btn-success mt-1">
                                     <i class="fas fa-clipboard-list me-1"></i>Listar Todo</button>
+                            </div>
+
+                            <div class="col-auto mt-3 position-absolute end-0 top-0">
+                                <a href="{{ route ('peaje.reporte_diario')}}" id="reporte_diario" class="btn btn-primary mt-1" target="_blank">
+                                    <i class="fas fa-file-pdf me-1"></i>Reporte Diario</a>
                             </div>
 
 
