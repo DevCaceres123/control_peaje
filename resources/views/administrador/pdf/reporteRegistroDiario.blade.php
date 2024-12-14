@@ -225,8 +225,8 @@
                 <thead>
                     <tr>
                         <th>Nº</th>
-                        <th>MONTO</th>
                         <th>FECHA ELIMINACION</th>
+                        <th>MONTO</th>
 
 
                     </tr>
@@ -240,8 +240,8 @@
                     @foreach ($registros_eliminados as $registros_eliminado)
                         <tr>
                             <td>{{ $count++ }}</td>
-                            <td>{{ $registros_eliminado->precio }}</td>
                             <td>{{ $registros_eliminado->created_at }}</td>
+                            <td>{{ $registros_eliminado->precio }}</td>
 
                             {{ $costo_total = $costo_total + $registros_eliminado->precio }}
                         </tr>
