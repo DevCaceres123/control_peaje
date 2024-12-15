@@ -653,9 +653,6 @@ class Controlador_registro extends Controller
     public function reporteDiario()
     {
 
-
-
-
         $usuario_actual = auth()->user()->id;
         $fecha_actual = $this->fecha->toDateString();
 
@@ -678,7 +675,7 @@ class Controlador_registro extends Controller
             ->get();
 
 
-        $pdf = Pdf::loadView('administrador/pdf/reporteRegistroDiario', compact('registros', 'puesto', 'nombreCompletoUsuario','registros_eliminados'));
+        $pdf = Pdf::loadView('administrador/pdf/reporteRegistroDiario', compact('registros', 'puesto', 'nombreCompletoUsuario','registros_eliminados','fecha_actual'));
         return $pdf->stream();
     }
 

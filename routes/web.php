@@ -6,6 +6,7 @@ use App\Http\Controllers\Configuracion\TarifaControlador;
 use App\Http\Controllers\Configuracion\TipoVehiculoControlador;
 use App\Http\Controllers\Peaje\Controlador_registro;
 use App\Http\Controllers\Puesto\Controlador_puesto;
+use App\Http\Controllers\Reporte\Controlador_reporte;
 use App\Http\Controllers\Usuario\Controlador_login;
 use App\Http\Controllers\Usuario\Controlador_permisos;
 use App\Http\Controllers\Usuario\Controlador_rol;
@@ -59,28 +60,28 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
     Route::controller(Controlador_registro::class)->group(function () {
         Route::resource('peaje', Controlador_registro::class);
         Route::post('generar_qr', "generar_qr")->name('peaje.generar_qr');
-        Route::get('/verificarQr/{id_qr}','verificarQr');
+        Route::get('/verificarQr/{id_qr}', 'verificarQr');
 
-        Route::get('/ver_registros','ver_registros')->name('peaje.ver_registros');
-        Route::get('/listar_registro','listar_registro');
+        Route::get('/ver_registros', 'ver_registros')->name('peaje.ver_registros');
+        Route::get('/listar_registro', 'listar_registro');
 
-        Route::get('/reporteDiario','reporteDiario')->name('peaje.reporte_diario');
-
+        Route::get('/reporteDiario', 'reporteDiario')->name('peaje.reporte_diario');
     });
 
     // PARA LA ADMINISTRACION DE PUESTOS EN ADICIONAR A UN USUARIO 
     Route::controller(Controlador_puesto::class)->group(function () {
         Route::resource('puesto_asignar', Controlador_puesto::class);
-        Route::get('/historial','historial')->name('puesto_asignar.historial');
-        Route::get('/listar_historial','listar_historial');
-       
-       
+        Route::get('/historial', 'historial')->name('puesto_asignar.historial');
+        Route::get('/listar_historial', 'listar_historial');
         // Route::get('/buscar_encargado/{id_encargado}','buscar_encargado')->name('peaje.buscar_ci');
-      
-        
+
     });
 
+    //PARA GENERAR REPORTES DE TODO TIPO
 
+    Route::controller(Controlador_reporte::class)->group(function () {
+        Route::resource('reportes', Controlador_reporte::class);
+    });
 
 
     //PARA LA ADMINISTRACION DE PUESTO

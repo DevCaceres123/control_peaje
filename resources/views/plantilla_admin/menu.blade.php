@@ -69,12 +69,12 @@
                             <ul class="nav flex-column">
 
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('peaje.index')}}">Generar Registro</a>
+                                    <a class="nav-link" href="{{ route('peaje.index') }}">Generar Registro</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('peaje.ver_registros')}}">Listar Registros</a>
+                                    <a class="nav-link" href="{{ route('peaje.ver_registros') }}">Listar Registros</a>
                                 </li>
-                               
+
                             </ul>
                         </div>
                     </li>
@@ -89,16 +89,23 @@
                             <ul class="nav flex-column">
 
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('puesto_asignar.index')}} ">Asignar Puestos</a>
+                                    <a class="nav-link" href="{{ route('puesto_asignar.index') }} ">Asignar Puestos</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('puesto_asignar.historial')}} ">Historial</a>
+                                    <a class="nav-link" href="{{ route('puesto_asignar.historial') }} ">Historial</a>
                                 </li>
-                               
+
                             </ul>
                         </div>
                     </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('reportes.index') }}" role="button" aria-expanded="false"
+                            aria-controls="sidebarDashboards">
+                            <i class="far fa-file-pdf menu-icon"></i>
+                            <span>REPORTES</span>
+                        </a>
+                    </li><!--end nav-item-->
 
                     <li class="menu-label mt-2">
                         <small class="label-border">
@@ -133,6 +140,8 @@
                             </ul>
                         </div>
                     </li>
+
+
 
 
                 </ul><!--end navbar-nav--->
