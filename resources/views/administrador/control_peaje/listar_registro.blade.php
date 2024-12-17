@@ -10,7 +10,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-12 mb-2">
-                            <h4 class="card-title">REGISTROS DEL DIA</h4>
+                            <h4 class="card-title badge bg-success p-2 text-light fs-13">REGISTROS DEL DIA</h4>
                         </div>
 
                     </div>

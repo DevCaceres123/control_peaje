@@ -10,7 +10,7 @@
                     <div class="card-body">
                         <div class="row d-flex justify-content-center border-dashed-bottom pb-3">
                             <div class="col-9">
-                                <p class="text-dark mb-0 fw-semibold fs-14">{{ $puesto->nombre }}</p>
+                                <p class="b-0 fw-semibold fs-13 badge bg-primary p-1 text-light">{{ $puesto->nombre }}</p>
                                 <h5 class="mt-2 mb-0 fw-bold text-capitalize">{{ $fecha_parseada }}</h5>
 
                                 @if (!$puesto->users->isEmpty())
@@ -28,7 +28,7 @@
                             <!--end col-->
                             <div class="col-3 align-self-center">
                                 <div
-                                    class="d-flex justify-content-center align-items-center thumb-xxl bg-warning rounded-circle mx-auto">
+                                    class="d-flex justify-content-center align-items-center thumb-xxl bg-dark rounded-circle mx-auto">
                                     @foreach ($monto_puesto as $monto)
                                         @if ($puesto->nombre == $monto['puesto'])
                                             <span class="fs-14 text-light">{{ $monto['total_precio'] }} <b>Bs</b></span>

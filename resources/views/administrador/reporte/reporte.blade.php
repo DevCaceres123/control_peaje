@@ -8,7 +8,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-12 mb-2">
-                            <h4 class="card-title">REPORTES DE PAGOS</h4>
+                            <h4 class="card-title badge bg-success p-2 text-light fs-13">REPORTES DE PAGOS</h4>
                         </div>
 
                     </div>

@@ -7,7 +7,7 @@
             <div class="card-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h4 class="card-title">TIPOS DE VEHICULOS</h4>
+                        <h4 class="card-title badge bg-success p-2 text-light fs-13">TIPOS DE VEHICULOS</h4>
                     </div>
                     <div class="col-auto">
                         <button class="btn btn-primary" onclick="abrirModalTipoVehiculo()">

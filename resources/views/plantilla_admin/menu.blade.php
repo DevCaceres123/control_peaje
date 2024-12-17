@@ -1,21 +1,18 @@
 <div class="startbar d-print-none">
     <!--start brand-->
     <div class="brand">
-        <a href="index.html" class="logo">
-            <span>
-                <img src="{{ asset('admin_template/images/logo-sm.png') }}" alt="logo-small" class="logo-sm">
+        <div  class="logo" style="display: block ; width: 100% !important; height: 70px; overflow: hidden;">
+            <span style="width: 100%; height: 100%;">
+                <img src="{{ asset('assets/logo-caranavi.webp') }}" alt="logo-small" class="" width="70px" height="70px" style="object-fit: contain">
             </span>
             <span class="">
-                <img src="{{ asset('admin_template/images/logo-light.png') }}" alt="logo-large"
-                    class="logo-lg logo-light">
-                <img src="{{ asset('admin_template/images/logo-dark.png') }}" alt="logo-large"
-                    class="logo-lg logo-dark">
+
             </span>
-        </a>
+        </div>
     </div>
     <!--end brand-->
     <!--start startbar-menu-->
-    <div class="startbar-menu">
+    <div class="startbar-menu ">
         <div class="startbar-collapse" id="startbarCollapse" data-simplebar>
             <div class="d-flex align-items-start flex-column w-100">
                 <!-- Navigation -->
