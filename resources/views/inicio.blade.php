@@ -1,6 +1,7 @@
 @extends('principal')
 @section('titulo', 'INICIO')
 @section('contenido')
+
     <div class="row justify-content-center">
 
         @foreach ($puestos_usuario as $puesto)
