@@ -2,22 +2,22 @@
 @section('titulo', 'PERFIL')
 @section('contenido')
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h4 class="card-title badge bg-success p-2 text-light fs-13">PUESTOS DISPONIBLES</h4>
-                    </div>
-                    <div class="col-auto">
-                       
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="card-title badge bg-success p-2 text-light fs-13">PUESTOS DISPONIBLES</h4>
+                        </div>
+                        <div class="col-auto">
+
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 
     <div class="container">
@@ -55,44 +55,46 @@
                             <!-- Botón para acciones -->
                             <div class="d-flex justify-content-center">
                                 @if (count($puesto->users) == 0)
-                                    <form class="form-asignar_encargado">
+                                    @can('puesto.asignar.asignar')
+                                        <form class="form-asignar_encargado">
 
-                                        <div class="d-flex">
+                                            <div class="d-flex">
 
 
-                                            <input type="hidden" value="{{ $puesto->id }}" name="puesto_id"
-                                                id="puesto_id">
-                                            <select class="form-select" aria-label="Default select example "
-                                                name="encargado" id="encargado">
-                                                <option selected disabled>Encargados</option>
-                                                @foreach ($encargados_sin_registro as $item)
-                                                    <option value="{{ $item->id }}" class="text-capitalize">
-                                                        {{ $item->nombres }} {{ $item->apellidos }}</option>
-                                                @endforeach
-                                            </select>
-                                            <button type="submit" class="btn btn btn-primary ms-2"
-                                                id="btn-asignar_encargado">
-                                                <i class="fas fa-check-circle"></i>
-                                            </button>
-                                        </div>
+                                                <input type="hidden" value="{{ $puesto->id }}" name="puesto_id"
+                                                    id="puesto_id">
+                                                <select class="form-select" aria-label="Default select example "
+                                                    name="encargado" id="encargado">
+                                                    <option selected disabled>Encargados</option>
+                                                    @foreach ($encargados_sin_registro as $item)
+                                                        <option value="{{ $item->id }}" class="text-capitalize">
+                                                            {{ $item->nombres }} {{ $item->apellidos }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="submit" class="btn btn btn-primary ms-2"
+                                                    id="btn-asignar_encargado">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>
+                                            </div>
 
-                                        <div id="_encargado">
+                                            <div id="_encargado">
 
-                                        </div>
-                                    </form>
+                                            </div>
+                                        </form>
+                                    @endcan
                                 @endif
 
 
                             </div>
                         </div>
                         <div class="card-footer d-flex justify-content-between">
-                            @if (count($puesto->users) > 0)
-                                
-
-                                <a class="btn btn-sm btn-danger terminar_reunion" data-id="{{$puesto->id}}">
-                                    <i class="fas fa-window-close me-1"></i>Terminar
-                                </a>
-                            @endif
+                            @can('puesto.asignar.asignar')
+                                @if (count($puesto->users) > 0)
+                                    <a class="btn btn-sm btn-danger terminar_reunion" data-id="{{ $puesto->id }}">
+                                        <i class="fas fa-window-close me-1"></i>Terminar
+                                    </a>
+                                @endif
+                            @endcan
 
 
                         </div>

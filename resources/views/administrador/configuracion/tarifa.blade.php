@@ -10,9 +10,11 @@
                         <h4 class="card-title badge bg-success p-2 text-light fs-13">TARIFAS</h4>
                     </div>
                     <div class="col-auto">
+                        @can('configuracion.tarifa.inicio')
                         <button class="btn btn-primary" onclick="abrirModalTarifa()">
                             <i class="fas fa-plus me-1"></i> Nuevo
                         </button>
+                        @endcan
                     </div>
                 </div>
             </div>

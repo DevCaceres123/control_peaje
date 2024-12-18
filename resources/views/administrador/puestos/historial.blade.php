@@ -14,16 +14,21 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <label for="filterFecha" class="mb-2">Filtrar por fecha:</label>
-                            <div class="col-auto ">
+                            @can('puesto.historial.fecha')
+                                <label for="filterFecha" class="mb-2">Filtrar por fecha:</label>
+                                <div class="col-auto ">
 
-                                <input type="date" id="filterFecha" class="form-control"
-                                    value="{{ \Carbon\Carbon::now()->toDateString() }}" />
-                            </div>
-                            <div class="col-3 mb-2">
-                                <button id="btnListarTodo" class="btn btn-success ">
-                                    <i class="fas fa-clipboard-list me-1"></i>Listar Todo</button>
-                            </div>
+                                    <input type="date" id="filterFecha" class="form-control"
+                                        value="{{ \Carbon\Carbon::now()->toDateString() }}" />
+                                </div>
+                            @endcan
+
+                            @can('puesto.historial.listar_todo')
+                                <div class="col-3 mb-2">
+                                    <button id="btnListarTodo" class="btn btn-success ">
+                                        <i class="fas fa-clipboard-list me-1"></i>Listar Todo</button>
+                                </div>
+                            @endcan
                         </div>
                         <div class="table-responsive">
                             <table class="table" id="tabla_historialPuesto">

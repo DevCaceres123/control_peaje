@@ -1,6 +1,6 @@
-let modal_tarifa        = new bootstrap.Modal(document.getElementById("modal_tarifa"));
-let form_tarifa         = document.getElementById("form_tarifa");
-let btn_guardar_tarifa  = document.getElementById("btn_guardar_tarifa");
+let modal_tarifa = new bootstrap.Modal(document.getElementById("modal_tarifa"));
+let form_tarifa = document.getElementById("form_tarifa");
+let btn_guardar_tarifa = document.getElementById("btn_guardar_tarifa");
 let errores_msj = ["_nombre", "_precio", "_descripcion"];
 
 function abrirModalTarifa(id = null) {
@@ -29,9 +29,9 @@ async function cargarDatosTarifa(id) {
         });
         let data = await respuesta.json();
         if (data.tipo === "success") {
-            document.getElementById("nombre").value         = data.mensaje.nombre;
-            document.getElementById("precio").value         = data.mensaje.precio;
-            document.getElementById("descripcion").value    = data.mensaje.descripcion;
+            document.getElementById("nombre").value = data.mensaje.nombre;
+            document.getElementById("precio").value = data.mensaje.precio;
+            document.getElementById("descripcion").value = data.mensaje.descripcion;
         } else {
             alerta_top(data.tipo, data.mensaje);
         }
@@ -96,10 +96,10 @@ async function listar_tarifa() {
     }
 }
 
-function tarifa_tabla(data) {
+function tarifa_tabla(dato) {
     $("#tabla_tarifa").DataTable({
         responsive: true,
-        data: data,
+        data: dato.tarifa,
         columns: [
             { data: null, render: (data, type, row, meta) => meta.row + 1 },
             { data: "nombre", className: "table-td" },
@@ -110,20 +110,29 @@ function tarifa_tabla(data) {
                 className: "table-td",
                 render: (data, type, row) => `
                     <div class="form-check form-switch form-switch-dark">
-                        <input class="form-check-input" onclick="estado_tarifa('${ row.id }')" type="checkbox"  id="customSwitchDark" ${ row.estado === "activo" ? "checked" : "" }>
+                        <input class="form-check-input" onclick="estado_tarifa('${row.id}')" type="checkbox"  id="customSwitchDark" ${row.estado === "activo" ? "checked" : ""}>
                     </div>
                 `,
             },
             {
                 data: null,
                 className: "table-td",
-                render: (data, type, row) => `
-                    <button class="btn rounded-pill btn-sm btn-warning p-0.5" onclick="abrirModalTarifa('${row.id}')">
+                render: (data,type, row) => `
+
+                    ${dato.permissions['editar'] ?
+                        `  <button class="btn rounded-pill btn-sm btn-warning p-0.5" onclick="abrirModalTarifa('${row.id}')">
                         <i class="las la-pen fs-18"></i>
-                    </button>
-                    <button class="btn rounded-pill btn-sm btn-danger p-0.5" onclick="eliminarTarifa('${row.id}')">
+                    </button>`
+                        : ``}
+
+ ${dato.permissions['eliminar'] ?
+                        `  <button class="btn rounded-pill btn-sm btn-danger p-0.5" onclick="eliminarTarifa('${row.id}')">
                         <i class="las la-trash-alt fs-18"></i>
-                    </button>
+                    </button>`
+                        : ``}
+                        
+                   
+                   
                 `,
             },
         ],
@@ -158,7 +167,7 @@ async function estado_tarifa(id) {
             } catch (error) {
                 console.log("Error al cambiar el estado:", error);
             }
-        }else{
+        } else {
             listar_tarifa();
         }
     });
@@ -190,7 +199,7 @@ async function eliminarTarifa(id) {
                 console.log("Error al eliminar:", error);
                 listar_tarifa();
             }
-        }else{
+        } else {
             listar_tarifa();
         }
     });

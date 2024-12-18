@@ -146,11 +146,16 @@ function listar_registros() {
                 className: 'table-td',
                 render: function (data, type, row) {
                     return `
+
                     <div class="d-flex justify-content-center">
-                   
-                         <a  class="btn btn-sm btn-outline-danger px-2 d-inline-flex align-items-center eliminar_registro" data-id="${row.id}">
+
+                   ${permissions['eliminar'] ?
+                            ` <a  class="btn btn-sm btn-outline-danger px-2 d-inline-flex align-items-center eliminar_registro" data-id="${row.id}">
                       <i class="fas fa-window-close fs-16"></i>
-                  </a>
+                  </a>`
+                            : ``}
+
+                        
                     
                  
                  </div> `;
@@ -200,7 +205,7 @@ $('#tabla_historialRegistro').on('click', '.eliminar_registro', function (e) {
     e.preventDefault(); // Evitar que el enlace recargue la página
     let id_registro = $(this).data('id'); // Obtener el id 
 
-   
+
     Swal.fire({
         title: "NOTA!",
         text: "¿Está seguro de eliminar el registro?",

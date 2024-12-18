@@ -19,6 +19,9 @@ class Controlador_permisos extends Controller
      */
     public function index()
     {
+        if (!auth()->user()->can('admin.permiso.inicio')) {
+            return redirect()->route('inicio');
+        }
         return view('administrador.usuarios.permisos');
     }
 
@@ -28,8 +31,22 @@ class Controlador_permisos extends Controller
      */
     public function listar()
     {
+
+        // Permisos (para el frontend, si es necesario)
+        $permissions = [
+            
+            'editar' => auth()->user()->can('admin.permiso.editar'),
+            'eliminar' => auth()->user()->can('admin.permiso.eliminar'),
+        ];
+
+
         $listar_permiso = Permission::OrderBy('id', 'asc')->get();
-        return response()->json($listar_permiso);
+
+        $data=[
+            'permissions'=>$permissions,
+            'listar_permiso'=>$listar_permiso,
+        ];
+        return response()->json($data);
     }
     /**
      *Fin de listar

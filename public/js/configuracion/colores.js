@@ -64,6 +64,7 @@ btn_guardar_color.addEventListener("click", async () => {
             body: JSON.stringify(datos),
         });
         let data = await respuesta.json();
+        
         vaciar_errores(errores_msj);
         if (data.tipo === "errores") {
             mostrarErrores(data.mensaje);
@@ -90,16 +91,17 @@ async function listar_colores() {
             },
         });
         let data = await respuesta.json();
+        console.log(data);
         color_tabla(data);
     } catch (error) {
         console.log("Error al obtener los datos:", error);
     }
 }
 
-function color_tabla(data) {
+function color_tabla(dato) {
     $("#tabla_color").DataTable({
         responsive: true,
-        data: data,
+        data: dato.color,
         columns: [
             { data: null, render: (data, type, row, meta) => meta.row + 1 },
             { data: "nombre", className: "table-td" },
@@ -114,13 +116,21 @@ function color_tabla(data) {
             {
                 data: null,
                 className: "table-td",
-                render: (data, type, row) => `
-                    <button class="btn rounded-pill btn-sm btn-warning p-0.5" onclick="abrirModalColor('${row.id}')">
+                render: (data,type, row) => `
+            
+                ${dato.permissions['editar'] ?
+                        ` <button class="btn rounded-pill btn-sm btn-warning p-0.5" onclick="abrirModalColor(${row.id})">
                         <i class="las la-pen fs-18"></i>
-                    </button>
-                    <button class="btn rounded-pill btn-sm btn-danger p-0.5" onclick="eliminarColor('${row.id}')">
+                    </button>`
+                        : ``}
+                    
+                        ${dato.permissions['eliminar'] ?
+                        `  <button class="btn rounded-pill btn-sm btn-danger p-0.5" onclick="eliminarColor('${row.id}')">
                         <i class="las la-trash-alt fs-18"></i>
-                    </button>
+                    </button>`
+                        : ``}  
+                    
+                  
                 `,
             },
         ],
@@ -155,7 +165,7 @@ async function estado_color(id) {
             } catch (error) {
                 console.log("Error al cambiar el estado:", error);
             }
-        }else{
+        } else {
             listar_colores();
         }
     });
@@ -186,7 +196,7 @@ async function eliminarColor(id) {
             } catch (error) {
                 console.log("Error al eliminar:", error);
             }
-        }else{
+        } else {
             listar_colores();
         }
     });

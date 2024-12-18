@@ -16,6 +16,9 @@ class TarifaControlador extends Controller
      */
     public function index()
     {
+        if (!auth()->user()->can('configuracion.tarifa.inicio')) {
+            return redirect()->route('inicio');
+        }
         return view('administrador.configuracion.tarifa');
     }
 
@@ -134,7 +137,20 @@ class TarifaControlador extends Controller
 
 
     public function listar(){
+
+        $permissions = [
+            'editar' => auth()->user()->can('configuracion.tarifa.editar'),
+            'eliminar' => auth()->user()->can('configuracion.tarifa.eliminar'),
+            'desactivar' => auth()->user()->can('configuracion.tarifa.desactivar'),
+           
+        ];
+
         $tarifa = Tarifa::OrderBy('id', 'desc')->get();
-        return response()->json($tarifa);
+
+        $data=[
+            'permissions'=>$permissions,
+            'tarifa'=>$tarifa,
+        ];
+        return response()->json($data);
     }
 }

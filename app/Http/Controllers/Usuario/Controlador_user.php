@@ -19,6 +19,9 @@ class Controlador_user extends Controller
      */
     public function index()
     {
+        if (!auth()->user()->can('admin.usuario.inicio')) {
+            return redirect()->route('inicio');
+        }
         $roles = Role::get();
         return view("administrador.usuarios.usuarios", compact("roles"));
     }
@@ -61,7 +64,7 @@ class Controlador_user extends Controller
             );
         } catch (\Throwable $th) {
             DB::rollback();
-            Log::error('Error al guardar usuario: '.$th->getMessage());
+            Log::error('Error al guardar usuario: ' . $th->getMessage());
             return response()->json(mensaje_mostrar('error', 'Ocurrió un problema inesperado!'));
         }
     }
@@ -75,7 +78,7 @@ class Controlador_user extends Controller
         DB::beginTransaction();
         try {
             $usuario = User::find($id);
-            $usuario->estado = ($usuario->estado=='activo') ? 'inactivo' : 'activo';
+            $usuario->estado = ($usuario->estado == 'activo') ? 'inactivo' : 'activo';
             $usuario->save();
             DB::commit();
             return response()->json(
@@ -96,11 +99,11 @@ class Controlador_user extends Controller
     {
         try {
             $usuario = User::with(['roles'])->find($id);
-            if($usuario){
+            if ($usuario) {
                 return response()->json(
                     mensaje_mostrar('success', $usuario)
                 );
-            }else{
+            } else {
                 return response()->json(
                     mensaje_mostrar('error', 'Ocurrio un error al obtener los datos')
                 );
@@ -121,7 +124,7 @@ class Controlador_user extends Controller
         try {
             $usuario                = User::find($id);
             $usuario->usuario       = $request->usuario;
-            if($request->password != null || $request->password != ''){
+            if ($request->password != null || $request->password != '') {
                 $usuario->password      = Hash::make($request->password);
             }
             $usuario->ci            = $request->ci;
@@ -171,13 +174,28 @@ class Controlador_user extends Controller
     }
 
     //para listar usuario
-    public function listar(){
+    public function listar()
+    {
+
+        // Permisos (para el frontend, si es necesario)
+        $permissions = [
+            'desactivar' => auth()->user()->can('admin.usuario.desactivar'),          
+            'editar' => auth()->user()->can('admin.usuario.editarRol'),
+            'eliminar' => auth()->user()->can('admin.usuario.eliminarRol'),
+        ];
+
+
         //$usuario = User::where('id', '!=', 1)->get();
         $usuario = User::with(['roles'])
-        ->where('id', '!=', 1)
-        ->where('deleted_at', null)
-        ->OrderBy('id','desc')
-        ->get();
-        return response()->json($usuario);
+            ->where('id', '!=', 1)
+            ->where('deleted_at', null)
+            ->OrderBy('id', 'desc')
+            ->get();
+
+        $data=[
+            'usuario'=>$usuario,
+            'permissions'=>$permissions,
+        ];
+        return response()->json($data);
     }
 }

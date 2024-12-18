@@ -42,7 +42,7 @@ class UsuarioSeeder extends Seeder
 
 
 
-        
+
         $usuario2 = new User();
         $usuario2->usuario = '123456';
         $usuario2->password = Hash::make('1234');
@@ -85,35 +85,105 @@ class UsuarioSeeder extends Seeder
         $usuario3->syncRoles(['encargado_puesto']);
 
 
-        /* $usuario1 = new User();
-        $usuario1->usuario = '10091554';
-        $usuario1->password = Hash::make('10091554');
-        $usuario1->ci = '10091554';
-        $usuario1->nombres = 'Admin';
-        $usuario1->apellidos = 'admin admin';
-        $usuario1->estado = 'activo';
-        $usuario1->email = 'rodrigo1@gmail.com';
-        $usuario1->save();
+        // PERMISOS PARA EL SISTEMA
 
-        $usuario2 = new User();
-        $usuario2->usuario = '8330023';
-        $usuario2->password = Hash::make('8330023');
-        $usuario2->ci = '8330023';
-        $usuario2->nombres = 'Admin';
-        $usuario2->apellidos = 'admin admin';
-        $usuario2->estado = 'activo';
-        $usuario2->email = 'rodrigo2@gmail.com';
-        $usuario2->save();
+        Permission::create(['name' => 'inicio.index'])->assignRole($rol1);
+        Permission::create(['name' => 'inicio.estadistica'])->assignRole($rol1);
 
-        $usuario3 = new User();
-        $usuario3->usuario = '6015869';
-        $usuario3->password = Hash::make('6015869');
-        $usuario3->ci = '6015869';
-        $usuario3->nombres = 'Admin';
-        $usuario3->apellidos = 'admin admin';
-        $usuario3->estado = 'activo';
-        $usuario3->email = 'rodrigo3@gmail.com';
-        $usuario3->save(); */
+        // USUARIO
+        Permission::create(['name' => 'admin.index'])->syncRoles([$rol1]);
+
+
+        Permission::create(['name' => 'admin.usuario.inicio'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'admin.usuario.crear'])->assignRole($rol1);
+        Permission::create(['name' => 'admin.usuario.desactivar'])->assignRole($rol1);
+        Permission::create(['name' => 'admin.usuario.editarRol'])->assignRole($rol1);
+        Permission::create(['name' => 'admin.usuario.eliminarRol'])->assignRole($rol1);
+
+
+        //ROL
+        Permission::create(['name' => 'admin.rol.inicio'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'admin.rol.crear'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'admin.rol.editar'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'admin.rol.eliminar'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'admin.rol.visualizar'])->syncRoles([$rol1]);
+
+
+        //PERMISOS
+        Permission::create(['name' => 'admin.permiso.inicio'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'admin.permiso.crear'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'admin.permiso.editar'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'admin.permiso.eliminar'])->syncRoles([$rol1]);
+
+
+        //CONTROL PEJAE
+
+        // GENERAR REGISTROS
+        Permission::create(['name' => 'control.index'])->syncRoles([$rol1, $rol2]);
+
+        Permission::create(['name' => 'control.generar.inicio'])->syncRoles([$rol1, $rol2]);
+        Permission::create(['name' => 'control.generar.verificar'])->syncRoles([$rol1, $rol2]);
+        Permission::create(['name' => 'control.generar.generar'])->syncRoles([$rol1, $rol2]);
+        Permission::create(['name' => 'control.generar.llenar'])->syncRoles([$rol1, $rol2]);
+
+        // LISTAR REGISTROS
+
+        Permission::create(['name' => 'control.listar.inicio'])->syncRoles([$rol1, $rol2]);
+        Permission::create(['name' => 'control.listar.fechas_encargado'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'control.listar.listar_todo'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'control.listar.reporte_diario'])->syncRoles([$rol1, $rol2]);
+        Permission::create(['name' => 'control.listar.eliminar'])->syncRoles([$rol1, $rol2]);
+
+        // PUESTOS
+
+        // ASIGANAR PUESTO
+        Permission::create(['name' => 'puesto.index'])->syncRoles([$rol1]);
+
+        Permission::create(['name' => 'puesto.asignar.inicio'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'puesto.asignar.asignar'])->syncRoles([$rol1]);
+
+
+        // HISTORIAL PUESTO
+        Permission::create(['name' => 'puesto.historial.inicio'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'puesto.historial.fecha'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'puesto.historial.listar_todo'])->syncRoles([$rol1]);
+
+
+        // REPORTES
+
+        Permission::create(['name' => 'reporte.inicio'])->syncRoles([$rol1]);
+
+        // CONFIGURACION
+        Permission::create(['name' => 'configuracion.index'])->syncRoles([$rol1]);
+
+
+        // PUESTO
+        Permission::create(['name' => 'configuracion.puesto.inicio'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.puesto.crear'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.puesto.editar'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.puesto.eliminar'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.puesto.desactivar'])->syncRoles([$rol1]);
+
+        // TARIFA
+        Permission::create(['name' => 'configuracion.tarifa.inicio'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.tarifa.crear'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.tarifa.editar'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.tarifa.eliminar'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.tarifa.desactivar'])->syncRoles([$rol1]);
+
+
+        // TIPO DE VEGICULO
+        Permission::create(['name' => 'configuracion.tipo_vehi.inicio'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.tipo_vehi.crear'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.tipo_vehi.editar'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.tipo_vehi.eliminar'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.tipo_vehi.desactivar'])->syncRoles([$rol1]);
+
+        // COLOR
+        Permission::create(['name' => 'configuracion.color.inicio'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.color.crear'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.color.editar'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.color.eliminar'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'configuracion.color.desactivar'])->syncRoles([$rol1]);
     }
-
 }

@@ -32,6 +32,10 @@ class Controlador_puesto extends Controller
     public function index()
     {
 
+        if (!auth()->user()->can('puesto.asignar.inicio')) {
+            return redirect()->route('inicio');
+        }
+
         $fecha_actual = $this->fecha->toDateString();
 
         $puestos = Puesto::with(['users' => function ($query) use ($fecha_actual) {
@@ -64,6 +68,10 @@ class Controlador_puesto extends Controller
 
     public function listar_historial(Request $request)
     {
+
+        if (!auth()->user()->can('puesto.historial.inicio')) {
+            return redirect()->route('inicio');
+        }
         // Obtén la fecha del request o usa la fecha actual como predeterminada
         $fecha_actual = $request->input('fecha') ? Carbon::parse($request->input('fecha'))->toDateString() : null;
 

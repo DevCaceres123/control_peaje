@@ -39,7 +39,9 @@ class Controlador_registro extends Controller
 
     public function index()
     {
-
+        if (!auth()->user()->can('control.generar.inicio')) {
+            return redirect()->route('inicio');
+        }
         $fecha_actual = $this->fecha->toDateString();
         $usuario_actual = auth()->user()->id;
         $vehiculos = TipoVehiculo::select('id', 'nombre')->get();
@@ -500,6 +502,12 @@ class Controlador_registro extends Controller
     public function listar_registro(Request $request)
     {
 
+
+        if (!auth()->user()->can('control.listar.inicio')) {
+            return redirect()->route('inicio');
+        }
+
+
         $fecha_actual = $request->input('fecha') ? Carbon::parse($request->input('fecha'))->toDateString() : null;
         $encargado = $request->input('encargado') ?? null;
 
@@ -569,10 +577,8 @@ class Controlador_registro extends Controller
 
         // Permisos (para el frontend, si es necesario)
         $permissions = [
-            'desactivar' => auth()->user()->can('admin.usuario.desactivar'),
-            'reset' => auth()->user()->can('admin.usuario.reset'),
-            'editarRol' => auth()->user()->can('admin.usuario.editarRol'),
-            'editarTargeta' => auth()->user()->can('admin.usuario.editarTargeta'),
+            'eliminar' => auth()->user()->can('control.listar.eliminar'),
+            
         ];
 
         // Retorna el JSON con los datos y los totales
@@ -675,7 +681,7 @@ class Controlador_registro extends Controller
             ->get();
 
 
-        $pdf = Pdf::loadView('administrador/pdf/reporteRegistroDiario', compact('registros', 'puesto', 'nombreCompletoUsuario','registros_eliminados','fecha_actual'));
+        $pdf = Pdf::loadView('administrador/pdf/reporteRegistroDiario', compact('registros', 'puesto', 'nombreCompletoUsuario', 'registros_eliminados', 'fecha_actual'));
         return $pdf->stream();
     }
 

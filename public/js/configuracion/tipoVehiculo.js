@@ -1,6 +1,6 @@
-let modal_tipoVehiculo        = new bootstrap.Modal(document.getElementById("modal_tipoVehiculo"));
-let form_tipoVehiculo         = document.getElementById("form_tipoVehiculo");
-let btn_guardar_tipoVehiculo  = document.getElementById("btn_guardar_tipoVehiculo");
+let modal_tipoVehiculo = new bootstrap.Modal(document.getElementById("modal_tipoVehiculo"));
+let form_tipoVehiculo = document.getElementById("form_tipoVehiculo");
+let btn_guardar_tipoVehiculo = document.getElementById("btn_guardar_tipoVehiculo");
 let errores_msj = ["_nombre"];
 
 function abrirModalTipoVehiculo(id = null) {
@@ -30,7 +30,7 @@ async function cargarDatosTipoVehiculo(id) {
         });
         let data = await respuesta.json();
         if (data.tipo === "success") {
-            document.getElementById("nombre").value         = data.mensaje.nombre;
+            document.getElementById("nombre").value = data.mensaje.nombre;
         } else {
             alerta_top(data.tipo, data.mensaje);
             modal_tipoVehiculo.hide();
@@ -55,26 +55,26 @@ btn_guardar_tipoVehiculo.addEventListener("click", async () => {
     validar_boton(true, "Validando . . .", btn_guardar_tipoVehiculo);
 
     //try {
-        let respuesta = await fetch(url, {
-            method: metodo,
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": token,
-            },
-            body: JSON.stringify(datos),
-        });
-        let data = await respuesta.json();
-        vaciar_errores(errores_msj);
-        if (data.tipo === "errores") {
-            mostrarErrores(data.mensaje);
-        } else {
-            alerta_top(data.tipo, data.mensaje);
-            if (data.tipo === "success") {
-                listar_tipoVehiculo();
-                cerrarModelTipoVehiculo();
-            }
+    let respuesta = await fetch(url, {
+        method: metodo,
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": token,
+        },
+        body: JSON.stringify(datos),
+    });
+    let data = await respuesta.json();
+    vaciar_errores(errores_msj);
+    if (data.tipo === "errores") {
+        mostrarErrores(data.mensaje);
+    } else {
+        alerta_top(data.tipo, data.mensaje);
+        if (data.tipo === "success") {
+            listar_tipoVehiculo();
+            cerrarModelTipoVehiculo();
         }
-        validar_boton(false, "Guardar", btn_guardar_tipoVehiculo);
+    }
+    validar_boton(false, "Guardar", btn_guardar_tipoVehiculo);
     /* } catch (error) {
         console.log("Ocurrió un error:", error);
     } */
@@ -96,10 +96,10 @@ async function listar_tipoVehiculo() {
     }
 }
 
-function tipoVehiculo_tabla(data) {
+function tipoVehiculo_tabla(dato) {
     $("#tabla_tipoVehiculo").DataTable({
         responsive: true,
-        data: data,
+        data: dato.tiposVehiculos,
         columns: [
             { data: null, render: (data, type, row, meta) => meta.row + 1 },
             { data: "nombre", className: "table-td" },
@@ -108,20 +108,27 @@ function tipoVehiculo_tabla(data) {
                 className: "table-td",
                 render: (data, type, row) => `
                     <div class="form-check form-switch form-switch-dark">
-                        <input class="form-check-input" onclick="estado_tipoVehiculo('${ row.id }')" type="checkbox"  id="customSwitchDark" ${ row.estado === "activo" ? "checked" : "" }>
+                        <input class="form-check-input" onclick="estado_tipoVehiculo('${row.id}')" type="checkbox"  id="customSwitchDark" ${row.estado === "activo" ? "checked" : ""}>
                     </div>
                 `,
             },
             {
                 data: null,
                 className: "table-td",
-                render: (data, type, row) => `
-                    <button class="btn rounded-pill btn-sm btn-warning p-0.5" onclick="abrirModalTipoVehiculo('${row.id}')">
+                render: (data,type, row) => `
+
+                ${dato.permissions['editar'] ?
+                        ` <button class="btn rounded-pill btn-sm btn-warning p-0.5" onclick="abrirModalTipoVehiculo('${row.id}')">
                         <i class="las la-pen fs-18"></i>
-                    </button>
-                    <button class="btn rounded-pill btn-sm btn-danger p-0.5" onclick="eliminarTipoVehiculo('${row.id}')">
+                    </button>`
+                        : ``}
+                   
+                     ${dato.permissions['eliminar'] ?
+                        `<button class="btn rounded-pill btn-sm btn-danger p-0.5" onclick="eliminarTipoVehiculo('${row.id}')">
                         <i class="las la-trash-alt fs-18"></i>
-                    </button>
+                    </button>`
+                        : ``}                
+
                 `,
             },
         ],
@@ -156,7 +163,7 @@ async function estado_tipoVehiculo(id) {
             } catch (error) {
                 console.log("Error al cambiar el estado:", error);
             }
-        }else{
+        } else {
             listar_tipoVehiculo();
         }
     });
@@ -188,7 +195,7 @@ async function eliminarTipoVehiculo(id) {
                 console.log("Error al eliminar:", error);
                 listar_tipoVehiculo();
             }
-        }else{
+        } else {
             listar_tipoVehiculo();
         }
     });

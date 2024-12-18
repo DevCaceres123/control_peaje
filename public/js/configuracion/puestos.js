@@ -94,10 +94,10 @@ async function listar_puesto() {
     }
 }
 
-function puesto_tabla(data) {
+function puesto_tabla(dato) {
     $("#tabla_puesto").DataTable({
         responsive: true,
-        data: data,
+        data: dato.puesto,
         columns: [
             { data: null, render: (data, type, row, meta) => meta.row + 1 },
             { data: "nombre", className: "table-td" },
@@ -105,21 +105,31 @@ function puesto_tabla(data) {
                 data: null,
                 className: "table-td",
                 render: (data, type, row) => `
+                
                     <div class="form-check form-switch form-switch-dark">
-                        <input class="form-check-input" onclick="estado_puesto('${ row.id }')" type="checkbox"  id="customSwitchDark" ${ row.estado === "activo" ? "checked" : "" }>
+                    
+                        <input class="form-check-input" onclick="estado_puesto('${row.id}')" type="checkbox"  id="customSwitchDark" ${row.estado === "activo" ? "checked" : ""}>
                     </div>
                 `,
             },
             {
                 data: null,
                 className: "table-td",
-                render: (data, type, row) => `
-                    <button class="btn rounded-pill btn-sm btn-warning p-0.5" onclick="abrirModalPuesto('${row.id}')">
+                render: (data,type, row) => `
+
+                 ${dato.permissions['editar'] ?
+                        ` <button class="btn rounded-pill btn-sm btn-warning p-0.5" onclick="abrirModalPuesto('${row.id}')">
                         <i class="las la-pen fs-18"></i>
-                    </button>
-                    <button class="btn rounded-pill btn-sm btn-danger p-0.5" onclick="eliminarPuesto('${row.id}')">
+                    </button>`
+                        : ``}
+    
+                    ${dato.permissions['eliminar'] ?
+                        ` <button class="btn rounded-pill btn-sm btn-danger p-0.5" onclick="eliminarPuesto('${row.id}')">
                         <i class="las la-trash-alt fs-18"></i>
-                    </button>
+                    </button>`
+                        : ``}
+    
+                   
                 `,
             },
         ],
@@ -154,7 +164,7 @@ async function estado_puesto(id) {
             } catch (error) {
                 console.log("Error al cambiar el estado:", error);
             }
-        }else{
+        } else {
             listar_puesto();
         }
     });
@@ -185,7 +195,7 @@ async function eliminarPuesto(id) {
             } catch (error) {
                 console.log("Error al eliminar:", error);
             }
-        }else{
+        } else {
             listar_puesto();
         }
     });

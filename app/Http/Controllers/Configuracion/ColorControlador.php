@@ -16,6 +16,9 @@ class ColorControlador extends Controller
      */
     public function index()
     {
+        if (!auth()->user()->can('configuracion.color.crear')) {
+            return redirect()->route('inicio');
+        }
         return view('administrador.configuracion.colores');
     }
 
@@ -115,7 +118,19 @@ class ColorControlador extends Controller
 
     //para listar 
     public function listar() {
+
+        $permissions = [
+            'editar' => auth()->user()->can('configuracion.color.editar'),
+            'eliminar' => auth()->user()->can('configuracion.color.eliminar'),
+            'desactivar' => auth()->user()->can('configuracion.color.desactivar'),
+           
+        ];
         $color = Color::OrderBy('id', 'desc')->get(); 
-        return response()->json($color);
+
+        $data=[
+            'permissions'=>$permissions,
+            'color'=>$color,
+        ];
+        return response()->json($data);
     }
 }

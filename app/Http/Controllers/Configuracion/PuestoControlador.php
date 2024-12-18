@@ -16,6 +16,10 @@ class PuestoControlador extends Controller
      */
     public function index()
     {
+        if (!auth()->user()->can('configuracion.puesto.crear')) {
+            return redirect()->route('inicio');
+        }
+
         return view('administrador.configuracion.puesto');
     }
 
@@ -136,7 +140,23 @@ class PuestoControlador extends Controller
 
     //para listar el registro
     public function listar(){
+
+        $permissions = [
+            'editar' => auth()->user()->can('configuracion.puesto.editar'),
+            'eliminar' => auth()->user()->can('configuracion.puesto.eliminar'),
+            'desactivar' => auth()->user()->can('configuracion.puesto.desactivar'),
+           
+        ];
+
+
+        
         $puesto = Puesto::OrderBy('id', 'desc')->get();
-        return response()->json($puesto);
+
+        $data=[
+            'permissions'=>$permissions,
+            'puesto'=>$puesto,
+        ];
+
+        return response()->json($data);
     }
 }
