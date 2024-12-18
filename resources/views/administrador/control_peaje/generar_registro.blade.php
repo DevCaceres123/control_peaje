@@ -7,11 +7,11 @@
         <div class="col-sm-12 col-6 col-lg-12">
             <div class="contenedor_precio">
                 @foreach ($tarifas as $tarifa)
-                    <div class="card_precio " data-id="{{ $tarifa->id }}">
+                    <div class="card_precio bg-primary" data-id="{{ $tarifa->id }}">
 
                         <p>{{ $tarifa->nombre }}</p>
                         <div class="icon"><i class="fas fa-truck fs-24"></i></div>
-                        <strong>{{ $tarifa->precio }}Bs</strong>
+                        <strong class="bg-success">{{ $tarifa->precio }}Bs</strong>
                     </div>
                 @endforeach
 
