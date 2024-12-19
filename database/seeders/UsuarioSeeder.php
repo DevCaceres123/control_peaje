@@ -129,7 +129,8 @@ class UsuarioSeeder extends Seeder
         // LISTAR REGISTROS
 
         Permission::create(['name' => 'control.listar.inicio'])->syncRoles([$rol1, $rol2]);
-        Permission::create(['name' => 'control.listar.fechas_encargado'])->syncRoles([$rol1]);
+        Permission::create(['name' => 'control.listar.fechas'])->syncRoles([$rol1, $rol2]);
+        Permission::create(['name' => 'control.listar.encargado'])->syncRoles([$rol1]);
         Permission::create(['name' => 'control.listar.listar_todo'])->syncRoles([$rol1]);
         Permission::create(['name' => 'control.listar.reporte_diario'])->syncRoles([$rol1, $rol2]);
         Permission::create(['name' => 'control.listar.eliminar'])->syncRoles([$rol1, $rol2]);
