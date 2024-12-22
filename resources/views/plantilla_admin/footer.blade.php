@@ -10,7 +10,7 @@
                                 document.write(new Date().getFullYear())
                             </script>
                             <span class="text-muted d-none d-sm-inline-block float-end">
-                                MR Tech Solutions
+                                M. Caceres Dev.
                             </span>
                         </p>
                     </div>
