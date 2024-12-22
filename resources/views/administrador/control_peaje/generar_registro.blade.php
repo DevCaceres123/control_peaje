@@ -41,18 +41,17 @@
                             @endcan
 
                             @can('control.generar.generar')
-                            <button type="button" class="btn btn-success px-2 d-inline-flex align-items-center mb-2"
-                                id="btn-generarQr">
-                                <i class="fas fa-qrcode fs-20 me-1"></i>Generar QR
-                            </button>
+                                <button type="button" class="btn btn-success px-2 d-inline-flex align-items-center mb-2"
+                                    id="btn-generarQr">
+                                    <i class="fas fa-qrcode fs-20 me-1"></i>Generar QR
+                                </button>
                             @endcan
 
                             @can('control.generar.llenar')
-                            <button type="button" class="btn btn-primary px-2 d-inline-flex align-items-center mb-2"
-                                id="btn-llenar_informacion">
-                                <i class="fas fa-shipping-fast fs-20 me-1"></i>Llenar informacion
-                            </button>
-
+                                <button type="button" class="btn btn-primary px-2 d-inline-flex align-items-center mb-2"
+                                    id="btn-llenar_informacion">
+                                    <i class="fas fa-shipping-fast fs-20 me-1"></i>Llenar informacion
+                                </button>
                             @endcan
 
 
@@ -67,104 +66,117 @@
 
                 <form id="nuevo_registro" style="display: none;">
                     <div class="row p-3">
-                        <h4 class="text-center ">REGISTRO DE VEHICULO</h4>
-                        <div class="form-group py-2 col-12 col-md-6">
 
-                            <input type="hidden" name="id_tarifa" id="id_tarifa" value>
-                            <label for="" class="form-label">DOCUMENTO DE IDENTIDAD</label>
-                            <div class="container-validation" id="group_usuarioReset">
-                                <input type="text" class="form-control rounded" name="ci" id="ci">
-                                <div id="_ci">
 
+                        <h5 class="mt-2">Datos Vehiculo:: </h5>
+                        <div class="row m-auto border border-success rounded p-2">
+
+
+
+
+                            <div class="form-group py-2 col-6 col-md-12">
+
+                                <label for="" class="form-label">PLACA</label>
+                                <div class="container-validation" id="group_usuarioReset">
+                                    <input type="text" class="form-control rounded" name="placa" id="placa"
+                                        style="text-transform: uppercase">
+                                    <div id="_placa">
+
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-group py-2 col-6 col-md-3">
-
-                            <label for="" class="form-label">PATERNO</label>
-                            <div class="container-validation" id="group_usuarioReset">
-                                <input type="text" class="form-control rounded" name="ap_paterno" id="ap_paterno">
-                                <div id="_ap_paterno">
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group py-2 col-6 col-md-3">
-
-                            <label for="" class="form-label">MATERNO</label>
-                            <div class="container-validation" id="group_usuarioReset">
-                                <input type="text" class="form-control rounded" name="ap_materno" id="ap_materno">
-                                <div id="_ap_materno">
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group py-2 col-6 col-md-4">
-
-                            <label for="" class="form-label">NOMBRES</label>
-                            <div class="container-validation" id="group_usuarioReset">
-                                <input type="text" class="form-control rounded" name="nombres" id="nombres">
-                                <div id="_nombres">
-
-                                </div>
-                            </div>
-                        </div>
+                            <div class="form-group py-2 col-md-6">
+                                <label for="" class="form-label">VEHICULO</label>
 
 
-                        <div class="form-group py-2 col-md-3">
-                            <label for="" class="form-label">VEHICULO</label>
-
-
-                            <select name="id_tipo_veh" id="id_tipo_veh" class="form-control  rounded" require>
-                                <option disabled selected>Opciones</option>
-                                @foreach ($vehiculos as $vehiculo)
-                                    <option class="text-capitalize" value="{{ $vehiculo->id }}">{{ $vehiculo->nombre }}
-                                    </option>
-                                @endforeach
-
-
-
-                            </select>
-                            <div id="_id_tipo_veh"></div>
-
-                        </div>
-
-
-                        <div class="form-group py-2 col-md-5">
-
-
-                            <div class="form-group">
-                                <label for="" class="form-label">COLOR</label>
-                                <select id="id_color" name="id_color">
-                                    <option disabled selected>Elige una opción</option>
-                                    @foreach ($colores as $colore)
-                                        <option value="{{ $colore->id }}"> {{ $colore->nombre }}</option>
+                                <select name="id_tipo_veh" id="id_tipo_veh" class="form-control  rounded" require>
+                                    <option disabled selected>Opciones</option>
+                                    @foreach ($vehiculos as $vehiculo)
+                                        <option class="text-capitalize" value="{{ $vehiculo->id }}">
+                                            {{ $vehiculo->nombre }}
+                                        </option>
                                     @endforeach
 
+
+
                                 </select>
+                                <div id="_id_tipo_veh"></div>
+
                             </div>
 
-                            <div id="_id_color"></div>
+
+                            <div class="form-group py-2 col-md-6">
+
+
+                                <div class="form-group">
+                                    <label for="" class="form-label">COLOR</label>
+                                    <select id="id_color" name="id_color">
+                                        <option disabled selected>Elige una opción</option>
+                                        @foreach ($colores as $colore)
+                                            <option value="{{ $colore->id }}"> {{ $colore->nombre }}</option>
+                                        @endforeach
+
+                                    </select>
+                                </div>
+
+                                <div id="_id_color"></div>
+
+                            </div>
 
                         </div>
 
 
-                        <div class="form-group py-2 col-6 col-md-12">
+                        <h5 class="mt-1">Datos Cliente:: </h5>
+                        <div class="row m-auto border border-primary rounded p-2">
+                            <div class="form-group py-2 col-12 col-md-12">
 
-                            <label for="" class="form-label">PLACA</label>
-                            <div class="container-validation" id="group_usuarioReset">
-                                <input type="text" class="form-control rounded" name="placa" id="placa"
-                                    style="text-transform: uppercase">
-                                <div id="_placa">
+                                <input type="hidden" name="id_tarifa" id="id_tarifa" value>
+                                <label for="" class="form-label">DOCUMENTO DE IDENTIDAD</label>
+                                <div class="container-validation" id="group_usuarioReset">
+                                    <input type="text" class="form-control rounded" name="ci" id="ci">
+                                    <div id="_ci">
 
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group py-2 col-6 col-md-4">
+
+                                <label for="" class="form-label">NOMBRES</label>
+                                <div class="container-validation" id="group_usuarioReset">
+                                    <input type="text" class="form-control rounded" name="nombres" id="nombres">
+                                    <div id="_nombres">
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group py-2 col-6 col-md-4">
+
+                                <label for="" class="form-label">PATERNO</label>
+                                <div class="container-validation" id="group_usuarioReset">
+                                    <input type="text" class="form-control rounded" name="ap_paterno" id="ap_paterno">
+                                    <div id="_ap_paterno">
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group py-2 col-6 col-md-4">
+
+                                <label for="" class="form-label">MATERNO</label>
+                                <div class="container-validation" id="group_usuarioReset">
+                                    <input type="text" class="form-control rounded" name="ap_materno"
+                                        id="ap_materno">
+                                    <div id="_ap_materno">
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-
-
                         <div class="d-flex mt-1">
                             <button type="button" class="btn btn-danger rounded btn-sm me-2"
                                 id="btn-terminar_formulario">
