@@ -7,6 +7,11 @@
     <title>BOLETA DE PAGO</title>
     <style>
         /* Estilos optimizados */
+
+        :root {
+            --temaño_letra: 10px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,13 +20,13 @@
 
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
+            padding: 10px;
             color: #333;
         }
 
         .container_boleta {
-            padding: 15px;
-            border: 3px dashed #8b5050;
+            padding: 9px;
+            border: 2px dashed #8b5050;
             border-radius: 8px;
             position: relative;
         }
@@ -33,102 +38,48 @@
         }
 
         .info_empresa h2 {
-            font-size: 14px;
+            font-size: var(--temaño_letra);
             margin-bottom: 5px;
             font-weight: 100;
             letter-spacing: 2px;
         }
 
-        .info_empresa p {
-            font-size: 14px;
-            margin: 4px 0;
+        .info_empresa .datos_us_pu {
+            position: relative;
+            width: 100%;
+            height: 20px;
             text-transform: capitalize;
         }
 
-
-
-        .detalles_reunion {
-            margin-top: 20px;
-            font-size: 14px;
-
-            text-transform: capitalize !important;
-        }
-
-
-        .detalles_reunion hr {
-            margin: 10px 0;
-            border: none;
-            border-top: 1px solid #ddd;
-        }
-
-        .titulo {
-            margin-top: 12px;
-            text-align: center;
+        .info_empresa span {
+            font-size: var(--temaño_letra);
+            margin: 4px 0;
             font-weight: bold;
+
         }
 
-        .tabla {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-
-        .tabla th,
-        .tabla td {
-            border: 1px solid #333;
-            padding: 8px;
-            text-align: center;
-            font-size: 12px;
-        }
-
-        .tabla th {
-            background-color: #080625;
-            color: white;
-            font-weight: bold;
-        }
-
-        .totalBoletas {
-            width: 100%;
-            position: relative;
-        }
-
-        .totalBoletas .inasitencia {
+        .info_empresa .usuario {
             position: absolute;
-            top: 0;
             left: 0;
-
-            margin-top: 20px;
-            font-size: 16px;
-            font-weight: bold;
+            top: 0;
         }
 
+        .info_empresa .puesto {
 
-        .totalBoletas .observados {
             position: absolute;
-            top: 0;
-            right: 50%;
-            left: 50%;
-            margin-top: 20px;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center
-        }
-
-        .totalBoletas .asistencia {
-            position: absolute;
-            top: 0;
             right: 0;
-
-            margin-top: 20px;
-            font-size: 16px;
-            font-weight: bold;
+            top: 0;
         }
+
 
         .cod_precio {
             width: 100%;
             position: relative;
-            height: 30px;
-            border-bottom: 5px dotted #000
+            width: 100%;
+            height: 80px;
+            font-size: 13px;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-weight: 900px;
         }
 
         .cod_precio .codigo {
@@ -144,13 +95,14 @@
         }
 
         .qr_code {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
 
-            width: 160px;
+            width: 80px;
             margin: auto;
-            height: 160px;
-            
-            margin-top: 15px;
-            margin-bottom: 20px;
+            height: 80px;
             box-sizing: border-box;
         }
 
@@ -165,50 +117,39 @@
         .vehiculo {
             width: 100%;
             text-align: center;
-            font-size: 13px;
-            letter-spacing: 1px;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 5px dotted #000;
-            border-bottom: 5px dotted #000
+            font-size: var(--temaño_letra);
+            margin-top: 3px;
+            padding: 5px 0px;
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
         }
 
-        .vehiculo h3 {
-            text-transform: uppercase;
-            font-size: 14px;
-        }
-
-        .vehiculo h3,
-        p {
-            margin-bottom: 4px;
-        }
 
         .fechas {
             width: 100%;
             text-align: center;
-            font-size: 13px;
+            font-size: var(--temaño_letra);
             letter-spacing: 1px;
-            margin-top: 8px;
-            padding-top: 8px;
+            margin-top: 5px;
 
         }
 
-        .nota {
-            margin-top: 10px;
-            text-align: center;
-            font-size: 12px;
-        }
+
 
         .ley {
-            margin-top: 15px;
-            font-size: 13px;
+            margin-top: 5px;
+            font-size: 8px;
             text-align: justify;
+        }
+
+        ley p {
+            margin-top: 3px;
         }
 
         .ley .titulo_creacion {
             text-align: center;
             font-weight: 900;
-            margin-bottom: 8px;
+
         }
     </style>
 </head>
@@ -222,44 +163,55 @@
             <h2>DIRECCION DE RECAUDACIONES</h2>
 
             <hr>
-            <p class="usuario">Us: {{ $usuario['nombres'] ?? 'NA' }} {{ $usuario['apellidos'] ?? 'NA' }}</p>
-            <p class="puesto">Puesto: {{ $puesto->nombre ?? 'N/A' }}</p>
+
+            <div class="datos_us_pu">
+                <span class="usuario">
+                    U.s. : {{ $usuario['nombres'][0] ?? 'N' }}. {{ $usuario['apellidos'][0] ?? 'A' }}.
+
+                    {{ isset($usuario['apellidos']) && strpos($usuario['apellidos'], ' ') !== false ? $usuario['apellidos'][strpos($usuario['apellidos'], ' ') + 1] : 'A' }}
+                </span>
+                <span class="puesto">Puesto: {{ $puesto->nombre ?? 'N/A' }}</span>
+
+            </div>
 
 
         </div>
 
         <div class="cod_precio">
             <span class="codigo">{{ $tarifa->descripcion ?? 'N/A' }}</span>
-            <span class="precio">{{ $tarifa->precio ?? 'N/A' }} <b>Bs</b></span>
+            <span class="precio"><b>Bs.- </b>{{ $tarifa->precio ?? 'N/A' }}.00</span>
+            <div class="qr_code">
+                <img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">
+            </div>
         </div>
 
-        <div class="qr_code">
 
-            <img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">
-        </div>
+        @if ($placa != null)
+            <div class="vehiculo">
+                @if ($placa != null)
+                    <span><b>Placa: </b> {{ strtoupper($placa) }} |</span>
+                @endif
+                @if ($color != null)
+                    <span>{{ $color }} |</span>
+                @endif
 
-        <div class="vehiculo">
-            @if ($placa != null)
-                <h3>Datos del Vehiculo</h3>
-                <p><b>Placa: </b> {{ strtoupper($placa) }}</p>
-            @endif
-            @if ($color != null)
-                <p><b>color: </b> {{ $color }}</p>
-            @endif
-
-            @if ($tipo_auto != null)
-                <p><b>Tipo: </b> {{ $tipo_auto }}</p>
-            @endif
+                @if ($tipo_auto != null)
+                    <span> {{ $tipo_auto }} |</span>
+                @endif
 
 
-        </div>
+            </div>
+        @endif
 
         <div class="fechas">
-            <p><b> Fecha Generada: </b></p>
-            <p>{{ now()->format('Y-m-d H:i:s') }}</p>
-            <p><b> Valida hasta:</b></p>
-            <p>{{ $fecha_finalizacion }}</p>
-
+            <p>
+                <b> Fecha Generada: </b>
+                {{ now()->format('Y-m-d H:i:s') }}
+            </p>
+            <p>
+                <b> Valida hasta: </b>
+                {{ $fecha_finalizacion }}
+            </p>
         </div>
 
 
