@@ -44,8 +44,11 @@ class Controlador_registro extends Controller
         }
         $fecha_actual = $this->fecha->toDateString();
         $usuario_actual = auth()->user()->id;
-        $vehiculos = TipoVehiculo::select('id', 'nombre')->get();
-        $colores = Color::select('id', 'nombre')->get();
+        $vehiculos = TipoVehiculo::select('id', 'nombre')
+            ->where('estado', 'activo')
+            ->get();
+        $colores = Color::select('id', 'nombre')
+            ->get();
         $tarifas = Tarifa::select('id', 'nombre', 'precio')
             ->where('estado', 'activo')
             ->get();
@@ -578,7 +581,7 @@ class Controlador_registro extends Controller
         // Permisos (para el frontend, si es necesario)
         $permissions = [
             'eliminar' => auth()->user()->can('control.listar.eliminar'),
-            
+
         ];
 
         // Retorna el JSON con los datos y los totales

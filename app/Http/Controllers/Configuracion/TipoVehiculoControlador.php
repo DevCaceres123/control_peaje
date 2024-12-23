@@ -17,7 +17,7 @@ class TipoVehiculoControlador extends Controller
      */
     public function index()
     {
-        if (!auth()->user()->can('configuracion.tipo_vehi.crear')) {
+        if (!auth()->user()->can('configuracion.tipo_vehi.inicio')) {
             return redirect()->route('inicio');
         }
         return view('administrador.configuracion.tipoVehiculo');
@@ -159,9 +159,9 @@ class TipoVehiculoControlador extends Controller
     public function listar() {
 
         $permissions = [
-            'editar' => auth()->user()->can('configuracion.tarifa.editar'),
-            'eliminar' => auth()->user()->can('configuracion.tarifa.eliminar'),
-            'desactivar' => auth()->user()->can('configuracion.tarifa.desactivar'),
+            'editar' => auth()->user()->can('configuracion.tipo_vehi.editar'),
+            'eliminar' => auth()->user()->can('configuracion.tipo_vehi.eliminar'),
+            'desactivar' => auth()->user()->can('configuracion.tipo_vehi.desactivar'),
            
         ];
         $tiposVehiculos = TipoVehiculo::OrderBy('id', 'desc')->get();
