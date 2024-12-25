@@ -206,7 +206,7 @@
         <div class="fechas">
             <p>
                 <b> Fecha Generada: </b>
-                {{ now()->format('Y-m-d H:i:s') }}
+                {{ $fecha_generada }}
             </p>
             <p>
                 <b> Valida hasta: </b>

@@ -118,8 +118,9 @@ class Controlador_registro extends Controller
             $data = [
                 'tarifa' => $tarifa,
                 'nuevo_Qr' => $cod_qr_unico,
-                'fecha_actual' => $fecha_actual,
+                'fecha_actual' => Carbon::now()->format('Y-m-d H:i:s'),
                 'puesto' => $puesto,
+                'vehiculo' => null,
             ];
 
 
@@ -163,6 +164,12 @@ class Controlador_registro extends Controller
 
     public function generar_ReportePdf($tarifa, $qrCodeBase64, $fecha_actual, $puesto, $vehiculo)
     {
+
+        if (Carbon::parse($fecha_actual)->format('H:i:s') === '00:00:00') {
+
+            $fecha_actual = Carbon::now();
+        }
+
         // si el vehiculo es distinto de nullo o vacio
         $color = "";
         $tipo_auto = "";
@@ -175,7 +182,8 @@ class Controlador_registro extends Controller
             $data = [
                 'tarifa' => $tarifa,
                 'qrCodeBase64' => $qrCodeBase64,
-                'fecha_finalizacion' => Carbon::now()->endOfDay(), // Obtener la fecha actual con hora 23:59:59
+                'fecha_finalizacion' => Carbon::parse($fecha_actual)->endOfDay(), // Obtener la fecha actual con hora 23:59:59
+                'fecha_generada' => $fecha_actual,
                 'usuario' => auth()->user()->only(['nombres', 'apellidos']),
                 'puesto' => $puesto,
                 'color' => $color->nombre ?? null,
@@ -186,7 +194,8 @@ class Controlador_registro extends Controller
             $data = [
                 'tarifa' => $tarifa,
                 'qrCodeBase64' => $qrCodeBase64,
-                'fecha_finalizacion' => Carbon::now()->endOfDay(), // Obtener la fecha actual con hora 23:59:59
+                'fecha_finalizacion' => Carbon::parse($fecha_actual)->endOfDay(), // Obtener la fecha actual con hora 23:59:59
+                'fecha_generada' => $fecha_actual,
                 'usuario' => auth()->user()->only(['nombres', 'apellidos']),
                 'puesto' => $puesto,
                 'color' => null,
@@ -279,8 +288,9 @@ class Controlador_registro extends Controller
             $data = [
                 'tarifa' => $tarifa,
                 'nuevo_Qr' => $cod_qr_unico,
-                'fecha_actual' => $fecha_actual,
+                'fecha_actual' => Carbon::now()->format('Y-m-d H:i:s'),
                 'puesto' => $puesto,
+                'vehiculo' => $vehiculo->id ? $vehiculo : null,
             ];
 
             $this->guardarHistorialRegistro($cod_qr_unico, $puesto->nombre, $tarifa->precio, $vehiculo->placa, $persona->ci,  json_encode($data), $id_registro);
@@ -581,6 +591,7 @@ class Controlador_registro extends Controller
         // Permisos (para el frontend, si es necesario)
         $permissions = [
             'eliminar' => auth()->user()->can('control.listar.eliminar'),
+            'reporte' => auth()->user()->can('control.listar.generar_boleta'),
 
         ];
 
@@ -687,6 +698,53 @@ class Controlador_registro extends Controller
         $pdf = Pdf::loadView('administrador/pdf/reporteRegistroDiario', compact('registros', 'puesto', 'nombreCompletoUsuario', 'registros_eliminados', 'fecha_actual'));
         return $pdf->stream();
     }
+
+
+
+    public function generar_boleta(String $id)
+    {
+        try {
+            $reporte = HistorialRegistros::find($id);
+
+            if (!$reporte) {
+                throw new Exception("Reporte no encontrado");
+            }
+
+            // Decodifica el campo JSON como objeto
+            $reporteJson = json_decode($reporte->reporte_json);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception("El campo reporte_json no contiene un JSON válido.");
+            }
+
+            // Acceso a datos del JSON como objeto
+            $nuevoQr = $reporteJson->nuevo_Qr ?? null;
+            $tarifa = $reporteJson->tarifa ?? null;
+            $fechaActual = $reporteJson->fecha_actual ?? null;
+            $puesto = $reporteJson->puesto ?? null;
+
+            // Decodifica 'vehiculo' como objeto
+            $vehiculo = $reporteJson->vehiculo ? json_decode(json_encode($reporteJson->vehiculo)) : null;
+
+
+
+            // Genera el QR
+            $qr_unico = $this->generar_qrReporte($nuevoQr);
+
+            // Genera el reporte en PDF (asumo que retorna una cadena base64)
+            $reporteBase64 = $this->generar_ReportePdf($tarifa, $qr_unico, $fechaActual, $puesto, $vehiculo);
+
+            // Responde con éxito
+            $this->mensaje('exito', $reporteBase64);
+            return response()->json($this->mensaje, 200);
+        } catch (Exception $e) {
+            // Manejo de excepciones
+            $this->mensaje("error", "Error: " . $e->getMessage());
+            return response()->json($this->mensaje, 500);
+        }
+    }
+
+
 
     public function mensaje($titulo, $mensaje)
     {

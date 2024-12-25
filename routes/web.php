@@ -64,6 +64,8 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
 
         Route::get('/ver_registros', 'ver_registros')->name('peaje.ver_registros');
         Route::get('/listar_registro', 'listar_registro');
+        // SE GENERA LA BOLETA DE UN REGISTRO
+        Route::get('/reporte/{id_registro}', 'generar_boleta');
 
         Route::get('/reporteDiario', 'reporteDiario')->name('peaje.reporte_diario');
     });

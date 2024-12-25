@@ -151,8 +151,14 @@ function listar_registros() {
 
                    ${permissions['eliminar'] ?
                             ` <a  class="btn btn-sm btn-outline-danger px-2 d-inline-flex align-items-center eliminar_registro" data-id="${row.id}">
-                      <i class="fas fa-window-close fs-16"></i>
-                  </a>`
+                                 <i class="fas fa-window-close fs-16"></i>
+                            </a>`
+                            : ``}
+
+                     ${permissions['reporte'] ?
+                            ` <button type="button" class="btn btn-sm btn-outline-success px-2 d-inline-flex align-items-center generar_reporte ms-1 btn-reporte" data-id="${row.id}">
+                                 <i class="fas fa-file-pdf  fs-16"></i>
+                            </button>`
                             : ``}
 
                         
@@ -240,3 +246,60 @@ $('#tabla_historialRegistro').on('click', '.eliminar_registro', function (e) {
         }
     })
 });
+
+
+
+// GENERAR REPORTE DE DEL REGISTRO
+
+$('#tabla_historialRegistro').on('click', '.generar_reporte', function (e) {
+
+    e.preventDefault();
+    let id_registro = $(this).data('id'); // Obtener el id 
+
+    $(".btn-reporte").prop("disabled", true);
+
+    crud("admin/reporte", "GET", id_registro, null, function (error, response) {
+
+        console.log(response);
+
+        // Verificamos que no haya un error o que todos los campos sean llenados
+        if (response.tipo === "errores") {
+            mensajeAlerta(response.mensaje, "errores");
+            return;
+        }
+        if (response.tipo != "exito") {
+            $(".btn-reporte").prop("disabled", false);
+            mensajeAlerta(response.mensaje, response.tipo);
+            return;
+        }
+        // si todo esta correcto muestra el mensaje de correcto
+        mensajeAlerta("Generando Reporte.....", "exito");
+        const blobUrl = generarURlBlob(response.mensaje); // Genera la URL del Blob
+
+        // espera un segundo para abrir la nueva ventana
+        setTimeout(() => {
+            window.open(blobUrl, '_blank'); // Abre en una nueva pestaña
+            $(".btn-reporte").prop("disabled", false);
+        }, 1500);
+
+    })
+
+});
+
+
+
+
+// PARA GENERAR UN BLOB PARA GENERAR EL REPORTE
+
+
+function generarURlBlob(pdfbase64) {
+
+    // Convertir Base64 a un Blob
+    const byteCharacters = atob(pdfbase64); // Decodifica el Base64
+    const byteNumbers = Array.from(byteCharacters).map(c => c.charCodeAt(0));
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+    // Crear una URL para el Blob
+    return URL.createObjectURL(blob);
+}

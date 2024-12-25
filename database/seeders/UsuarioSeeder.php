@@ -134,6 +134,7 @@ class UsuarioSeeder extends Seeder
         Permission::create(['name' => 'control.listar.listar_todo'])->syncRoles([$rol1]);
         Permission::create(['name' => 'control.listar.reporte_diario'])->syncRoles([$rol1, $rol2]);
         Permission::create(['name' => 'control.listar.eliminar'])->syncRoles([$rol1, $rol2]);
+        Permission::create(['name' => 'control.listar.generar_boleta'])->syncRoles([$rol1, $rol2]);
 
         // PUESTOS
 
