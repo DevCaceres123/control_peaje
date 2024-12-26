@@ -4,7 +4,7 @@
 @section('contenido')
     <link rel="stylesheet" href="{{ asset('css/precios.css') }}">
     <div class="row">
-        <div class="col-sm-12 col-6 col-lg-12">
+        <div class="col-12">
             <div class="contenedor_precio">
                 @foreach ($tarifas as $tarifa)
                     <div class="card_precio bg-primary" data-id="{{ $tarifa->id }}">
@@ -18,7 +18,7 @@
             </div>
 
         </div>
-        <div class="col-sm-12 col-6 col-lg-5 mt-3">
+        <div class="col-12 col-md-6 mt-3">
             <div class="card">
                 <div class="card-body">
                     <h3 class="card-title position-relative ">Importe::
@@ -31,24 +31,24 @@
 
                         </span>
                     </h3>
-                    <div class="row">
-                        <div class="col-12 d-flex  m-auto justify-content-between mt-1">
+                    <div class="row mt-1">
+                        <div class="col-12 d-flex flex-wrap  m-auto justify-content-between ">
                             @can('control.generar.verificar')
-                                <button type="button" class="btn btn-danger px-2 d-inline-flex align-items-center mb-2 me-1"
+                                <button type="button" class="btn btn-danger  d-inline-flex align-items-center   mb-2 m-auto"
                                     id="btn-verificarQr">
                                     <i class="far fa-question-circle fs-20 me-1"></i>Verificar QR
                                 </button>
                             @endcan
 
                             @can('control.generar.generar')
-                                <button type="button" class="btn btn-success px-2 d-inline-flex align-items-center mb-2"
+                                <button type="button" class="btn btn-success px-2 d-inline-flex align-items-center mb-2  m-auto"
                                     id="btn-generarQr">
                                     <i class="fas fa-qrcode fs-20 me-1"></i>Generar QR
                                 </button>
                             @endcan
 
                             @can('control.generar.llenar')
-                                <button type="button" class="btn btn-primary px-2 d-inline-flex align-items-center mb-2"
+                                <button type="button" class="btn btn-primary  d-inline-flex align-items-center mb-2  m-auto"
                                     id="btn-llenar_informacion">
                                     <i class="fas fa-shipping-fast fs-20 me-1"></i>Llenar informacion
                                 </button>

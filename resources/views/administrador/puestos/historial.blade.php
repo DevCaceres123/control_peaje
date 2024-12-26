@@ -16,7 +16,7 @@
                         <div class="row">
                             @can('puesto.historial.fecha')
                                 <label for="filterFecha" class="mb-2">Filtrar por fecha:</label>
-                                <div class="col-auto ">
+                                <div class="col-auto mb-2">
 
                                     <input type="date" id="filterFecha" class="form-control"
                                         value="{{ \Carbon\Carbon::now()->toDateString() }}" />
@@ -24,7 +24,7 @@
                             @endcan
 
                             @can('puesto.historial.listar_todo')
-                                <div class="col-3 mb-2">
+                                <div class="col-auto col-md-3 mb-2">
                                     <button id="btnListarTodo" class="btn btn-success ">
                                         <i class="fas fa-clipboard-list me-1"></i>Listar Todo</button>
                                 </div>

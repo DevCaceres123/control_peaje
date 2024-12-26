@@ -35,38 +35,35 @@
             <div class="contenedor_login-formulario-carusel">
 
                 <div class="contenedor-formulario">
+                    <div class="formulario">
 
-                    <div class="card-body p-5">
-                        <h2 class="contenedor-formulario">
+                        <h2>
                             Bienvenido
                         </h2>
+
                         <div class="text-center py-2" id="mensaje_error"></div>
                         <form id="formulario_login" autocomplete="off">
                             @csrf
                             <div class="form-group mb-2">
                                 <label class="form-label" for="usuario">Usuario</label>
-                                <input type="text" class="form-control rounded-pill text-light" id="usuario" name="usuario"
-                                    placeholder="Ingrese usuario">
+                                <input type="text" class="form-control rounded-pill text-light" id="usuario"
+                                    name="usuario" placeholder="Ingrese usuario">
                             </div><!--end form-group-->
 
                             <div class="form-group">
                                 <label class="form-label" for="password">Contraseña</label>
-                                <input type="password" class="form-control rounded-pill text-light" name="password" id="password"
-                                    placeholder="Ingrese la contraseña">
+                                <input type="password" class="form-control rounded-pill text-light" name="password"
+                                    id="password" placeholder="Ingrese la contraseña">
                             </div><!--end form-group-->
                         </form>
 
-                        <div class="form-group mb-0 row">
-                            <div class="col-12">
-                                <div class="d-grid mt-3">
-                                    <button class="btn  rounded-pill" type="button"
-                                        id="btn_ingresar_usuario">INGRESAR <i
-                                            class="fas fa-sign-in-alt ms-1"></i></button>
-                                </div>
-                            </div>
-                        </div>
+
+                        <button class="btn  rounded-pill" type="button" id="btn_ingresar_usuario">INGRESAR
+                            <i class="fas fa-sign-in-alt ms-1"></i>
+                        </button>
 
                     </div>
+
                 </div>
                 <div class="contenedor-carusel">
                     <div class="contenedor-carusel-titulo-descripcion">
