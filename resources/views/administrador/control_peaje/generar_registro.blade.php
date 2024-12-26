@@ -18,7 +18,7 @@
             </div>
 
         </div>
-        <div class="col-12 col-md-6 mt-3">
+        <div class="col-12 col-md-5 mt-3">
             <div class="card">
                 <div class="card-body">
                     <h3 class="card-title position-relative ">Importe::
