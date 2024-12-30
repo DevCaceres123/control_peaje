@@ -555,6 +555,7 @@ class Controlador_registro extends Controller
                 $query->where('puesto', 'like', '%' . $request->search['value'] . '%')
                     ->orWhere('nombre_usuario', 'like', '%' . $request->search['value'] . '%')
                     ->orWhere('precio', 'like', '%' . $request->search['value'] . '%')
+                    ->orWhere('placa', 'like', '%' . $request->search['value'] . '%')
                     ->orWhere('ci', 'like', '%' . $request->search['value'] . '%');
             });
         }
