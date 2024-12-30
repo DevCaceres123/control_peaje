@@ -181,7 +181,7 @@
             <thead>
                 <tr>
                     <th>Nº</th>
-                    <th>CONTEO</th>
+                    <th>CONTEO (QR)</th>
                     <th>PLACA</th>
                     <th>CI</th>
                     <th>MONTO</th>
@@ -198,7 +198,7 @@
                 @foreach ($registros as $registro)
                     <tr>
                         <td>{{ $count++ }}</td>
-                        <td>{{ $registro->num_aprobados ?? 0 }} Validados</td>
+                        <td>{{ $registro->num_aprobados ?? 0 }}</td>
                         <td>{{ $registro->placa ?? 'Sin registrar' }}</td>
                         <td>{{ $registro->ci ?? 'Sin registrar' }}</td>
                         <td>{{ $registro->precio }} <b>Bs</b></td>
