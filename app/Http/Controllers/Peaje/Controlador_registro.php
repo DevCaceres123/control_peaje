@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Peaje;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\peaje\RegistroPeajeRequest;
+use App\Http\Requests\Peaje\RegistroPeajeRequest;
 use App\Models\Color;
 use App\Models\DeleteTarifas;
 use App\Models\HistorialRegistros;
