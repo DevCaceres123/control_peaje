@@ -164,14 +164,14 @@ class UsuarioSeeder extends Seeder
         Permission::create(['name' => 'configuracion.puesto.crear'])->syncRoles([$rol1]);
         Permission::create(['name' => 'configuracion.puesto.editar'])->syncRoles([$rol1]);
         Permission::create(['name' => 'configuracion.puesto.eliminar'])->syncRoles([$rol1]);
-        Permission::create(['name' => 'configuracion.puesto.desactivar'])->syncRoles([$rol1]);
+        
 
         // TARIFA
         Permission::create(['name' => 'configuracion.tarifa.inicio'])->syncRoles([$rol1]);
         Permission::create(['name' => 'configuracion.tarifa.crear'])->syncRoles([$rol1]);
         Permission::create(['name' => 'configuracion.tarifa.editar'])->syncRoles([$rol1]);
         Permission::create(['name' => 'configuracion.tarifa.eliminar'])->syncRoles([$rol1]);
-        Permission::create(['name' => 'configuracion.tarifa.desactivar'])->syncRoles([$rol1]);
+        
 
 
         // TIPO DE VEGICULO
@@ -179,13 +179,13 @@ class UsuarioSeeder extends Seeder
         Permission::create(['name' => 'configuracion.tipo_vehi.crear'])->syncRoles([$rol1]);
         Permission::create(['name' => 'configuracion.tipo_vehi.editar'])->syncRoles([$rol1]);
         Permission::create(['name' => 'configuracion.tipo_vehi.eliminar'])->syncRoles([$rol1]);
-        Permission::create(['name' => 'configuracion.tipo_vehi.desactivar'])->syncRoles([$rol1]);
+        
 
         // COLOR
         Permission::create(['name' => 'configuracion.color.inicio'])->syncRoles([$rol1]);
         Permission::create(['name' => 'configuracion.color.crear'])->syncRoles([$rol1]);
         Permission::create(['name' => 'configuracion.color.editar'])->syncRoles([$rol1]);
         Permission::create(['name' => 'configuracion.color.eliminar'])->syncRoles([$rol1]);
-        Permission::create(['name' => 'configuracion.color.desactivar'])->syncRoles([$rol1]);
+        
     }
 }
