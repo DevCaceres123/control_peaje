@@ -52,6 +52,7 @@ class Controlador_puesto extends Controller
             ->whereDoesntHave('puestos', function ($query) use ($fecha_actual) {
                 $query->whereDate('historial_puesto.created_at', '=', $fecha_actual);
             })
+            ->where('estado','activo')
             ->get();
 
 
