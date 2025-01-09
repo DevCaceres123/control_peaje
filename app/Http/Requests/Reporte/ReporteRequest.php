@@ -27,7 +27,8 @@ class ReporteRequest extends BasePrincipalRequest
         switch ($routeName) {
             case 'reportes.store':
                 return [
-                    'fecha' => 'required|date',
+                    'fecha_inicio' => 'required|date',
+                    'fecha_final' => 'required|date',
                     'encargado' => 'required|exists:users,id|integer',
                 ];
             case 'reportes.update':

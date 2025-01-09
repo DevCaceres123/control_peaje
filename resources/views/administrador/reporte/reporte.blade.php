@@ -18,14 +18,29 @@
                     <form id="form-reportes">
                         <div class="row">
                             <div class="col-md-6 m-auto ">
-                                <div class="mb-3 ">
-                                    <label for="exampleInputEmail1" class="form-label">Seleccionar fecha: </label>
-                                    <input type="date" class="form-control" id="fecha" name="fecha"
-                                        value="{{ \Carbon\Carbon::now()->toDateString() }}" />
+                                <div class="mb-3 row">
+                                    <div class="col-6">
+                                        <label for="exampleInputEmail1" class="form-label">Fecha de Inicio: </label>
+                                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio"
+                                            value="{{ \Carbon\Carbon::now()->toDateString() }}" />
 
-                                    <div id="_fecha">
+                                        <div id="_fecha_inicio">
+
+                                        </div>
 
                                     </div>
+
+                                    <div class="col-6">
+                                        <label for="exampleInputEmail1" class="form-label">Fecha Final: </label>
+                                        <input type="date" class="form-control" id="fecha_final" name="fecha_final"
+                                            value="{{ \Carbon\Carbon::now()->toDateString() }}" />
+
+                                        <div id="_fecha_final">
+
+                                        </div>
+
+                                    </div>
+
                                 </div>
                                 <div class="mb-3">
 

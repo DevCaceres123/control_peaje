@@ -86,6 +86,14 @@
             text-align: center;
             font-weight: bold;
         }
+
+        .fecha_generacion {
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
         .tabla {
             width: 100%;
             margin-top: 20px;
@@ -173,7 +181,8 @@
 
         </div>
 
-        <h3 class="titulo">REPORTE DE REGISTROS ({{ $fecha_actual }})</h3>
+        <h3 class="titulo">REPORTE DE REGISTROS</h3>
+        <p class="fecha_generacion">({{ $fecha_inicio }} - {{ $fecha_fin }})</p>
 
         <!-- Tabla de asistencia -->
         <table class="tabla">
@@ -220,8 +229,8 @@
 
         <!-- Tabla de asistencia -->
         @if (!$registros_eliminados->isEmpty())
-            <h4 class="titulo">REGISTROS ELIMINADOS ({{$fecha_actual}})</h4>
-            
+            <h4 class="titulo">REGISTROS ELIMINADOS</h4>
+            <p class="fecha_generacion">({{ $fecha_inicio }} - {{ $fecha_fin }})</p>
             <table class="tabla" style="width: 60%; margin:15px auto 0px auto;">
                 <thead>
                     <tr>
