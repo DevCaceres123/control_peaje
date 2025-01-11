@@ -681,7 +681,7 @@ class Controlador_registro extends Controller
 
         $nombreCompletoUsuario = auth()->user()->only(['nombres', 'apellidos']);
 
-        $registros = HistorialRegistros::select('precio', 'placa', 'ci', 'num_aprobados')
+        $registros = HistorialRegistros::select('precio', 'placa', 'ci', 'num_aprobados','created_at')
             ->where('usuario_id', "=", $usuario_actual)
             ->whereDate('created_at', "=", $fecha_actual)
             ->get();
