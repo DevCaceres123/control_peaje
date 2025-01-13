@@ -16,43 +16,55 @@ class TarifaSeeder extends Seeder
 
         $tarifas = [
             [
-                "nombre"        => "LIVIANOS",
-                "precio"        => "2",
+                "nombre"        => "PALA",
+                "precio"        => "500",
                 "descripcion"   => "C-1",
             ],
             [
-                "nombre"        => "BUSES Y CAMIONES DE 2 EJES",
-                "precio"        => "4",
+                "nombre"        => "MOTONIVELADORA",
+                "precio"        => "500",
                 "descripcion"   => "C-2",
             ],
             [
-                "nombre"        => "BUSES Y CAMIONES DE 3 EJES",
-                "precio"        => "6",
+                "nombre"        => "RETRO EXCABADORA",
+                "precio"        => "1000",
                 "descripcion"   => "C-3",
             ],
             [
-                "nombre"        => "CAMIONES DE 4 EJES",
-                "precio"        => "8",
+                "nombre"        => "TOPADORA A ORUGA",
+                "precio"        => "1000",
                 "descripcion"   => "C-4",
             ],[
-                "nombre"        => "CAMIONES DE 5 EJES",
-                "precio"        => "10",
+                "nombre"        => "LOBOY CON CARGA",
+                "precio"        => "1000",
                 "descripcion"   => "C-5",
             ],
             [
-                "nombre"        => "CAMIONES DE 6 EJES",
-                "precio"        => "12",
+                "nombre"        => "SISTERNA DE 24M LT",
+                "precio"        => "50",
                 "descripcion"   => "C-6",
             ],
             [
-                "nombre"        => "CAMIONES DE 7 EJES",
-                "precio"        => "14",
+                "nombre"        => "SISTERNA DE 48M LT",
+                "precio"        => "100",
                 "descripcion"   => "C-7",
             ],
             [
-                "nombre"        => "MAQUINARIA",
-                "precio"        => "0",
+                "nombre"        => "CAMION DE GANADERIA",
+                "precio"        => "100",
                 "descripcion"   => "C-8",
+            ],
+
+            [
+                "nombre"        => "CAMION DE ENLATADOS",
+                "precio"        => "100",
+                "descripcion"   => "C-9",
+            ],
+
+            [
+                "nombre"        => "CAMION DE CERVEZA",
+                "precio"        => "100",
+                "descripcion"   => "C-10",
             ],
         ];
         foreach ($tarifas as $tarifa) {

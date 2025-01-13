@@ -166,9 +166,9 @@
 
             <div class="datos_us_pu">
                 <span class="usuario">
-                    U.s. : {{ $usuario['nombres'][0] ?? 'N' }}. {{ $usuario['apellidos'][0] ?? 'A' }}.
+                    U.s. : {{ $usuario['nombres'][0] ?? 'N' }}. {{ $usuario['apellidos'][0] ?? ' ' }}.
 
-                    {{ isset($usuario['apellidos']) && strpos($usuario['apellidos'], ' ') !== false ? $usuario['apellidos'][strpos($usuario['apellidos'], ' ') + 1] : 'A' }}
+                    {{ isset($usuario['apellidos']) && strpos($usuario['apellidos'], ' ') !== false ? $usuario['apellidos'][strpos($usuario['apellidos'], ' ') + 1] : ' ' }}
                 </span>
                 <span class="puesto">Puesto: {{ $puesto->nombre ?? 'N/A' }}</span>
 
@@ -217,9 +217,8 @@
 
 
         <div class="ley">
-            <p class="titulo_creacion">LEY AUTÓNOMA MUNICIPAL N.º 61/2024</p>
-            <P>LEY MUNICIPAL DE CREACION DE LA TASA DE RODAJE-PEAJE DEL GOBIERNO AUTÓNOMO
-                MUNICIPAL DE CARANAVI</P>
+            <p class="titulo_creacion">LEY AUTÓNOMA MUNICIPAL N.º 13/2021</p>
+            <P>LEY MUNICIPAL DE TASA DE RODAJE Y NORMATIVA DE INGRESO DE VEHICULOS DE TRANSPORTE,RURAL E INTERPROVINCIAL DE CARGA Y DESCARGA.</P>
         </div>
 
 
