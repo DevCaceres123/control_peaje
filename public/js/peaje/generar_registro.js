@@ -99,20 +99,10 @@ $('#nuevo_registro').submit(function (e) {
 });
 
 
+
 // Generar QR sin informacion
 $('#btn-generarQr').click(function (e) {
-    e.preventDefault();
-    Swal.fire({
-        title: "Se generara un nuevo registro..!!!",
-        text: "¿Estas seguro?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, Terminar",
-        cancelButtonText: "Cancelar",
-    }).then(async function (result) {
-        if (result.isConfirmed) {
+
             let datosFormulario = $('#nuevo_registro').serialize();
 
             $("#btn-generarQr").prop("disabled", true);
@@ -154,13 +144,9 @@ $('#btn-generarQr').click(function (e) {
                     iframe.contentWindow.print(); // Disparar impresión automática desde el iframe
                 };
             })
-
-
-        } else {
-            alerta_top('error', 'Se canceló la operacion');
-        }
-    })
+  
 })
+
 
 
 

@@ -128,9 +128,10 @@
         .fechas {
             width: 100%;
             text-align: center;
-            font-size: var(--temaño_letra);
+            font-size: 13px;
             letter-spacing: 1px;
             margin-top: 5px;
+            
 
         }
 
@@ -205,11 +206,11 @@
 
         <div class="fechas">
             <p>
-                <b> Fecha Generada: </b>
+                <b> Generado: </b>
                 {{ $fecha_generada }}
             </p>
             <p>
-                <b> Valida hasta: </b>
+                <b> Valido: </b>
                 {{ $fecha_finalizacion }}
             </p>
         </div>
@@ -217,8 +218,9 @@
 
 
         <div class="ley">
-            <p class="titulo_creacion">LEY AUTÓNOMA MUNICIPAL N.º 13/2021</p>
-            <P>LEY MUNICIPAL DE TASA DE RODAJE Y NORMATIVA DE INGRESO DE VEHICULOS DE TRANSPORTE,RURAL E INTERPROVINCIAL DE CARGA Y DESCARGA.</P>
+          <p class="titulo_creacion">LEY AUTÓNOMA MUNICIPAL N.º 61/2024</p>
+            <P>LEY MUNICIPAL DE CREACION DE LA TASA DE RODAJE-PEAJE DEL GOBIERNO AUTÓNOMO
+                MUNICIPAL DE CARANAVI</P>
         </div>
 
 
@@ -226,3 +228,4 @@
 </body>
 
 </html>
+

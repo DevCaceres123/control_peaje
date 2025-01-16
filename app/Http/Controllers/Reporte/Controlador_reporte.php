@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Exception;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf; // Asegúrate de importar esta clase
-
+use Illuminate\Support\Facades\Log;
 class Controlador_reporte extends Controller
 {
     public $mensaje = [];
@@ -63,32 +63,49 @@ class Controlador_reporte extends Controller
     }
 
     //generamos el reporte segun fecha
-    public function generarReporte($usuario_actual, $fecha_inicio, $fecha_fin)
-    {
+   public function generarReporte($usuario_actual, $fecha_inicio, $fecha_fin)
+{
+    try {
+        // Configurar el límite de memoria (opcional)
+        ini_set('memory_limit', env('PHP_MEMORY_LIMIT', '2G'));
+
+        // Formatear las fechas
         $fecha_actual = Carbon::now()->format('d-m-Y');
         $fecha_inicio = Carbon::parse($fecha_inicio)->format('Y-m-d');
         $fecha_fin = Carbon::parse($fecha_fin)->format('Y-m-d');
 
-        //Si tenemos las misma fecha entonces nos mostrara el puesto del dia seleccionado
-        if ($fecha_inicio === $fecha_fin) {
-            $puesto = $this->obtenerPuesto($fecha_inicio, $usuario_actual);
-        } else {
-            $puesto = null;
-        }
+        // Obtener el puesto si las fechas son iguales
+        $puesto = $fecha_inicio === $fecha_fin ? $this->obtenerPuesto($fecha_inicio, $usuario_actual) : null;
 
-        $registros = $this->obtenerRegistros($usuario_actual, $fecha_inicio, $fecha_fin);
+        // Obtener los registros y convertirlos en colecciones
+        $registros = collect($this->obtenerRegistros($usuario_actual, $fecha_inicio, $fecha_fin));
+        $registros_eliminados = collect($this->obtenerRegistrosEliminados($usuario_actual, $fecha_inicio, $fecha_fin));
 
-        $registros_eliminados = $this->obtenerRegistrosEliminados($usuario_actual, $fecha_inicio, $fecha_fin);
+        // Obtener los datos del usuario
+        $nombreCompletoUsuario = User::select('id', 'nombres', 'apellidos')
+            ->where('id', $usuario_actual)
+            ->role('encargado_puesto')
+            ->first();
 
-        $nombreCompletoUsuario = User::select('id', 'nombres', 'apellidos')->where('id', $usuario_actual)->role('encargado_puesto')->first();
+        // Generar el PDF
+        $pdf = Pdf::loadView('administrador/pdf/reporteRegistros', compact(
+            'registros',
+            'puesto',
+            'nombreCompletoUsuario',
+            'registros_eliminados',
+            'fecha_actual',
+            'fecha_inicio',
+            'fecha_fin'
+        ));
 
-        $pdf = Pdf::loadView('administrador/pdf/reporteRegistros', compact('registros', 'puesto', 'nombreCompletoUsuario', 'registros_eliminados', 'fecha_actual' ,'fecha_inicio','fecha_fin'));
-        // Obtener el contenido binario del PDF
-        $pdfContent = $pdf->output();
-
-        // Convertir el contenido binario a Base64
-        return base64_encode($pdfContent);
+        // Obtener el contenido binario del PDF y convertirlo a Base64
+        return base64_encode($pdf->output());
+    } catch (\Exception $e) {
+        Log::error('Error al generar el reporte: ' . $e->getMessage());
+        return response()->json(['error' => 'Ocurrió un error al generar el reporte.'], 500);
     }
+}
+
 
     public function obtenerPuesto($fecha_actual, $usuario_actual)
     {
