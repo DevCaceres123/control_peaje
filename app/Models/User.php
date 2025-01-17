@@ -82,7 +82,7 @@ class User extends Authenticatable
     public function puestos()
     {
         return $this->belongsToMany('App\Models\Puesto', 'historial_puesto', 'usuario_id', 'puesto_id')
-            ->withPivot('created_at', 'descripcion_edicion')
+            ->withPivot('created_at', 'updated_at','descripcion_edicion','estado')
             ->withTimestamps();
     }
 

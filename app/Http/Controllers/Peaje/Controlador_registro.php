@@ -55,12 +55,7 @@ class Controlador_registro extends Controller
 
 
 
-        $puestos_registrado_usuario = Puesto::select('id', 'nombre')
-            ->whereHas('users', function ($query) use ($usuario_actual, $fecha_actual) {
-                $query->where('historial_puesto.usuario_id', '=', $usuario_actual)
-                    ->whereDate('historial_puesto.created_at', '=', $fecha_actual);
-            })
-            ->first();
+        $puestos_registrado_usuario = $this->obtenerPuesto($fecha_actual,$usuario_actual);
 
         return view("administrador.control_peaje.generar_registro", compact('tarifas', 'vehiculos', 'colores', 'puestos_registrado_usuario'));
     }
@@ -145,7 +140,8 @@ class Controlador_registro extends Controller
         return Puesto::select('id', 'nombre')
             ->whereHas('users', function ($query) use ($usuario_actual, $fecha_actual) {
                 $query->where('historial_puesto.usuario_id', '=', $usuario_actual)
-                    ->whereDate('historial_puesto.created_at', '=', $fecha_actual);
+                    ->where('historial_puesto.estado', '=', 'activo');
+                    
             })
             ->first();
     }
@@ -205,7 +201,7 @@ class Controlador_registro extends Controller
         }
 
 
-        // Crear instancia del PDFhttpsÑ--www.example.com
+        // Crear instancia
 
 
         $pdf = Pdf::loadView('administrador/pdf/boletaPago', $data)
@@ -234,6 +230,7 @@ class Controlador_registro extends Controller
 
 
 
+    //GENERAR QR CON DATOS DEL VEHICULO O PERSONA
     public function store(RegistroPeajeRequest $request)
     {
         try {

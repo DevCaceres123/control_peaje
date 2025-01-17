@@ -21,7 +21,7 @@ class Puesto extends Model
 
     public function users(){
         return $this->belongsToMany('App\Models\User','historial_puesto','puesto_id','usuario_id')
-        ->withPivot('created_at','descripcion_edicion')
+        ->withPivot('created_at','updated_at','descripcion_edicion','estado')
         ->withTimestamps();
         
     }

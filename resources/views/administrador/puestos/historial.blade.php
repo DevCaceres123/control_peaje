@@ -38,7 +38,9 @@
                                         <th>CI</th>
                                         <th>NOMBRE COMPLETO</th>
                                         <th>PUESTO</th>
-                                        <th>FECHA ASIGNADA</th>
+                                        <th>ESTADO</th>
+                                        <th>ENTRADA</th>
+                                        <th>SALIDA</th>
                                     </tr>
                                 </thead>
                             </table>

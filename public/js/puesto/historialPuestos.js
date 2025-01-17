@@ -64,8 +64,28 @@ function listar_usuarios() {
                     `;
                 }
             },
+
+            {
+                data: 'estado',
+                className: 'table-td',
+                render: function (data) {
+
+                    return `
+                  
+                    <span class="badge bg-success fs-6 text-uppercase">${data}</span>
+                    `;
+                }
+            },
             {
                 data: 'fecha_asignado',
+                className: 'table-td',
+                render: function (data) {
+                    return `${data}`;
+                }
+            },
+
+            {
+                data: 'fecha_terminado',
                 className: 'table-td',
                 render: function (data) {
                     return `${data}`;

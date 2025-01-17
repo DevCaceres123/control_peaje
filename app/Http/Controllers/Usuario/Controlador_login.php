@@ -26,11 +26,10 @@ class Controlador_login extends Controller
      * ¡Muchas gracias por preferirnos! Esperamos poder servirte nuevamente
      */
 
-
     /**
      * PARA EL INGRESO DEL USUARIO POR USUARIO Y CONTRASEÑA
      */
-    private $mensajeError = "Usuario o contraseña inválidos";
+    private $mensajeError = 'Usuario o contraseña inválidos';
 
     public function ingresar(Request $request)
     {
@@ -55,7 +54,7 @@ class Controlador_login extends Controller
     {
         return Validator::make($request->all(), [
             'usuario' => 'required',
-            'password' => 'required'
+            'password' => 'required',
         ]);
     }
 
@@ -108,28 +107,24 @@ class Controlador_login extends Controller
         return view('inicio', compact('puestos_usuario', 'monto_puesto', 'fecha_parseada'));
     }
 
-
     // obtenemos todos los puestos y que ususarios estan asiganados en la fecha actual
     public function obtenerPuestoUsuario($fecha_actual)
     {
-        return $puestos =  Puesto::select('id', 'nombre')
-            ->with(['users' => function ($query) use ($fecha_actual) {
-                $query->select('users.id', 'nombres', 'apellidos')
-                    ->whereRaw('DATE(historial_puesto.created_at) = ?', [$fecha_actual]);
-            }])
+        return $puestos = Puesto::select('id', 'nombre')
+            ->with([
+                'users' => function ($query) use ($fecha_actual) {
+                    $query->select('users.id', 'nombres', 'apellidos')
+                    ->where('historial_puesto.estado', 'activo');
+                },
+            ])
             ->get();
     }
 
     // obtenemos los montos de los respecitvos puestos
     public function obtenerMontoDelDia($fecha_actual)
     {
-
-        $puestos =  Puesto::select('id', 'nombre')->get();
-        return HistorialRegistros::select(
-            'puesto',
-            DB::raw('COUNT(*) as total_registros'),
-            DB::raw('SUM(precio) as total_precio')
-        )
+        $puestos = Puesto::select('id', 'nombre')->get();
+        return HistorialRegistros::select('puesto', DB::raw('COUNT(*) as total_registros'), DB::raw('SUM(precio) as total_precio'))
             ->whereIn('puesto', $puestos->pluck('nombre')) // Filtrar por nombres de los puestos
             ->whereDate('created_at', '=', $fecha_actual) // Filtrar por la fecha actual
             ->groupBy('puesto') // Agrupar por el campo 'puesto'
@@ -144,11 +139,31 @@ class Controlador_login extends Controller
      */
     public function cerrar_session(Request $request)
     {
+
+        $this->desvincularPuesto();
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         $data = mensaje_mostrar('success', 'Finalizó la session con éxito!');
         return response()->json($data);
+    }
+
+    public function desvincularPuesto()
+    {
+        $usuario_actual = auth()->user()->id;
+
+        $fecha_actual=Carbon::now()->format('Y-m-d');
+        DB::table('historial_puesto')
+        ->where('usuario_id', $usuario_actual)
+        ->whereDate('created_at', $fecha_actual)
+        ->where('estado', 'activo')
+        ->update([
+            'estado' => 'inactivo', // Cambia el estado
+            'updated_at' => now()   // Actualiza el timestamp
+        ]);
+    
+        
     }
     /**
      * FIN DE CERRAR LA SESSIÓN

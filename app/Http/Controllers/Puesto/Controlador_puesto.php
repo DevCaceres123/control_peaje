@@ -38,19 +38,32 @@ class Controlador_puesto extends Controller
 
         $fecha_actual = $this->fecha->toDateString();
 
+        //listar puestos y quienes estan asignados
         $puestos = Puesto::with(['users' => function ($query) use ($fecha_actual) {
             $query->select('users.id', 'nombres', 'apellidos')
-                ->whereDate('historial_puesto.created_at', '=', $fecha_actual); // Usamos whereDate para comparar solo la fecha
+                ->where('historial_puesto.estado', 'activo'); // verificamos si el usuario esta usando el puesto
         }])
             ->select('id', 'nombre')
             ->where('estado', 'activo')
             ->get();
 
+    
+        // me filtra todos los usuarios que no tienen registros en la fecha actual y que su estado no en activo
+       // $encargados_sin_registro = User::select('id', 'nombres', 'apellidos')
+        //    ->role('encargado_puesto')
+        //    ->whereDoesntHave('puestos', function ($query) use ($fecha_actual) {
+         //       $query->whereDate('historial_puesto.created_at', '=', $fecha_actual)
+         //       ->where('historial_puesto.estado', 'activo');
+         //   })
+         //   ->where('estado','activo')
+         //   ->get();
 
+
+        // me filtra todos los usuarios que no tienen registros en la fecha actual y que su estado no en activo
         $encargados_sin_registro = User::select('id', 'nombres', 'apellidos')
             ->role('encargado_puesto')
             ->whereDoesntHave('puestos', function ($query) use ($fecha_actual) {
-                $query->whereDate('historial_puesto.created_at', '=', $fecha_actual);
+                $query ->where('historial_puesto.estado', 'activo');               
             })
             ->where('estado','activo')
             ->get();
@@ -112,9 +125,13 @@ class Controlador_puesto extends Controller
                     'ci' => $usuario->ci,
                     'nombres' => $usuario->nombres . " " . $usuario->apellidos,
                     'puesto_nombre' => $puesto->nombre,
+                    'estado'=>$puesto->pivot->estado,
                     'fecha_asignado' => Carbon::parse($puesto->pivot->created_at)
                         ->locale('es') // Establecer idioma a español
-                        ->translatedFormat('d \d\e F \d\e Y'), // Fecha con mes en español
+                        ->translatedFormat('d \d\e F \d\e Y H:i:s'), // Fecha con mes en español
+                    'fecha_terminado' => Carbon::parse($puesto->pivot->updated_at)
+                        ->locale('es') // Establecer idioma a español
+                        ->translatedFormat('d \d\e F \d\e Y H:i:s'),
                     'fecha_asignado_raw' => $puesto->pivot->created_at, // Fecha en formato crudo para ordenar
                 ];
             });
@@ -173,8 +190,11 @@ class Controlador_puesto extends Controller
                 throw new Exception('el usuario seleccionado ya tiene un puesto seleccionado');
             }
 
-            // agregamos un usuario a un puesto
-            $user->puestos()->attach($puesto_id);
+                       
+            // Agregamos un usuario a un puesto con el estado "activo"
+            $user->puestos()->attach($puesto_id, [  
+                'estado' => 'activo', // Asignamos el estado
+            ]);
 
 
             DB::commit();
@@ -197,7 +217,7 @@ class Controlador_puesto extends Controller
 
         return  DB::table('historial_puesto')
             ->where('usuario_id', $encargado_id)
-            ->whereDate('created_at', $fecha_actual)
+            ->where('estado', 'activo') 
             ->first();
     }
 
@@ -237,18 +257,17 @@ class Controlador_puesto extends Controller
                 throw new Exception('el puesto seleccionado no existe');
             }
 
-            $resultado = $this->buscarRegistrosPuesto($id);
-
-            if ($resultado) {
-                throw new Exception('el puesto seleccionado ya tiene registros en el historial por lo cual no se puede cambiar');
-            }
+           
 
             $fecha_actual = $this->fecha->toDateString();
 
             DB::table('historial_puesto')
                 ->where('puesto_id', $id)
-                ->whereDate('created_at', $fecha_actual)
-                ->delete();
+                ->where('estado', 'activo') 
+                ->update([
+                    'estado' => 'inactivo',
+                    'updated_at' => now(),
+                ]);
 
             DB::commit();
 
