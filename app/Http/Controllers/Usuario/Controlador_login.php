@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Exception;
 
 use function Laravel\Prompts\select;
 
@@ -30,6 +31,7 @@ class Controlador_login extends Controller
      * PARA EL INGRESO DEL USUARIO POR USUARIO Y CONTRASEÑA
      */
     private $mensajeError = 'Usuario o contraseña inválidos';
+    public $mensaje = [];
 
     public function ingresar(Request $request)
     {
@@ -113,8 +115,7 @@ class Controlador_login extends Controller
         return $puestos = Puesto::select('id', 'nombre')
             ->with([
                 'users' => function ($query) use ($fecha_actual) {
-                    $query->select('users.id', 'nombres', 'apellidos')
-                    ->where('historial_puesto.estado', 'activo');
+                    $query->select('users.id', 'nombres', 'apellidos')->where('historial_puesto.estado', 'activo');
                 },
             ])
             ->get();
@@ -139,8 +140,6 @@ class Controlador_login extends Controller
      */
     public function cerrar_session(Request $request)
     {
-
-        $this->desvincularPuesto();
         Auth::logout();
 
         $request->session()->invalidate();
@@ -149,21 +148,100 @@ class Controlador_login extends Controller
         return response()->json($data);
     }
 
+    public function terminar_turno()
+    {
+        if ($this->desvincularPuesto() == 0) {
+            $this->mensaje('error', 'El usuario no tiene ningun puesto asignado');
+            return response()->json($this->mensaje);
+        }
+
+        $this->mensaje('success', 'Turno terminado...');
+        return response()->json($this->mensaje);
+    }
+
     public function desvincularPuesto()
     {
         $usuario_actual = auth()->user()->id;
 
-        $fecha_actual=Carbon::now()->format('Y-m-d');
-        DB::table('historial_puesto')
-        ->where('usuario_id', $usuario_actual)
-        ->whereDate('created_at', $fecha_actual)
-        ->where('estado', 'activo')
-        ->update([
-            'estado' => 'inactivo', // Cambia el estado
-            'updated_at' => now()   // Actualiza el timestamp
-        ]);
-    
-        
+        $fecha_actual = Carbon::now()->format('Y-m-d');
+        return DB::table('historial_puesto')
+            ->where('usuario_id', $usuario_actual)
+            ->where('estado', 'activo')
+            ->update([
+                'estado' => 'inactivo', // Cambia el estado
+                'updated_at' => now(), // Actualiza el timestamp
+            ]);
+    }
+
+    //Estas funciones son utilizadas para cuando el usuario no tiene un puesto adicionado
+    //verificamos si el usuario tiene un puesto asignado
+    public function puesto_usuario()
+    {
+        $usuario_actual = auth()->user()->id;
+        $respuesta = Puesto::select('id', 'nombre')
+            ->whereHas('users', function ($query) use ($usuario_actual) {
+                $query->where('historial_puesto.usuario_id', '=', $usuario_actual)->where('historial_puesto.estado', '=', 'activo');
+            })
+            ->first();
+
+        if (!$respuesta) {
+            $respuesta = [
+                'titulo' => 'error',
+                'mensaje' => 'Ningun puesto encontrado',
+            ];
+            return response()->json($respuesta);
+        }
+        return response()->json($respuesta);
+    }
+
+    public function asignar_puesto(string $id)
+    {
+        try {
+            $encargado_id = auth()->user()->id;
+            $puesto_id = $id;
+            $user = User::find($encargado_id);
+
+            if (!$user->hasRole('encargado_puesto')) {
+                throw new Exception('el usuario seleccionado no tiene el rol de encargado de puesto');
+            }
+
+            DB::beginTransaction();
+
+            $resultado = $this->varficarRegistro($encargado_id);
+            if ($resultado) {
+                throw new Exception('el usuario seleccionado ya tiene un puesto seleccionado');
+            }
+
+            // Agregamos un usuario a un puesto con el estado "activo"
+            $user->puestos()->attach($puesto_id, [
+                'estado' => 'activo', // Asignamos el estado
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Puesto asignado correctamente.');
+            return response()->json($this->mensaje, 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            $this->mensaje('error', 'Error ' . $e->getMessage());
+
+            return response()->json($this->mensaje, 200);
+        }
+    }
+
+    // verificamos que no se pueda registrar un usuario dos veces en un puesto el mismo dia
+    public function varficarRegistro($encargado_id)
+    {
+        return DB::table('historial_puesto')->where('usuario_id', $encargado_id)->where('estado', 'activo')->first();
+    }
+
+    // MENSAJES PARA ENVIARLOS DE RESPUESTA
+    public function mensaje($titulo, $mensaje)
+    {
+        $this->mensaje = [
+            'tipo' => $titulo,
+            'mensaje' => $mensaje,
+        ];
     }
     /**
      * FIN DE CERRAR LA SESSIÓN

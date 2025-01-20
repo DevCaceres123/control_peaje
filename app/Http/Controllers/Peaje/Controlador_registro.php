@@ -668,21 +668,55 @@ class Controlador_registro extends Controller
 
 
     // Funcion para genearar reportes diarios
-    public function reporteDiario()
+    public function reporteDiario(Request $request)
     {
 
+    
+    
         $usuario_actual = auth()->user()->id;
-        $fecha_actual = $this->fecha->toDateString();
+        $fecha_actual = $request->input('fecha', now()->toDateString());
 
-        $puesto = $this->obtenerPuesto($fecha_actual, $usuario_actual);
+        //$puesto = $this->obtenerPuesto($fecha_actual, $usuario_actual);
 
+         $turnos = $this->obtenerTurno($usuario_actual,$fecha_actual);
         $nombreCompletoUsuario = auth()->user()->only(['nombres', 'apellidos']);
 
-        $registros = HistorialRegistros::select('precio', 'placa', 'ci', 'num_aprobados','created_at')
-            ->where('usuario_id', "=", $usuario_actual)
-            ->whereDate('created_at', "=", $fecha_actual)
-            ->get();
+       // Arreglo para almacenar los registros por turno
+        $registros_por_turno = [];
+        $registros_eliminados_por_turno = [];
 
+
+        foreach ($turnos as $turno) {
+            $entrada = $turno->created_at;
+            $salida = $turno->updated_at;
+    
+            // Obtener los registros del historial para este turno
+            $registros_turno = HistorialRegistros::select('precio', 'placa', 'ci', 'num_aprobados', 'created_at')
+                ->where('usuario_id', '=', $usuario_actual)
+                ->whereBetween('created_at', [$entrada, $salida])
+                ->get();
+    
+
+        // Agrupar registros por precio
+        $registros_agrupados = $registros_turno->groupBy('precio')->map(function ($grupo) {
+            return [
+                'cantidad' => $grupo->count(),  // Número de transacciones
+                'total' => $grupo->sum('precio'),  // Suma total de ese precio
+            ];
+        });
+        
+            // Almacenar los registros por turno
+            $registros_por_turno[] = [
+                'puesto'=> Puesto::find($turno->puesto_id),
+                'entrada' => Carbon::parse($turno->created_at)->translatedFormat('l, d \d\e F \d\e Y H:i:s '),
+                'salida' => Carbon::parse($turno->updated_at)->translatedFormat('l, d \d\e F \d\e Y H:i:s '),
+                'registros' => $registros_turno,  // Registros de historial
+                'registros_agrupados' => $registros_agrupados,
+               
+            ];
+        }
+
+       
 
         // listar los registros eliminados
         $registros_eliminados = DB::table('delete_tarifas')
@@ -693,8 +727,19 @@ class Controlador_registro extends Controller
             ->get();
 
 
-        $pdf = Pdf::loadView('administrador/pdf/reporteRegistroDiario', compact('registros', 'puesto', 'nombreCompletoUsuario', 'registros_eliminados', 'fecha_actual'));
+        $pdf = Pdf::loadView('administrador/pdf/reporteRegistroDiario', compact('registros_por_turno', 'nombreCompletoUsuario', 'registros_eliminados'));
         return $pdf->stream();
+    }
+
+
+
+    public function obtenerTurno($id_usuario,$fecha_actual){
+
+        return DB::table('historial_puesto')
+            ->where('usuario_id', $id_usuario)
+            ->whereDate('created_at', $fecha_actual) 
+            ->get();
+        
     }
 
 

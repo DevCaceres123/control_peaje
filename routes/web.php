@@ -35,8 +35,11 @@ Route::prefix('/')->middleware([No_autenticados::class])->group(function () {
 
 Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
     Route::controller(Controlador_login::class)->group(function () {
+        Route::get('puesto_usuario', 'puesto_usuario')->name('inicio.puesto.usuario'); // es para saber si el usuario actual tiene asignado  un puesto
+        Route::get('asignar_puesto/{id_puesto}', 'asignar_puesto')->name('asignar.puesto');
         Route::get('inicio', 'inicio')->name('inicio');
         Route::post('cerrar_session', 'cerrar_session')->name('salir');
+        Route::get('terminar_turno', 'terminar_turno')->name('terminar');
     });
 
     Route::controller(Controlador_usuario::class)->group(function () {

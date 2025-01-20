@@ -83,4 +83,28 @@
 @endsection
 @section('scripts')
     <script src="{{ asset('js/peaje/listar_registro.js') }}" type="module"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterFecha = document.getElementById('filterFecha');
+            const reporteDiarioLink = document.getElementById('reporte_diario');
+
+            filterFecha.addEventListener('change', function() {
+                // Obtener la fecha seleccionada
+                const fechaSeleccionada = filterFecha.value;
+
+                // Actualizar el enlace con el parámetro de fecha
+                if (fechaSeleccionada) {
+                    reporteDiarioLink.href =
+                        `${reporteDiarioLink.dataset.baseUrl}?fecha=${fechaSeleccionada}`;
+                } else {
+                    // Restablecer al enlace base si no hay fecha seleccionada
+                    reporteDiarioLink.href = reporteDiarioLink.dataset.baseUrl;
+                }
+            });
+
+            // Establecer el atributo base de la URL del enlace
+            reporteDiarioLink.dataset.baseUrl = "{{ route('peaje.reporte_diario') }}";
+        });
+    </script>
 @endsection

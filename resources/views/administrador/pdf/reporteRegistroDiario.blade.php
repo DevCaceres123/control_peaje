@@ -83,21 +83,39 @@
 
         .titulo {
             margin-top: 12px;
+            margin-bottom: 3px;
             text-align: center;
             font-weight: bold;
         }
+
+        .entrada,
+        .salida {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .puesto {
+            margin-top: 18px;
+        }
+
         .tabla {
-            width: 100%;
+            width: 60%;
+            margin: auto;
             margin-top: 20px;
             border-collapse: collapse;
+            margin-bottom: 30px;
+
+
         }
+
 
         .tabla th,
         .tabla td {
             border: 1px solid #333;
-            padding: 8px;
+            padding: 4px;
             text-align: center;
             font-size: 12px;
+
         }
 
         .tabla th {
@@ -143,6 +161,22 @@
             font-size: 16px;
             font-weight: bold;
         }
+        .firmaencargado{
+            text-align: center;
+            margin:60px 0px;
+        
+        }
+        .nombreFirma{
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .rol{
+            font-size: 12px;
+        }
+        .aclaracionFirma{
+            font-size: 11px;
+        }
     </style>
 </head>
 
@@ -165,63 +199,61 @@
             </p>
 
 
-            <p class="puesto">
-                <b>Puesto: </b>
-                {{ $puesto->nombre ?? 'Sin asignar' }}
-            </p>
+
             <hr>
 
         </div>
 
-        <h3 class="titulo">REPORTE DE REGISTROS ({{ $fecha_actual }})</h3>
-
-        <!-- Tabla de asistencia -->
-        <table class="tabla">
-            <thead>
-                <tr>
-                    <th>Nº</th>
-                    <th>CONTEO (QR)</th>
-                    <th>PLACA</th>
-                    <th>CI</th>
-                    <th>FECHA</th>
-                    <th>MONTO</th>
 
 
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $count = 1;
-                $costo_total = 0;
-                $count_pagados = 0;
-                ?>
-                @foreach ($registros as $registro)
+
+        {{-- TABLA DE LOS REGISTROS --}}
+
+        @foreach ($registros_por_turno as $turno_info)
+            <h3 class="titulo">REPORTE DE REGISTROS</h3>
+            <p class="entrada">Entrada: {{ $turno_info['entrada'] }}</p>
+            <p class="salida">Salida: {{ $turno_info['salida'] }}</p>
+
+            <h5 class="puesto">{{ $turno_info['puesto']['nombre'] }}</h5>
+            <table class="tabla">
+                <thead>
                     <tr>
-                        <td>{{ $count++ }}</td>
-                        <td>{{ $registro->num_aprobados ?? 0 }}</td>
-                        <td>{{ $registro->placa ?? 'Sin registrar' }}</td>
-                        <td>{{ $registro->ci ?? 'Sin registrar' }}</td>
-                        <td>{{$registro->created_at}}</td>
-                        <td>{{ $registro->precio }} <b>Bs</b></td>
-                        {{ $costo_total = $costo_total + $registro->precio }}
+                        <th>Nº</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Importe</th>
                     </tr>
-                @endforeach
-                <tr>
-                    <td colspan="5" style="text-align: right;"><b>TOTAL MONTO:</b></td>
-                    <td><b>{{ $costo_total }} Bs</b></td>
-                </tr>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php
+                    $cont = 1;
+                    $costo_total = 0;
+                    $cantidad = 0;
+                    ?>
+                    @foreach ($turno_info['registros_agrupados'] as $precio => $detalle)
+                        <tr>
+                            <td>{{ $cont++ }}</td>
+                            <td>{{ $precio }} Bs</td>
+                            <td>{{ $detalle['cantidad'] }}</td>
+                            <td>{{ $detalle['total'] }} Bs</td>
+                            {{ $cantidad = $cantidad + $detalle['cantidad'] }}
+                            {{ $costo_total = $costo_total + $detalle['total'] }}
+                        </tr>
+                    @endforeach
+                    <tr>
+                        <td colspan="2" style="text-align: right;"></td>
+                        <td style="text-center: right;"><b>CANTIDAD: {{ $cantidad }} Registros </b></td>
+                        <td style="text-center: right;"><b>TOTAL: {{ $costo_total }} (Bs) </b></td>
 
+                    </tr>
+                </tbody>
+            </table>
+        @endforeach
 
-
-
-
-
-        <!-- Tabla de asistencia -->
+        <!-- Tabla de registros eliminados ese dia -->
         @if (!$registros_eliminados->isEmpty())
-            <h4 class="titulo">REGISTROS ELIMINADOS ({{$fecha_actual}})</h4>
-            
+            <h4 class="titulo">REGISTROS ELIMINADOS </h4>
+
             <table class="tabla" style="width: 60%; margin:15px auto 0px auto;">
                 <thead>
                     <tr>
@@ -254,6 +286,20 @@
                 </tbody>
             </table>
         @endif
+
+        <div class="firmaencargado">
+            <p>....................................................</p>
+            <p class="nombreFirma">
+                {{ $nombreCompletoUsuario['nombres'] ?? 'N/A' }}
+                {{ $nombreCompletoUsuario['apellidos'] ?? 'N/A' }}
+            </p>
+            <p class="rol">
+                Cajero(a) de Turno
+            </p>
+            <p class="aclaracionFirma">
+                Aclaracion de firma
+            </p>
+        </div>
 
 
     </div>

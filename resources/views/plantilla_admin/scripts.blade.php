@@ -91,6 +91,26 @@
         }
     }
 
+
+    //para terminar el turno
+    let btn_terminar_turno = document.getElementById("btn-terminar_turno");
+    btn_terminar_turno.addEventListener("click", async () => {
+        try {
+            let respuesta = await fetch("{{ route('terminar') }}", {
+                method: "GEt",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            let dato = await respuesta.json();
+            alerta_top(dato.tipo, dato.mensaje);
+          
+        } catch (error) {
+            console.log('Ocurrio un error: ' + error);
+        }
+    });
+
+
     //para validar el boton
     function validar_boton(valor, msj, boton) {
         let boton_env = boton;
