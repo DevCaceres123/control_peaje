@@ -362,13 +362,15 @@ qrInput.on('input', function () {
 
                 console.log(response);
 
-                $('#estado_qr').text(response.tipo);
+              
 
                 if (response.tipo == "exito") {
-                    $('#respuesta_servidor').html(`<span class="text-success">${response.mensaje}  <i class="fas fa-check-circle ms-1"></i></span>`);
+                    $('#estado_qr').html(`<b class="text-success fs-3">${response.tipo}  <i class="fas fa-check-circle ms-1"></i></b>`);
+                    $('#respuesta_servidor').html(`<span class="text-success fs-4">${response.mensaje}  <i class="fas fa-check-circle ms-1"></i></span>`);
                 }
                 else {
-                    $('#respuesta_servidor').html(`<span class="text-danger">${response.mensaje} <i class="fas fa-exclamation-triangle ms-1"></i></span>`);
+                    $('#estado_qr').html(`<b class="text-danger  fs-3">${response.tipo}</b>`);
+                    $('#respuesta_servidor').html(`<span class="text-danger fs-4">${response.mensaje} <i class="fas fa-exclamation-triangle ms-1"></i></span>`);
                 }
 
                 qrInput.val("");

@@ -477,7 +477,7 @@ class Controlador_registro extends Controller
 
             if ($fecha_actual->isAfter($fecha_vencimiento)) {
 
-                throw new Exception('el QR ya nos es valido...!! ' . $registro_fecha);
+                throw new Exception('el QR ya no es valido...!! ' . $registro_fecha);
             }
 
             // Se aumenta el conteo de las veces que paso el qr

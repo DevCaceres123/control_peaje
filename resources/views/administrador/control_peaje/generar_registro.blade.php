@@ -254,7 +254,7 @@
                     <label for="" class="form-labbel fs-18 text-center text-uppercase text-bold"><b>Escanee el qr
                             para verificar los datos....</b></label>
                     <input type="text" name="cod_qr" id="cod_qr" class="input_qr">
-                    <span id="estado_qr" class=" text-primary fs-18 text-uppercase"></span>
+                    <span id="estado_qr" class="text-primary fs-18 text-uppercase"></span>
                     <div class="contenido_respuesta" id="respuesta_servidor">
 
                     </div>

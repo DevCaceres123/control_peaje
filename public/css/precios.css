@@ -97,10 +97,10 @@
 
 .contenido_respuesta {
     width: 80%;
-    height: 40px;
+    
     border: 1px solid black;
     margin: auto;
-
+    padding: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
