@@ -131,11 +131,15 @@
             font-size: 13px;
             letter-spacing: 1px;
             margin-top: 5px;
-            
-
         }
 
-
+        .fecha_generada {
+            margin: 10px 0px 0px  0px  0px;
+            padding: 0px;
+            text-align: center;
+            font-size: 15px;
+            letter-spacing: 1px; 
+        }
 
         .ley {
             margin-top: 5px;
@@ -156,6 +160,10 @@
 </head>
 
 <body>
+    <p class="fecha_generada">
+       
+        {{ $fecha_generada }}
+    </p>
     <div class="container_boleta">
         <!-- Información de la empresa -->
         <div class="info_empresa">
@@ -206,10 +214,6 @@
 
         <div class="fechas">
             <p>
-                <b> Generado: </b>
-                {{ $fecha_generada }}
-            </p>
-            <p>
                 <b> Valido: </b>
                 {{ $fecha_finalizacion }}
             </p>
@@ -218,7 +222,7 @@
 
 
         <div class="ley">
-          <p class="titulo_creacion">LEY AUTÓNOMA MUNICIPAL N.º 61/2024</p>
+            <p class="titulo_creacion">LEY AUTÓNOMA MUNICIPAL N.º 61/2024</p>
             <P>LEY MUNICIPAL DE CREACION DE LA TASA DE RODAJE-PEAJE DEL GOBIERNO AUTÓNOMO
                 MUNICIPAL DE CARANAVI</P>
         </div>
@@ -228,4 +232,3 @@
 </body>
 
 </html>
-

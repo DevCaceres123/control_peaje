@@ -205,6 +205,7 @@ $('#generar_boletas').submit(function (e) {
     if (!isNaN(cantidad_generar) && cantidad_generar > 1 && cantidad_generar <= 20) {
         let colaDeImpresion = [];
         let pdfUrl;
+        let boletasProcesadas=1;
 
 
 
@@ -254,12 +255,13 @@ $('#generar_boletas').submit(function (e) {
 
                 console.log(totalBoletas);
                 // Imprimir una por una
-                for (let i = 1; i <= colaDeImpresion.length; i++) {
+                for (let i = 0; i < colaDeImpresion.length; i++) {
+                    
                     let pdfUrl = colaDeImpresion[i];
                     const iframe = document.createElement('iframe');
                     iframe.style.display = 'none';
                     iframe.src = pdfUrl;
-                    document.body.appendChild(iframe);
+                   document.body.appendChild(iframe);
 
                     await new Promise(resolve => {
                         iframe.onload = () => {
@@ -267,10 +269,11 @@ $('#generar_boletas').submit(function (e) {
                             iframe.contentWindow.print(); // Imprimir el documento
                             setTimeout(() => {
                                 boletasRestantes--; // Reducir el contador
-                                actualizarBoletasRestantes(i, boletasRestantes, totalBoletas); // Actualizar visualmente
+                                actualizarBoletasRestantes(boletasProcesadas, boletasRestantes, totalBoletas); // Actualizar visualmente
 
 
                                 console.log(boletasRestantes);
+                                boletasProcesadas++;
                                 resolve(); // Resolver la promesa
                             }, 2500); // Esperar 2.5 segundos antes de resolver
                         };
