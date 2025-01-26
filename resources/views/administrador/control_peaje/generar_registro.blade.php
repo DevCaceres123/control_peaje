@@ -7,12 +7,22 @@
         <div class="col-12">
             <div class="contenedor_precio">
                 @foreach ($tarifas as $tarifa)
-                    <div class="card_precio bg-primary" data-id="{{ $tarifa->id }}">
+                    @if ($tarifa->precio == 2 || $tarifa->precio == 4 || $tarifa->precio == 8)
+                        <div class="card_precio masUsados" data-id="{{ $tarifa->id }}"
+                            style="width: 15%; min-width: 160px; height: 115px; background-color: rgb(223, 99, 42);font-size: 12px;">
 
-                        <p>{{ $tarifa->nombre }}</p>
-                        <div class="icon"><i class="fas fa-truck fs-24"></i></div>
-                        <strong class="bg-success">{{ $tarifa->precio }}Bs</strong>
-                    </div>
+                            <p>{{ $tarifa->nombre }}</p>
+                            <div class="icon"><i class="fas fa-truck fs-24"></i></div>
+                            <strong class="bg-success">{{ $tarifa->precio }}Bs</strong>
+                        </div>
+                    @else
+                        <div class="card_precio bg-primary" data-id="{{ $tarifa->id }}">
+
+                            <p>{{ $tarifa->nombre }}</p>
+                            <div class="icon"><i class="fas fa-truck fs-24"></i></div>
+                            <strong class="bg-success">{{ $tarifa->precio }}Bs</strong>
+                        </div>
+                    @endif
                 @endforeach
 
             </div>
@@ -41,7 +51,8 @@
                             @endcan
 
                             @can('control.generar.generar')
-                                <button type="button" class="btn btn-success px-2 d-inline-flex align-items-center mb-2  m-auto"
+                                <button type="button"
+                                    class="btn btn-success px-2 d-inline-flex align-items-center mb-2  m-auto"
                                     id="btn-generarQr">
                                     <i class="fas fa-qrcode fs-20 me-1"></i>Generar QR
                                 </button>
@@ -53,10 +64,52 @@
                                     <i class="fas fa-shipping-fast fs-20 me-1"></i>Llenar informacion
                                 </button>
                             @endcan
-
-
-
                         </div>
+                        <hr>
+                        <label for="" class="">GENERAR BOLETAS:::</label>
+                        <div class="row border border-success rounded p-2 mt-1 m-auto">
+                            <form id="generar_boletas">
+
+
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="" class="form-label">Precio</label>
+
+                                        <select name="id_precios" id="id_precios" class="form-control  rounded" require>
+                                            <option disabled selected>Seleccionar</option>
+                                            @foreach ($tarifas as $tarifa)
+                                                @if ($tarifa->precio == 2 || $tarifa->precio == 4 || $tarifa->precio == 8)
+                                                    <option class="text-capitalize " value="{{ $tarifa->id }}">
+                                                        {{ $tarifa->precio }} {{ $tarifa->nombre }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-3">
+                                        <label for="" class="form-label">(2 - 20)</label>
+                                        <input type="number" class="form-control rounded" name="cantidad" id="cantidad"
+                                            min="2" max="20">
+
+                                    </div>
+
+                                    <div class="col-3 mt-2">
+
+                                        <button type="submit" class="btn btn-info rounded btn-md" id="btn-generar_boleta">
+                                            <i class="fas fa-print"></i>
+                                            Generar</button>
+                                    </div>
+
+
+                                </div>
+
+                            </form>
+
+                            <div id="error_cantidad" class="text-danger mt-1"></div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -158,7 +211,8 @@
 
                                 <label for="" class="form-label">PATERNO</label>
                                 <div class="container-validation" id="group_usuarioReset">
-                                    <input type="text" class="form-control rounded" name="ap_paterno" id="ap_paterno">
+                                    <input type="text" class="form-control rounded" name="ap_paterno"
+                                        id="ap_paterno">
                                     <div id="_ap_paterno">
 
                                     </div>
@@ -205,8 +259,32 @@
 
                     </div>
                 </div>
+
+
+
+                <div id="boletas_generadas" style=" display:none;" class="p-2">
+                    <div
+                        style="width: 100%; height: 320px; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                        <h3 class="text-primary">Boletas en proceso de impresión</h3>
+                        <p>El número total de boletas a imprimir. <b class="text-danger" id="numero_boletas"></b></p>
+                        <h1 class="text-success display-1">
+                            <span id="contadorBoletas">0</span>
+                            <span class="fs-4">Boletas restantes por imprimir</span>
+                        </h1>
+                        <div class="progress w-50 mt-2" style="height: 20px;">
+                            <div id="barraProgreso" class="progress-bar bg-success" style="width: 100%;">0%</div>
+                        </div>
+                        <p class="text-success mt-1 fs-4 text-center" id="correcto_impresion"></p>
+                        <p class="text-info mt-1" id="nota_impresion"></p>
+                    </div>
+
+                </div>
+
             </div>
         </div>
+
+
+
 
     </div>
 
@@ -214,10 +292,18 @@
         // Inicialización de Selectr
         document.addEventListener('DOMContentLoaded', function() {
             const selectElement = document.getElementById('id_color');
+            const selectElement2 = document.getElementById('id_precios');
             new Selectr(selectElement, {
                 searchable: true, // Activa la barra de búsqueda
                 placeholder: 'Busca o selecciona una opción...' // Texto de placeholder
             });
+
+            new Selectr(selectElement2, {
+                searchable: true, // Activa la barra de búsqueda
+                placeholder: 'Busca o selecciona una opción...' // Texto de placeholder
+            });
+
+
         });
     </script>
 

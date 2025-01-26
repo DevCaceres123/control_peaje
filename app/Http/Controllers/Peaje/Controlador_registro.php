@@ -18,8 +18,11 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use function Laravel\Prompts\select;
+use function PHPUnit\Framework\isNumeric;
+
 use Barryvdh\DomPDF\Facade\Pdf; // Asegúrate de importar esta clase
 use Exception;
+use Hamcrest\Type\IsNumeric;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Hashids\Hashids; // libreria para encriptar y descencriptar
 
@@ -55,7 +58,7 @@ class Controlador_registro extends Controller
 
 
 
-        $puestos_registrado_usuario = $this->obtenerPuesto($fecha_actual,$usuario_actual);
+        $puestos_registrado_usuario = $this->obtenerPuesto($fecha_actual, $usuario_actual);
 
         return view("administrador.control_peaje.generar_registro", compact('tarifas', 'vehiculos', 'colores', 'puestos_registrado_usuario'));
     }
@@ -141,7 +144,6 @@ class Controlador_registro extends Controller
             ->whereHas('users', function ($query) use ($usuario_actual, $fecha_actual) {
                 $query->where('historial_puesto.usuario_id', '=', $usuario_actual)
                     ->where('historial_puesto.estado', '=', 'activo');
-                    
             })
             ->first();
     }
@@ -671,17 +673,17 @@ class Controlador_registro extends Controller
     public function reporteDiario(Request $request)
     {
 
-    
-    
+
+
         $usuario_actual = auth()->user()->id;
         $fecha_actual = $request->input('fecha', now()->toDateString());
 
         //$puesto = $this->obtenerPuesto($fecha_actual, $usuario_actual);
 
-         $turnos = $this->obtenerTurno($usuario_actual,$fecha_actual);
+        $turnos = $this->obtenerTurno($usuario_actual, $fecha_actual);
         $nombreCompletoUsuario = auth()->user()->only(['nombres', 'apellidos']);
 
-       // Arreglo para almacenar los registros por turno
+        // Arreglo para almacenar los registros por turno
         $registros_por_turno = [];
         $registros_eliminados_por_turno = [];
 
@@ -689,34 +691,34 @@ class Controlador_registro extends Controller
         foreach ($turnos as $turno) {
             $entrada = $turno->created_at;
             $salida = $turno->updated_at;
-    
+
             // Obtener los registros del historial para este turno
             $registros_turno = HistorialRegistros::select('precio', 'placa', 'ci', 'num_aprobados', 'created_at')
                 ->where('usuario_id', '=', $usuario_actual)
                 ->whereBetween('created_at', [$entrada, $salida])
                 ->get();
-    
 
-        // Agrupar registros por precio
-        $registros_agrupados = $registros_turno->groupBy('precio')->map(function ($grupo) {
-            return [
-                'cantidad' => $grupo->count(),  // Número de transacciones
-                'total' => $grupo->sum('precio'),  // Suma total de ese precio
-            ];
-        });
-        
+
+            // Agrupar registros por precio
+            $registros_agrupados = $registros_turno->groupBy('precio')->map(function ($grupo) {
+                return [
+                    'cantidad' => $grupo->count(),  // Número de transacciones
+                    'total' => $grupo->sum('precio'),  // Suma total de ese precio
+                ];
+            });
+
             // Almacenar los registros por turno
             $registros_por_turno[] = [
-                'puesto'=> Puesto::find($turno->puesto_id),
+                'puesto' => Puesto::find($turno->puesto_id),
                 'entrada' => Carbon::parse($turno->created_at)->translatedFormat('l, d \d\e F \d\e Y H:i:s '),
                 'salida' => Carbon::parse($turno->updated_at)->translatedFormat('l, d \d\e F \d\e Y H:i:s '),
                 'registros' => $registros_turno,  // Registros de historial
                 'registros_agrupados' => $registros_agrupados,
-               
+
             ];
         }
 
-       
+
 
         // listar los registros eliminados
         $registros_eliminados = DB::table('delete_tarifas')
@@ -733,13 +735,13 @@ class Controlador_registro extends Controller
 
 
 
-    public function obtenerTurno($id_usuario,$fecha_actual){
+    public function obtenerTurno($id_usuario, $fecha_actual)
+    {
 
         return DB::table('historial_puesto')
             ->where('usuario_id', $id_usuario)
-            ->whereDate('created_at', $fecha_actual) 
+            ->whereDate('created_at', $fecha_actual)
             ->get();
-        
     }
 
 
@@ -788,6 +790,117 @@ class Controlador_registro extends Controller
     }
 
 
+    public function generar_varias_boletas(Request $request)
+    {
+
+        try {
+
+            $validatedData = $request->validate([
+                'id_precios' => 'required|exists:tarifas,id',
+                'cantidad' => 'required|numeric|min:2|max:20',
+            ]);
+
+            $fecha_actual = $this->fecha->toDateString();
+            $usuario_actual = auth()->user()->id;
+            // return $request->all();
+
+            // se obtiene datos del puesto
+            $puesto = $this->obtenerPuesto($fecha_actual, $usuario_actual);
+
+
+            if (!$puesto) {
+                throw new Exception(' el usuario no tiene asignado un puesto');
+            }
+
+            $arrayBoletas = [];
+
+            for ($i = 0; $i < $request->cantidad; $i++) {
+                $resultado = $this->generar_boletas_masivamente($request->id_precios);
+
+                if ($resultado['tipo'] === "exito") {
+                    $arrayBoletas[$i] = $resultado['mensaje'];
+                }
+            }
+
+
+        
+               $this->mensaje("exito", $arrayBoletas);
+               return response()->json($this->mensaje, 200);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            $this->mensaje("error", "Error " . $e->getMessage());
+
+            return response()->json($this->mensaje, 200);
+        }
+    }
+
+
+    public function generar_boletas_masivamente($id_precio)
+    {
+        try {
+
+            DB::beginTransaction();
+            $fecha_actual = $this->fecha->toDateString();
+            $usuario_actual = auth()->user()->id;
+            // return $request->all();
+
+            // se obtiene datos del puesto
+            $puesto = $this->obtenerPuesto($fecha_actual, $usuario_actual);
+
+
+            if (!$puesto) {
+                throw new Exception(' el usuario no tiene asignado un puesto');
+            }
+
+            // Se obtiene datos de la tarifa
+            $tarifa = Tarifa::find($id_precio);
+
+            $registro = new Registro();
+            $registro->puesto_id = $puesto->id;
+            $registro->tarifa_id = $tarifa->id;
+            $registro->usuario_id = $usuario_actual;
+
+            $registro->save();
+
+            $cod_qr_unico = $this->encrypt($registro->id);
+
+            $nuevo_Qr = $this->generar_qrReporte($cod_qr_unico);
+
+            // se obtiene el pdf en base 64
+            $resultado = $this->generar_ReportePdf($tarifa, $nuevo_Qr, $fecha_actual, $puesto, null);
+
+            // guardar el cod_qr generado
+            $registro->codigo_qr = $cod_qr_unico;
+            $registro->save();
+
+
+            // Datos que necesito para generar el reporte
+            $data = [
+                'tarifa' => $tarifa,
+                'nuevo_Qr' => $cod_qr_unico,
+                'fecha_actual' => Carbon::now()->format('Y-m-d H:i:s'),
+                'puesto' => $puesto,
+                'vehiculo' => null,
+            ];
+
+
+            $this->guardarHistorialRegistro($cod_qr_unico, $puesto->nombre, $tarifa->precio, null, null, json_encode($data), $registro->id);
+
+            DB::commit();
+            // Retornar el PDF para su visualización
+            return   [
+                'tipo' => "exito",
+                'mensaje' => $resultado
+            ];
+        } catch (Exception $e) {
+            DB::rollBack();
+            return   [
+                'tipo' => "error",
+                'mensaje' => $e->getMessage()
+            ];
+        }
+    }
 
     public function mensaje($titulo, $mensaje)
     {

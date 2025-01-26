@@ -83,6 +83,8 @@ $('#nuevo_registro').submit(function (e) {
         $('#pdf-container').css('display', 'block');
         $('#nuevo_registro').css('display', 'none');
         $('#verificarQr').css('display', 'none');
+        $('#boletas_generadas').css('display', 'none');
+
 
         // Esperar a que el iframe termine de cargar antes de imprimir
         iframe.onload = () => {
@@ -103,48 +105,50 @@ $('#nuevo_registro').submit(function (e) {
 // Generar QR sin informacion
 $('#btn-generarQr').click(function (e) {
 
-            let datosFormulario = $('#nuevo_registro').serialize();
+    let datosFormulario = $('#nuevo_registro').serialize();
 
-            $("#btn-generarQr").prop("disabled", true);
-            crud("admin/generar_qr", "POST", null, datosFormulario, function (error, response) {
+    console.log(datosFormulario);
+    $("#btn-generarQr").prop("disabled", true);
+    crud("admin/generar_qr", "POST", null, datosFormulario, function (error, response) {
 
-                console.log(response);
-                // Verificamos que no haya un error o que todos los campos sean llenados
-                if (response.tipo === "errores") {
-                    $("#btn-generarQr").prop("disabled", false);
-                    mensajeAlerta(response.mensaje, "errores");
-                    return;
-                }
-                if (response.tipo != "exito") {
-                    $("#btn-generarQr").prop("disabled", false);
-                    mensajeAlerta(response.mensaje, response.tipo);
-                    return;
-                }
+        console.log(response);
+        // Verificamos que no haya un error o que todos los campos sean llenados
+        if (response.tipo === "errores") {
+            $("#btn-generarQr").prop("disabled", false);
+            mensajeAlerta(response.mensaje, "errores");
+            return;
+        }
+        if (response.tipo != "exito") {
+            $("#btn-generarQr").prop("disabled", false);
+            mensajeAlerta(response.mensaje, response.tipo);
+            return;
+        }
 
 
-                mensajeAlerta("Procesado correctamente.", "exito");
-                vaciar_formulario("nuevo_registro");
-                const iframe = document.getElementById('pdf-iframe');
+        mensajeAlerta("Procesado correctamente.", "exito");
+        vaciar_formulario("nuevo_registro");
+        const iframe = document.getElementById('pdf-iframe');
 
-                let pdfUrl = generarURlBlob(response.mensaje);
-                iframe.src = pdfUrl;
-                // activar ventana del generado de pdf
-                $('#pdf-container').css('display', 'block');
-                $('#nuevo_registro').css('display', 'none'); // no mostrar el formulario
-                $('#verificarQr').css('display', 'none'); // no mostrar el verificar qr
-                $("#btn-generarQr").prop("disabled", false);
+        let pdfUrl = generarURlBlob(response.mensaje);
+        iframe.src = pdfUrl;
+        // activar ventana del generado de pdf
+        $('#pdf-container').css('display', 'block');
+        $('#nuevo_registro').css('display', 'none'); // no mostrar el formulario
+        $('#verificarQr').css('display', 'none'); // no mostrar el verificar qr
+        $('#boletas_generadas').css('display', 'none');
+        $("#btn-generarQr").prop("disabled", false);
 
-                //    Una ves registrado se le quita los valores a los montos
-                $('#precio').html('');
-                $('#id_tarifa').val("");
+        //    Una ves registrado se le quita los valores a los montos
+        $('#precio').html('');
+        $('#id_tarifa').val("");
 
-                // Esperar a que el iframe termine de cargar antes de imprimir
-                iframe.onload = () => {
-                    iframe.contentWindow.focus();
-                    iframe.contentWindow.print(); // Disparar impresión automática desde el iframe
-                };
-            })
-  
+        // Esperar a que el iframe termine de cargar antes de imprimir
+        iframe.onload = () => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print(); // Disparar impresión automática desde el iframe
+        };
+    })
+
 })
 
 
@@ -156,6 +160,8 @@ $('#btn-llenar_informacion').click(function (e) {
     $('#nuevo_registro').css('display', 'block'); // Elimina el color
     $('#pdf-container').css('display', 'none');
     $('#verificarQr').css('display', 'none'); // no mostrar el verificar qr
+    $('#boletas_generadas').css('display', 'none'); // no mostrar el verificar qr
+    
 })
 
 
@@ -186,6 +192,138 @@ $('#btn-terminar_formulario').click(function (e) {
 })
 
 
+// GENERAR VARIOS COMPROBANTES A LA VES
+
+$('#generar_boletas').submit(function (e) {
+    e.preventDefault();
+    $("#btn-generar_boleta").prop("disabled", true);
+    let datosFormulario = $('#generar_boletas').serialize();
+    let cantidad_generar = $("#cantidad").val();
+
+    cantidad_generar = parseInt(cantidad_generar); // Convertir el valor a un número
+
+    if (!isNaN(cantidad_generar) && cantidad_generar > 1 && cantidad_generar <= 20) {
+        let colaDeImpresion = [];
+        let pdfUrl;
+
+
+
+
+        // Función autoejecutada para manejar async/await
+        (async function () {
+            try {
+                // Obtener los datos del servidor
+                const response = await new Promise((resolve, reject) => {
+                    crud("admin/generar_varias_boletas", "POST", null, datosFormulario, function (error, response) {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(response);
+                        }
+                    });
+                });
+
+                if (response.tipo !== "exito") {
+                    $("#btn-generar_boleta").prop("disabled", false);
+                    mensajeAlerta(response.mensaje, response.tipo);
+                    return;
+                }
+
+                mensajeAlerta("Procesado correctamente.", "exito");
+
+                // se ocualta las otras ventanas
+                $('#boletas_generadas').css('display', 'block');
+
+                $('#verificarQr').css('display', 'none');
+
+                $('#pdf-container').css('display', 'none');
+                $('#nuevo_registro').css('display', 'none'); // no mostrar formulario
+
+
+
+
+                // Convertir las URLs de respuesta
+                response.mensaje.forEach(element => {
+                    pdfUrl = generarURlBlob(element);
+                    colaDeImpresion.push(pdfUrl);
+                });
+
+                $('#numero_boletas').text(colaDeImpresion.length);
+                let totalBoletas = colaDeImpresion.length; // Inicializar el total de boletas
+                let boletasRestantes = colaDeImpresion.length;
+
+                console.log(totalBoletas);
+                // Imprimir una por una
+                for (let i = 1; i <= colaDeImpresion.length; i++) {
+                    let pdfUrl = colaDeImpresion[i];
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = pdfUrl;
+                    document.body.appendChild(iframe);
+
+                    await new Promise(resolve => {
+                        iframe.onload = () => {
+                            iframe.contentWindow.focus();
+                            iframe.contentWindow.print(); // Imprimir el documento
+                            setTimeout(() => {
+                                boletasRestantes--; // Reducir el contador
+                                actualizarBoletasRestantes(i, boletasRestantes, totalBoletas); // Actualizar visualmente
+
+
+                                console.log(boletasRestantes);
+                                resolve(); // Resolver la promesa
+                            }, 2500); // Esperar 2.5 segundos antes de resolver
+                        };
+                    });
+                }
+            } catch (error) {
+                console.error("Error al procesar la boleta:", error);
+                mensajeAlerta("Error al procesar la boleta. Intenta nuevamente.", "error");
+            } finally {
+
+                $("#btn-generar_boleta").prop("disabled", false);
+                $('#generar_boletas')[0].reset(); // Limpia el formulario
+            }
+        })();
+    } else {
+        $("#error_cantidad").text("La cantidad debe estar entre 2 y 20.");
+    }
+});
+
+// Actualizar visualmente el progreso de las boletas procesadas
+function actualizarBoletasRestantes(boletasProcesadas, boletasRestantes, totalBoletas) {
+    const contador = document.getElementById("contadorBoletas");
+    const barraProgreso = document.getElementById("barraProgreso");
+
+    // Actualizar contador de boletas procesadas
+    contador.textContent = boletasRestantes;
+
+    // Calcular el porcentaje progresivo
+    const porcentaje = (boletasProcesadas / totalBoletas) * 100;
+
+    // Ajustar la barra de progreso
+    barraProgreso.style.width = `${porcentaje}%`;
+    barraProgreso.textContent = `${Math.round(porcentaje)}%`;
+
+    // Cambiar a rojo si faltan pocas boletas (opcional, adaptado para el caso progresivo)
+    barraProgreso.classList.toggle("bg-success", totalBoletas - boletasProcesadas <= 2);
+
+    if(boletasProcesadas=== totalBoletas){
+
+        
+        $("#correcto_impresion").text("Correcto....");
+        $("#nota_impresion").text("Nota: Si existe alguna boleta faltante verificar en la cola de impresion...");
+    }
+}
+
+
+
+
+
+
+
+
+
 // VERIFICAR EL QR ENVIADO
 
 $('#btn-verificarQr').on('click', function () {
@@ -193,8 +331,8 @@ $('#btn-verificarQr').on('click', function () {
 
     $('#verificarQr').css('display', 'block');
 
-
     $('#pdf-container').css('display', 'none');
+    $('#boletas_generadas').css('display', 'none');
     $('#nuevo_registro').css('display', 'none'); // no mostrar formulario
 
     qrInput.focus();

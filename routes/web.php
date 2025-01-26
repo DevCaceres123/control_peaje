@@ -71,6 +71,9 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
         Route::get('/reporte/{id_registro}', 'generar_boleta');
 
         Route::get('/reporteDiario', 'reporteDiario')->name('peaje.reporte_diario');
+
+        Route::post('generar_varias_boletas', "generar_varias_boletas");
+
     });
 
     // PARA LA ADMINISTRACION DE PUESTOS EN ADICIONAR A UN USUARIO 
