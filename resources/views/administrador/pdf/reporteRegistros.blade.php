@@ -66,10 +66,17 @@
             left: 0;
         }
 
-        .detalle_reporte .puesto {
-            position: absolute;
-            top: 0;
-            right: 0;
+        .puesto {
+         margin: 15px 0px 8px 0px ;
+
+        }
+        .puesto b{
+            display: inline-block;
+            background-color: #080625;
+            color: white;
+            padding: 5px 8px;
+            border-radius: 10px;
+            font-size: 12px;
         }
 
 
@@ -95,7 +102,8 @@
         }
 
         .tabla {
-            width: 100%;
+            width: 70%;
+            margin: auto;
             margin-top: 20px;
             border-collapse: collapse;
         }
@@ -167,102 +175,69 @@
         <!-- Detalles de la reunión -->
         <div class="detalle_reporte">
             <p class="encargado">
-                <b>Encargado: </b>
+                <b>Usuario: </b>
                 {{ $nombreCompletoUsuario['nombres'] ?? 'N/A' }}
                 {{ $nombreCompletoUsuario['apellidos'] ?? 'N/A' }}
             </p>
 
-
-            <p class="puesto">
-                <b>Puesto: </b>
-                {{ $puesto->nombre ?? 'Sin asignar' }}
-            </p>
             <hr>
 
         </div>
 
+        <p class="puesto">
+           
+            @foreach ($puestos as $puesto)
+               <b> {{ $puesto->nombre ?? 'Sin asignar' }}</b>
+            @endforeach
+
+        </p>
+
         <h3 class="titulo">REPORTE DE REGISTROS</h3>
         <p class="fecha_generacion">({{ $fecha_inicio }} - {{ $fecha_fin }})</p>
+        {{-- TABLA DE LOS REGISTROS --}}
 
-        <!-- Tabla de asistencia -->
+
+
+
         <table class="tabla">
             <thead>
                 <tr>
                     <th>Nº</th>
-                    <th>CONTEO (QR)</th>
-                    <th>PLACA</th>
-                    <th>CI</th>
-                    <th>FECHA</th>
-                    <th>MONTO</th>
-
-
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Importe</th>
                 </tr>
             </thead>
             <tbody>
-                <?php
-                $count = 1;
-                $costo_total = 0;
-                $count_pagados = 0;
-                ?>
+                @php
+                    $cont = 1; // Contador para las filas
+                    $costo_total = 0; // Acumulador para el total de importes
+                    $cantidad_total = 0; // Acumulador para la cantidad total
+                @endphp
+
                 @foreach ($registros as $registro)
                     <tr>
-                        <td>{{ $count++ }}</td>
-                        <td>{{ $registro->num_aprobados ?? 0 }}</td>
-                        <td>{{ $registro->placa ?? 'Sin registrar' }}</td>
-                        <td>{{ $registro->ci ?? 'Sin registrar' }}</td>
-                        <td>{{$registro->created_at}}</td>
-                        <td>{{ $registro->precio }} <b>Bs</b></td>
-                        {{ $costo_total = $costo_total + $registro->precio }}
+                        <td>{{ $cont++ }}</td>
+                        <td>{{ number_format($registro['precio']) }} Bs</td>
+                        <td>{{ $registro['cantidad'] }}</td>
+                        <td>{{ number_format($registro['total']) }} Bs</td>
+                        @php
+                            $cantidad_total += $registro['cantidad'];
+                            $costo_total += $registro['total'];
+                        @endphp
                     </tr>
                 @endforeach
+
+                <!-- Fila de totales -->
                 <tr>
-                    <td colspan="5" style="text-align: right;"><b>TOTAL MONTO:</b></td>
-                    <td><b>{{ $costo_total }} Bs</b></td>
+                    <td colspan="2" style="text-align: right;"><strong>Total:</strong></td>
+                    <td><strong>{{ $cantidad_total }} Registros</strong></td>
+                    <td><strong>{{ number_format($costo_total, 2) }} Bs</strong></td>
                 </tr>
             </tbody>
         </table>
 
 
-
-
-
-
-        <!-- Tabla de asistencia -->
-        @if (!$registros_eliminados->isEmpty())
-            <h4 class="titulo">REGISTROS ELIMINADOS</h4>
-            <p class="fecha_generacion">({{ $fecha_inicio }} - {{ $fecha_fin }})</p>
-            <table class="tabla" style="width: 60%; margin:15px auto 0px auto;">
-                <thead>
-                    <tr>
-                        <th>Nº</th>
-                        <th>FECHA ELIMINACION</th>
-                        <th>MONTO</th>
-
-
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $count = 1;
-                    $costo_total = 0;
-                    
-                    ?>
-                    @foreach ($registros_eliminados as $registros_eliminado)
-                        <tr>
-                            <td>{{ $count++ }}</td>
-                            <td>{{ $registros_eliminado->created_at }}</td>
-                            <td>{{ $registros_eliminado->precio }}</td>
-
-                            {{ $costo_total = $costo_total + $registros_eliminado->precio }}
-                        </tr>
-                    @endforeach
-                    <tr>
-                        <td colspan="2" style="text-align: right;"><b>TOTAL MONTO:</b></td>
-                        <td><b>{{ $costo_total }} Bs</b></td>
-                    </tr>
-                </tbody>
-            </table>
-        @endif
 
 
     </div>

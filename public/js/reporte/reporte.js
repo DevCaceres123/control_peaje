@@ -3,7 +3,45 @@ import { crud } from '../../../funciones_helper/operaciones_crud/crud.js';
 import { vaciar_errores, vaciar_formulario } from '../../../funciones_helper/vistas/formulario.js';
 
 
-// GENERAR REPORTE
+// // GENERAR REPORTE
+// $('#form-reportes').submit(function (e) {
+//     e.preventDefault();
+//     $("#btn-reporte").prop("disabled", true);
+//     let datosFormulario = $('#form-reportes').serialize();
+
+//     vaciar_errores("form-reportes");
+
+//     // envia a la funcion de store
+//     crud("admin/reportes", "POST", null, datosFormulario, function (error, response) {
+
+//         console.log(response);
+//         if (response.tipo == "errores") {
+//             $("#btn-reporte").prop("disabled", false);
+//             mensajeAlerta(response.mensaje, "errores");
+//             return;
+//         }
+
+//         if (response.tipo != "exito") {
+//             $("#btn-reporte").prop("disabled", false);
+//             mensajeAlerta(response.mensaje, response.tipo);
+//             return;
+//         }
+
+     
+//         mensajeAlerta("Generando Reporte.....", "exito");
+//         const blobUrl = generarURlBlob(response.mensaje); // Genera la URL del Blob
+       
+
+//         setTimeout(() => {
+//             window.open(blobUrl, '_blank'); // Abre en una nueva pestaña
+//             $("#btn-reporte").prop("disabled", false);
+//         }, 1500);
+
+//     });
+// })
+
+
+// GENERAR REPORTE POR FECHA
 $('#form-reportes').submit(function (e) {
     e.preventDefault();
     $("#btn-reporte").prop("disabled", true);
@@ -12,7 +50,7 @@ $('#form-reportes').submit(function (e) {
     vaciar_errores("form-reportes");
 
     // envia a la funcion de store
-    crud("admin/reportes", "POST", null, datosFormulario, function (error, response) {
+    crud("admin/reportes_fecha", "POST", null, datosFormulario, function (error, response) {
 
         console.log(response);
         if (response.tipo == "errores") {
@@ -52,3 +90,10 @@ function generarURlBlob(pdfbase64) {
     // Crear una URL para el Blob
     return URL.createObjectURL(blob);
 }
+
+
+// MARCAR DESMARCAR CHECK
+$('#select_all').on('change', function () {
+    // Cambia el estado de todos los checkboxes dentro de #form_rol
+    $('#form-reportes input[type="checkbox"]').prop('checked', this.checked);
+});
