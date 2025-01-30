@@ -79,6 +79,46 @@ $('#form-reportes').submit(function (e) {
 })
 
 
+
+
+// GENERAR REPORTE POR USUARIO
+$('#form-reporte_usuario').submit(function (e) {
+    e.preventDefault();
+    $("#btn-reporte_usuario").prop("disabled", true);
+    let datosFormulario = $('#form-reporte_usuario').serialize();
+
+    vaciar_errores("form-reportes");
+
+    // envia a la funcion de store
+    crud("admin/reportes_usuario", "POST", null, datosFormulario, function (error, response) {
+
+        console.log(response);
+        if (response.tipo == "errores") {
+            $("#btn-reporte").prop("disabled", false);
+            mensajeAlerta(response.mensaje, "errores");
+            return;
+        }
+
+        if (response.tipo != "exito") {
+            $("#btn-reporte").prop("disabled", false);
+            mensajeAlerta(response.mensaje, response.tipo);
+            return;
+        }
+
+     
+        mensajeAlerta("Generando Reporte.....", "exito");
+        const blobUrl = generarURlBlob(response.mensaje); // Genera la URL del Blob
+       
+
+        setTimeout(() => {
+            window.open(blobUrl, '_blank'); // Abre en una nueva pestaña
+            $("#btn-reporte_usuario").prop("disabled", false);
+        }, 1500);
+
+    });
+})
+
+
 function generarURlBlob(pdfbase64) {
 
     // Convertir Base64 a un Blob
@@ -96,4 +136,11 @@ function generarURlBlob(pdfbase64) {
 $('#select_all').on('change', function () {
     // Cambia el estado de todos los checkboxes dentro de #form_rol
     $('#form-reportes input[type="checkbox"]').prop('checked', this.checked);
+});
+
+
+// MARCAR DESMARCAR CHECK
+$('#select_all_user').on('change', function () {
+    // Cambia el estado de todos los checkboxes dentro de #form_rol
+    $('#form-reporte_usuario input[type="checkbox"]').prop('checked', this.checked);
 });

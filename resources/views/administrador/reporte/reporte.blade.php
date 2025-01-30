@@ -93,17 +93,15 @@
                                 <div class="mb-3 row">
                                     <div class="col-6">
                                         <label for="fecha_inicio" class="form-label">Fecha de Inicio: </label>
-                                        <input type="date" class="form-control" id="fecha_inicio"
-                                               name="fecha_inicio"
-                                               value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
+                                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio"
+                                            value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
                                         <div id="_fecha_inicio"></div>
                                     </div>
-                                    
+
                                     <div class="col-6">
                                         <label for="fecha_final" class="form-label">Fecha Final: </label>
-                                        <input type="date" class="form-control" id="fecha_final"
-                                               name="fecha_final"
-                                               value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
+                                        <input type="date" class="form-control" id="fecha_final" name="fecha_final"
+                                            value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
                                         <div id="_fecha_final"></div>
                                     </div>
 
@@ -173,69 +171,58 @@
 
                 </div>
                 <div class="card-body">
-                    <form id="form-reportes">
+                    <form id="form-reporte_usuario">
                         <div class="row">
                             <div class="col-md-12 m-auto ">
                                 <div class="mb-3 row">
-                                    <div class="col-6">
+                                    <div class="col-12">
                                         <label for="fecha_inicio" class="form-label">Fecha de Inicio: </label>
-                                        <input type="date" class="form-control" id="fecha_inicio"
-                                               name="fecha_inicio"
-                                               value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
-                                        <div id="_fecha_inicio"></div>
+                                        <input type="date" class="form-control" id="fecha_inicio_usuario" name="fecha_inicio_usuario"
+                                            value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
+                                        <div id="_fecha_inicio_usuario"></div>
                                     </div>
-                                    
-                                    <div class="col-6">
-                                        <label for="fecha_final" class="form-label">Fecha Final: </label>
-                                        <input type="date" class="form-control" id="fecha_final"
-                                               name="fecha_final"
-                                               value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
-                                        <div id="_fecha_final"></div>
-                                    </div>
-
-                                </div>
-                                <div class="mb-3">
-
-                                    <label for="exampleInputEmail1" class="form-label">Seleccionar Puesto:
+                                    <label for="exampleInputEmail1" class="form-label mt-1">Seleccionar encargado de
+                                        puesto:
                                     </label>
-                                    <div class="row border border-secondary   border-2 rounded p-2 ">
+                                    <div class="col-12 mt-1 border border-secondary   border-2 rounded p-2">
+
                                         <!-- Checkbox para seleccionar todo -->
                                         <div class="col-md-12">
                                             <div class="form-check d-flex justify-content-center align-items-center">
                                                 <label class="form-check-label me-4" for="select_all">Seleccionar
                                                     todo</label>
-                                                <input class="form-check-input" type="checkbox" id="select_all"
+                                                <input class="form-check-input" type="checkbox" id="select_all_user"
                                                     style="border-color: #007bff">
                                             </div>
                                         </div>
                                         <!-- Checkbox para Listar Meses -->
-                                        <div class="row" id="mesesPagados">
-                                            @foreach ($puestos as $puesto)
+                                        <div class="row " id="mesesPagados">
+                                            @foreach ($encargados_puesto as $encargados)
                                                 <div class="col-12 col-md-6">
-
+                                                    
                                                     <div
                                                         class="form-check d-flex justify-content-between align-items-center mt-2">
-                                                        <label class="form-check-label me-3"
-                                                            for="enero">{{ $puesto->nombre }}</label>
+                                                        <label class="form-check-label me-3 text-uppercase"
+                                                            for="enero">{{ $encargados->nombres }}
+                                                            {{ $encargados->apellidos }}</label>
                                                         <input class="form-check-input" type="checkbox"
-                                                            id="{{ $puesto->nombre }}" name="puestos[]"
-                                                            value="{{ $puesto->id }}" style="border-color: #007bff">
+                                                            id="" name="encargados_puesto[]"
+                                                            value="{{ $encargados->id}}" style="border-color: #007bff">
                                                     </div>
-
-
                                                 </div>
                                             @endforeach
                                         </div>
+                                        <div id="_encargado">
 
+                                        </div>
                                     </div>
 
-                                    <div id="_encargado">
-
-                                    </div>
                                 </div>
 
+
                                 <div class="col-12 m-auto">
-                                    <button type="submit" class="btn btn-primary" id="btn-reporte">Generar Reporte</button>
+                                    <button type="submit" class="btn btn-primary" id="btn-reporte_usuario">Generar
+                                        Reporte</button>
                                 </div>
 
                             </div>

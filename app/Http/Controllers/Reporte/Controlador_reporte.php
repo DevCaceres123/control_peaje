@@ -25,7 +25,11 @@ class Controlador_reporte extends Controller
     }
     public function index()
     {
-        $encargados_puesto = User::select('id', 'nombres', 'apellidos')->role('encargado_puesto')->get();
+        $encargados_puesto = User::select('id', 'nombres', 'apellidos')
+            ->role('encargado_puesto')
+            ->where('estado','activo')
+            ->get();
+
 
         $puestos = Puesto::select('id', 'nombre')->where('estado', 'activo')->get();
         return view('administrador.reporte.reporte', compact('encargados_puesto', 'puestos'));
@@ -298,6 +302,95 @@ class Controlador_reporte extends Controller
             ->get();
     }
 
+    // GENERAR REPORTEN POR USUARIO
+    public function reportes_usuario(Request $request){
+
+        
+        try {
+            $validatedData = $request->validate([
+                'fecha_inicio_usuario' => 'required|date',             
+                'encargados_puesto' => 'required|exists:users,id',
+            ]);
+
+            $puestos_ultimoRegistro = [];
+            $registros=[];
+            foreach ($request->encargados_puesto as $key => $value) {
+                $registros[] = $this->generarReporteUsuario($value,$request->fecha_inicio_usuario);
+            }
+
+            
+            $nombreCompletoUsuario = auth()->user()->only(['nombres', 'apellidos']);
+        
+
+            $pdf = Pdf::loadView('administrador/pdf/reporteRegistrosUsuario', compact('registros','nombreCompletoUsuario'));
+
+            // Obtener el contenido binario del PDF y convertirlo a Base64
+            $reportebase64= base64_encode($pdf->output());
+
+            $this->mensaje('exito', $reportebase64);
+            return response()->json($this->mensaje, 200);
+        } catch (Exception $e) {
+            $this->mensaje('error', 'Error ' . $e->getMessage());
+            return response()->json($this->mensaje, 200);
+        }
+    }
+
+
+    public function generarReporteUsuario($usuario_actual,$fecha){
+
+        
+        $fecha_actual=Carbon::parse($fecha);
+        $turnos = $this->obtenerTurno($usuario_actual, $fecha_actual);
+        $nombreCompletoUsuario = User::select('id','nombres','apellidos')->where('id',$usuario_actual)->first();
+
+        // Arreglo para almacenar los registros por turno
+        $registros_por_turno = [];
+        
+        foreach ($turnos as $turno) {
+            $entrada = $turno->created_at;
+            $salida = $turno->updated_at;
+
+            // Obtener los registros del historial para este turno
+            $registros_turno = HistorialRegistros::select('precio')
+                ->where('usuario_id', '=', $usuario_actual)
+                ->whereBetween('created_at', [$entrada, $salida])
+                ->get();
+
+
+            // Agrupar registros por precio
+            $registros_agrupados = $registros_turno->groupBy('precio')->map(function ($grupo) {
+                return [
+                    'cantidad' => $grupo->count(),  // Número de transacciones
+                    'total' => $grupo->sum('precio'),  // Suma total de ese precio
+                ];
+            });
+
+            // Almacenar los registros por turno
+            $registros_por_turno[] = [
+                'nombreEncargado'=>$nombreCompletoUsuario,
+                'puesto' => Puesto::select('id','nombre')->where('id',$turno->puesto_id)->first(),
+                'entrada' => Carbon::parse($turno->created_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
+                'salida' => Carbon::parse($turno->updated_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
+                'registros' => $registros_turno,  // Registros de historial
+                'registros_agrupados' => $registros_agrupados,
+
+            ];
+        }
+
+
+        return $registros_por_turno;
+      
+    }
+
+
+    public function obtenerTurno($id_usuario, $fecha_actual)
+    {
+
+        return DB::table('historial_puesto')
+                ->where('usuario_id', $id_usuario)
+                ->whereDate('created_at', $fecha_actual)
+                ->get();
+    }
     /**
      * Remove the specified resource from storage.
      */
