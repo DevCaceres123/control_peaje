@@ -524,7 +524,7 @@ class Controlador_registro extends Controller
         $encargado = $request->input('encargado') ?? null;
 
         // Inicia la consulta con los usuarios y sus puestos
-        $registroQuery = HistorialRegistros::select('id', 'puesto', 'nombre_usuario', 'precio', 'placa', 'ci', 'created_at', 'num_aprobados');
+        $registroQuery = HistorialRegistros::select('id', 'puesto', 'nombre_usuario', 'precio', 'placa', 'ci', 'created_at', 'num_aprobados','cod_qr');
 
 
 
@@ -555,6 +555,7 @@ class Controlador_registro extends Controller
                     ->orWhere('nombre_usuario', 'like', '%' . $request->search['value'] . '%')
                     ->orWhere('precio', 'like', '%' . $request->search['value'] . '%')
                     ->orWhere('placa', 'like', '%' . $request->search['value'] . '%')
+                    ->orWhere('cod_qr', 'like', '%' . $request->search['value'] . '%')
                     ->orWhere('ci', 'like', '%' . $request->search['value'] . '%');
             });
         }
