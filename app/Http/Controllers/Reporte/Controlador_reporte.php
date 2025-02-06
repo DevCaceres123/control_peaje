@@ -25,11 +25,7 @@ class Controlador_reporte extends Controller
     }
     public function index()
     {
-        $encargados_puesto = User::select('id', 'nombres', 'apellidos')
-            ->role('encargado_puesto')
-            ->where('estado','activo')
-            ->get();
-
+        $encargados_puesto = User::select('id', 'nombres', 'apellidos')->role('encargado_puesto')->where('estado', 'activo')->get();
 
         $puestos = Puesto::select('id', 'nombre')->where('estado', 'activo')->get();
         return view('administrador.reporte.reporte', compact('encargados_puesto', 'puestos'));
@@ -172,8 +168,8 @@ class Controlador_reporte extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'fecha_inicio' => 'required|date',
-                'fecha_final' => 'required|date',
+                'fecha_inicio' => 'required|date|before_or_equal:fecha_final',
+                'fecha_final' => 'required|date|after_or_equal:fecha_inicio',
                 'puestos' => 'required|exists:puestos,id',
             ]);
 
@@ -185,6 +181,7 @@ class Controlador_reporte extends Controller
                 $puestos_ultimoRegistro[] = $this->verificarFechasTurno($request->fecha_inicio, $request->fecha_final, $puesto);
             }
 
+            
             foreach ($puestos_ultimoRegistro as $value) {
                 $registros = $this->obtenerRegistrosPuesto($value['fecha_mas_corta'], $value['fecha_mas_alta'], $value['puesto_id']);
 
@@ -257,30 +254,73 @@ class Controlador_reporte extends Controller
         }
     }
 
+    
+   
+    
     public function verificarFechasTurno($fecha_inicio, $fecha_final, $puesto)
     {
-        // Asegurarnos de que la fecha esté en el formato correcto
-        $fecha_inicio = Carbon::parse($fecha_inicio)->format('Y-m-d');
-        $fecha_final = Carbon::parse($fecha_final)->format('Y-m-d');
-
-        // Realizar la consulta para obtener la fecha más alta y la más corta
-        // Realizar la consulta para obtener la fecha más alta
+        // Asegurar que las fechas sean instancias de Carbon antes de formatearlas
+        $fecha_inicio = Carbon::parse($fecha_inicio);
+        $fecha_final = Carbon::parse($fecha_final);
+    
+        // Obtener la fecha más corta dentro de la fecha inicio
         $fecha_mas_corta = DB::table('historial_puesto')
-            ->where('puesto_id', $puesto) // Filtrar por el puesto dinámico
-            ->whereDate('created_at', $fecha_inicio) // Filtrar por la fecha sin hora
-            ->min('created_at'); // Obtener la fecha más alta de updated_at
-
+            ->where('puesto_id', $puesto)
+            ->whereDate('created_at', $fecha_inicio->format('Y-m-d'))
+            ->min('created_at');
+    
+        // Obtener la fecha más alta dentro de la fecha final
         $fecha_mas_alta = DB::table('historial_puesto')
-            ->where('puesto_id', $puesto) // Filtrar por el puesto dinámico
-            ->whereDate('created_at', $fecha_final) // Filtrar por la fecha sin hora
-            ->max('updated_at'); // Obtener la fecha más alta de updated_at
-
+            ->where('puesto_id', $puesto)
+            ->whereDate('created_at', $fecha_final->format('Y-m-d'))
+            ->max('updated_at');
+    
+        // Si no hay una fecha más corta, buscar la primera fecha con registros en el rango ascendente
+        if (!$fecha_mas_corta) {
+            $fecha_actual = clone $fecha_inicio; // Clonar para evitar modificar la original
+    
+            while ($fecha_actual->lte($fecha_final)) {
+                $registro = DB::table('historial_puesto')
+                    ->where('puesto_id', $puesto)
+                    ->whereDate('created_at', $fecha_actual->format('Y-m-d'))
+                    ->min('created_at');
+    
+                if ($registro) {
+                    $fecha_mas_corta = $registro;
+                    break;
+                }
+    
+                $fecha_actual->addDay(); // Avanzar un día
+            }
+        }
+    
+        // Si no hay una fecha más alta, buscar la última fecha con registros en el rango descendente
+        if (!$fecha_mas_alta) {
+            $fecha_actual = clone $fecha_final; // Clonar para evitar modificar la original
+    
+            while ($fecha_actual->gte($fecha_inicio)) {
+                $registro = DB::table('historial_puesto')
+                    ->where('puesto_id', $puesto)
+                    ->whereDate('created_at', $fecha_actual->format('Y-m-d'))
+                    ->max('updated_at');
+    
+                if ($registro) {
+                    $fecha_mas_alta = $registro;
+                    break;
+                }
+    
+                $fecha_actual->subDay(); // Retroceder un día
+            }
+        }
+    
         return [
             'puesto_id' => $puesto,
-            'fecha_mas_alta' => $fecha_mas_alta,
-            'fecha_mas_corta' => $fecha_mas_corta,
+            'fecha_mas_corta' => $fecha_mas_corta, // Ya está formateada
+            'fecha_mas_alta' => $fecha_mas_alta, // Ya está formateada
         ];
     }
+    
+    
 
     // Se obtiene los registros de un puestos en un rango de fechas
     public function obtenerRegistrosPuesto($fecha_inicio, $fecha_fin = null, $puesto_id)
@@ -303,29 +343,28 @@ class Controlador_reporte extends Controller
     }
 
     // GENERAR REPORTEN POR USUARIO
-    public function reportes_usuario(Request $request){
-
-        
+    public function reportes_usuario(Request $request)
+    {
         try {
             $validatedData = $request->validate([
-                'fecha_inicio_usuario' => 'required|date',             
+                'fecha_inicio_usuario' => 'required|date',
                 'encargados_puesto' => 'required|exists:users,id',
             ]);
 
             $puestos_ultimoRegistro = [];
-            $registros=[];
+            $registros = [];
             foreach ($request->encargados_puesto as $key => $value) {
-                $registros[] = $this->generarReporteUsuario($value,$request->fecha_inicio_usuario);
+                $registros[] = $this->generarReporteUsuario($value, $request->fecha_inicio_usuario);
             }
 
-            
-            $nombreCompletoUsuario = auth()->user()->only(['nombres', 'apellidos']);
-        
+            $nombreCompletoUsuario = auth()
+                ->user()
+                ->only(['nombres', 'apellidos']);
 
-            $pdf = Pdf::loadView('administrador/pdf/reporteRegistrosUsuario', compact('registros','nombreCompletoUsuario'));
+            $pdf = Pdf::loadView('administrador/pdf/reporteRegistrosUsuario', compact('registros', 'nombreCompletoUsuario'));
 
             // Obtener el contenido binario del PDF y convertirlo a Base64
-            $reportebase64= base64_encode($pdf->output());
+            $reportebase64 = base64_encode($pdf->output());
 
             $this->mensaje('exito', $reportebase64);
             return response()->json($this->mensaje, 200);
@@ -335,17 +374,15 @@ class Controlador_reporte extends Controller
         }
     }
 
-
-    public function generarReporteUsuario($usuario_actual,$fecha){
-
-        
-        $fecha_actual=Carbon::parse($fecha);
+    public function generarReporteUsuario($usuario_actual, $fecha)
+    {
+        $fecha_actual = Carbon::parse($fecha);
         $turnos = $this->obtenerTurno($usuario_actual, $fecha_actual);
-        $nombreCompletoUsuario = User::select('id','nombres','apellidos')->where('id',$usuario_actual)->first();
+        $nombreCompletoUsuario = User::select('id', 'nombres', 'apellidos')->where('id', $usuario_actual)->first();
 
         // Arreglo para almacenar los registros por turno
         $registros_por_turno = [];
-        
+
         foreach ($turnos as $turno) {
             $entrada = $turno->created_at;
             $salida = $turno->updated_at;
@@ -356,40 +393,31 @@ class Controlador_reporte extends Controller
                 ->whereBetween('created_at', [$entrada, $salida])
                 ->get();
 
-
             // Agrupar registros por precio
             $registros_agrupados = $registros_turno->groupBy('precio')->map(function ($grupo) {
                 return [
-                    'cantidad' => $grupo->count(),  // Número de transacciones
-                    'total' => $grupo->sum('precio'),  // Suma total de ese precio
+                    'cantidad' => $grupo->count(), // Número de transacciones
+                    'total' => $grupo->sum('precio'), // Suma total de ese precio
                 ];
             });
 
             // Almacenar los registros por turno
             $registros_por_turno[] = [
-                'nombreEncargado'=>$nombreCompletoUsuario,
-                'puesto' => Puesto::select('id','nombre')->where('id',$turno->puesto_id)->first(),
+                'nombreEncargado' => $nombreCompletoUsuario,
+                'puesto' => Puesto::select('id', 'nombre')->where('id', $turno->puesto_id)->first(),
                 'entrada' => Carbon::parse($turno->created_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
                 'salida' => Carbon::parse($turno->updated_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
-                'registros' => $registros_turno,  // Registros de historial
+                'registros' => $registros_turno, // Registros de historial
                 'registros_agrupados' => $registros_agrupados,
-
             ];
         }
 
-
         return $registros_por_turno;
-      
     }
-
 
     public function obtenerTurno($id_usuario, $fecha_actual)
     {
-
-        return DB::table('historial_puesto')
-                ->where('usuario_id', $id_usuario)
-                ->whereDate('created_at', $fecha_actual)
-                ->get();
+        return DB::table('historial_puesto')->where('usuario_id', $id_usuario)->whereDate('created_at', $fecha_actual)->get();
     }
     /**
      * Remove the specified resource from storage.

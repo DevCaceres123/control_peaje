@@ -104,7 +104,6 @@
                                             value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
                                         <div id="_fecha_final"></div>
                                     </div>
-
                                 </div>
                                 <div class="mb-3">
 
@@ -177,7 +176,8 @@
                                 <div class="mb-3 row">
                                     <div class="col-12">
                                         <label for="fecha_inicio" class="form-label">Fecha de Inicio: </label>
-                                        <input type="date" class="form-control" id="fecha_inicio_usuario" name="fecha_inicio_usuario"
+                                        <input type="date" class="form-control" id="fecha_inicio_usuario"
+                                            name="fecha_inicio_usuario"
                                             value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
                                         <div id="_fecha_inicio_usuario"></div>
                                     </div>
@@ -199,15 +199,15 @@
                                         <div class="row " id="mesesPagados">
                                             @foreach ($encargados_puesto as $encargados)
                                                 <div class="col-12 col-md-6">
-                                                    
+
                                                     <div
                                                         class="form-check d-flex justify-content-between align-items-center mt-2">
                                                         <label class="form-check-label me-3 text-uppercase"
                                                             for="enero">{{ $encargados->nombres }}
                                                             {{ $encargados->apellidos }}</label>
-                                                        <input class="form-check-input" type="checkbox"
-                                                            id="" name="encargados_puesto[]"
-                                                            value="{{ $encargados->id}}" style="border-color: #007bff">
+                                                        <input class="form-check-input" type="checkbox" id=""
+                                                            name="encargados_puesto[]" value="{{ $encargados->id }}"
+                                                            style="border-color: #007bff">
                                                     </div>
                                                 </div>
                                             @endforeach
@@ -240,5 +240,22 @@
 
 @endsection
 @section('scripts')
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let fechaInicio = document.getElementById("fecha_inicio");
+            let fechaFinal = document.getElementById("fecha_final");
+
+            // Al cambiar la fecha de inicio, actualizamos el mínimo de la fecha final
+            fechaInicio.addEventListener("change", function() {
+                fechaFinal.min = fechaInicio.value;
+            });
+
+            // Al cambiar la fecha final, actualizamos el máximo de la fecha de inicio
+            fechaFinal.addEventListener("change", function() {
+                fechaInicio.max = fechaFinal.value;
+            });
+        });
+    </script>
     <script src="{{ asset('js/reporte/reporte.js') }}" type="module"></script>
 @endsection

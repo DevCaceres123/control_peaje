@@ -67,10 +67,11 @@
         }
 
         .puesto {
-         margin: 15px 0px 8px 0px ;
+            margin: 15px 0px 8px 0px;
 
         }
-        .puesto b{
+
+        .puesto b {
             display: inline-block;
             background-color: #080625;
             color: white;
@@ -159,6 +160,16 @@
             font-size: 16px;
             font-weight: bold;
         }
+
+        .ley13 {
+            background-color: #c01c28;
+            color: wheat;
+        }
+
+        .ley64 {
+            background-color: #2b8a3e;
+            color: wheat;
+        }
     </style>
 </head>
 
@@ -167,7 +178,7 @@
         <!-- Información de la empresa -->
         <div class="info_empresa">
             <h2>GOBIERNO AUTÓNOMO MUNICIPAL DE CARANAVI</h2>
-            <h3>Departamento de Recaudaciones</h3>
+            <h3>Direccion de Recaudaciones</h3>
             <p>Reporte Generado: {{ now()->format('d-m-Y H:i:s') }}</p>
             <img src="assets/logo-caranavi.webp" alt="Logo" width="90" height="95">
         </div>
@@ -185,9 +196,9 @@
         </div>
 
         <p class="puesto">
-           
+
             @foreach ($puestos as $puesto)
-               <b> {{ $puesto->nombre ?? 'Sin asignar' }}</b>
+                <b> {{ $puesto->nombre ?? 'Sin asignar' }}</b>
             @endforeach
 
         </p>
@@ -196,46 +207,112 @@
         <p class="fecha_generacion">({{ $fecha_inicio }} - {{ $fecha_fin }})</p>
         {{-- TABLA DE LOS REGISTROS --}}
 
-
+        @php
+            // Filtramos los registros por ley
+            $ley13 = collect($registros)->whereIn('precio', [50, 100, 500, 1000]);
+            $ley61 = collect($registros)->whereIn('precio', [2, 4, 6, 8, 10, 12, 14]);
+        @endphp
 
 
         <table class="tabla">
             <thead>
                 <tr>
                     <th>Nº</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Importe</th>
+                    @if ($ley13->count() > 0)
+                        <th>Ley 13/2021</th>
+                        <th>Cantidad</th>
+                        <th>Importe</th>
+                    @endif
+                    @if ($ley61->count() > 0)
+                        <th>Ley 61/2024</th>
+                        <th>Cantidad</th>
+                        <th>Importe</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
                 @php
-                    $cont = 1; // Contador para las filas
-                    $costo_total = 0; // Acumulador para el total de importes
-                    $cantidad_total = 0; // Acumulador para la cantidad total
+                    $cont = 1;
+                    $cantidad_total_ley13 = 0;
+                    $costo_total_ley13 = 0;
+                    $cantidad_total_ley61 = 0;
+                    $costo_total_ley61 = 0;
+
+                    $maxFilas = max($ley13->count(), $ley61->count());
                 @endphp
 
-                @foreach ($registros as $registro)
+                @for ($i = 0; $i < $maxFilas; $i++)
                     <tr>
                         <td>{{ $cont++ }}</td>
-                        <td>{{ number_format($registro['precio']) }} Bs</td>
-                        <td>{{ $registro['cantidad'] }}</td>
-                        <td>{{ number_format($registro['total']) }} Bs</td>
-                        @php
-                            $cantidad_total += $registro['cantidad'];
-                            $costo_total += $registro['total'];
-                        @endphp
-                    </tr>
-                @endforeach
 
-                <!-- Fila de totales -->
+                        @php
+                            $registro13 = $ley13->values()->get($i);
+                            $registro61 = $ley61->values()->get($i);
+                        @endphp
+
+                        @if ($ley13->count() > 0)
+                            <td>{{ $registro13 ? number_format($registro13['precio']) . ' Bs' : '' }}</td>
+                            <td>{{ $registro13 ? $registro13['cantidad'] : '' }}</td>
+                            <td>
+                                @php
+                                    $importe13 = $registro13 ? $registro13['total'] : 0;
+                                    $cantidad_total_ley13 += $registro13 ? $registro13['cantidad'] : 0;
+                                    $costo_total_ley13 += $importe13;
+                                @endphp
+                                {{ $registro13 ? number_format($importe13) . ' Bs' : '' }}
+                            </td>
+                        @endif
+
+                        @if ($ley61->count() > 0)
+                            <td>{{ $registro61 ? number_format($registro61['precio']) . ' Bs' : '' }}</td>
+                            <td>{{ $registro61 ? $registro61['cantidad'] : '' }}</td>
+                            <td>
+                                @php
+                                    $importe61 = $registro61 ? $registro61['total'] : 0;
+                                    $cantidad_total_ley61 += $registro61 ? $registro61['cantidad'] : 0;
+                                    $costo_total_ley61 += $importe61;
+                                @endphp
+                                {{ $registro61 ? number_format($importe61) . ' Bs' : '' }}
+                            </td>
+                        @endif
+                    </tr>
+                @endfor
+
+                <!-- Fila de totales por ley -->
                 <tr>
-                    <td colspan="2" style="text-align: right;"><strong>Total:</strong></td>
-                    <td><strong>{{ $cantidad_total }} Registros</strong></td>
-                    <td><strong>{{ number_format($costo_total, 2) }} Bs</strong></td>
+                    <td></td>
+                    @if ($ley13->count() > 0)
+                        <td colspan="2" class="ley13"><strong>{{ $cantidad_total_ley13 }} Registros</strong></td>
+                        <td class="ley13"><strong>{{ number_format($costo_total_ley13, 2) }} Bs</strong></td>
+                    @endif
+                    @if ($ley61->count() > 0)
+                        <td colspan="2" class="ley64"><strong>{{ $cantidad_total_ley61 }} Registros</strong></td>
+                        <td class="ley64"><strong>{{ number_format($costo_total_ley61, 2) }} Bs</strong></td>
+                    @endif
+                </tr>
+
+                <!-- Fila total de cantidad -->
+                <tr>
+                    <td colspan="{{ $ley13->count() > 0 && $ley61->count() > 0 ? 3 : 2 }}" style="text-align: right;">
+                        <strong>Total Registros:</strong></td>
+                    <td colspan="{{ $ley13->count() > 0 && $ley61->count() > 0 ? 4 : 2 }}"
+                        style="text-align: center; background-color: #252525; color: #fff;">
+                        <strong>{{ $cantidad_total_ley13 + $cantidad_total_ley61 }} Registros</strong>
+                    </td>
+                </tr>
+
+                <!-- Fila del importe total -->
+                <tr>
+                    <td colspan="{{ $ley13->count() > 0 && $ley61->count() > 0 ? 3 : 2 }}" style="text-align: right;">
+                        <strong>Importe Total:</strong></td>
+                    <td colspan="{{ $ley13->count() > 0 && $ley61->count() > 0 ? 4 : 2 }}"
+                        style="text-align: center; background-color: #080625; color: #ddd">
+                        <strong>{{ number_format($costo_total_ley13 + $costo_total_ley61, 2) }} Bs</strong>
+                    </td>
                 </tr>
             </tbody>
         </table>
+
 
 
 

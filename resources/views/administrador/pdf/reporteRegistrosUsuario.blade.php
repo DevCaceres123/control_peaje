@@ -213,7 +213,7 @@
         <!-- Información de la empresa -->
         <div class="info_empresa">
             <h2>GOBIERNO AUTÓNOMO MUNICIPAL DE CARANAVI</h2>
-            <h3>Departamento de Recaudaciones</h3>
+            <h3>Direccion de Recaudaciones</h3>
             <p>Reporte Generado: {{ now()->format('d-m-Y H:i:s') }}</p>
             <img src="assets/logo-caranavi.webp" alt="Logo" width="90" height="95">
         </div>
