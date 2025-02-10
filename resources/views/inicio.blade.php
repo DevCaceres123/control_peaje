@@ -68,6 +68,7 @@ aria-labelledby="puestoModalLabel" aria-hidden="true">
     <div class="modal-content">
         <div class="modal-header">
             <h6 class="modal-title m-0" id="puestoModalLabel">Seleccionar Puesto</h6>
+            <button type="button" class="btn-close btn-xs" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
             <div class="row">
@@ -105,6 +106,10 @@ aria-labelledby="puestoModalLabel" aria-hidden="true">
                 @endforeach
             </div>
         </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No asignar</button>
+            
+          </div>
     </div>
 </div>
 </div>
