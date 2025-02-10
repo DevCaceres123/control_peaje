@@ -555,7 +555,7 @@ class Controlador_registro extends Controller
                     ->orWhere('nombre_usuario', 'like', '%' . $request->search['value'] . '%')
                     ->orWhere('precio', 'like', '%' . $request->search['value'] . '%')
                     ->orWhere('placa', 'like', '%' . $request->search['value'] . '%')
-                    ->orWhere('cod_qr', 'like', '%' . $request->search['value'] . '%')
+                    ->orWhere('cod_qr',$request->search['value'])
                     ->orWhere('ci', 'like', '%' . $request->search['value'] . '%');
             });
         }
