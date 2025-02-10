@@ -70,10 +70,18 @@ function listar_usuarios() {
                 className: 'table-td',
                 render: function (data) {
 
-                    return `
-                  
-                    <span class="badge bg-success fs-6 text-uppercase">${data}</span>
-                    `;
+                    if(data === 'activo')
+                    {
+                        return `                  
+                            <span class="badge bg-primary fs-6 text-uppercase">${data}</span>
+                        `;
+                    }
+                    else{
+                        return `                  
+                          <span class="badge bg-danger fs-6 text-uppercase">${data}</span>
+                       `;
+                    }
+                   
                 }
             },
             {
