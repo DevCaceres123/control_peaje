@@ -102,6 +102,7 @@ $('#form-reporte_usuario').submit(function (e) {
         if (response.tipo != "exito") {
             $("#btn-reporte").prop("disabled", false);
             mensajeAlerta(response.mensaje, response.tipo);
+            $("#btn-reporte_usuario").prop("disabled", false);
             return;
         }
 

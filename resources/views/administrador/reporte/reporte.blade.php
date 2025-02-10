@@ -174,14 +174,21 @@
                         <div class="row">
                             <div class="col-md-12 m-auto ">
                                 <div class="mb-3 row">
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <label for="fecha_inicio" class="form-label">Fecha de Inicio: </label>
                                         <input type="date" class="form-control" id="fecha_inicio_usuario"
                                             name="fecha_inicio_usuario"
                                             value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
                                         <div id="_fecha_inicio_usuario"></div>
                                     </div>
-                                    <label for="exampleInputEmail1" class="form-label mt-1">Seleccionar encargado de
+                                    <div class="col-6">
+                                        <label for="fecha_final_usuario" class="form-label">Fecha de Final: </label>
+                                        <input type="date" class="form-control" id="fecha_final_usuario"
+                                            name="fecha_final_usuario"
+                                            value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" />
+                                        <div id="fecha_final_usuario"></div>
+                                    </div>
+                                    <label for="exampleInputEmail1" class="form-label mt-2">Seleccionar encargado de
                                         puesto:
                                     </label>
                                     <div class="col-12 mt-1 border border-secondary   border-2 rounded p-2">
@@ -195,8 +202,18 @@
                                                     style="border-color: #007bff">
                                             </div>
                                         </div>
-                                        <!-- Checkbox para Listar Meses -->
+                                       
                                         <div class="row " id="mesesPagados">
+                                            <div class="col-12 col-md-6">
+                                                <div
+                                                    class="form-check d-flex justify-content-between align-items-center mt-2">
+                                                    <label class="form-check-label me-3 text-uppercase text-danger"
+                                                        for="listar_turnos">Listar Turnos</label>
+                                                    <input class="form-check-input listar-turnos" type="checkbox"
+                                                        name="listar_turnos" value="0" data-checked-value="1"
+                                                        data-unchecked-value="0" style="border-color: #d30c1d">
+                                                </div>
+                                            </div>
                                             @foreach ($encargados_puesto as $encargados)
                                                 <div class="col-12 col-md-6">
 
@@ -246,6 +263,9 @@
             let fechaInicio = document.getElementById("fecha_inicio");
             let fechaFinal = document.getElementById("fecha_final");
 
+            let fecha_inicio_usuario = document.getElementById("fecha_inicio_usuario");
+            let fecha_final_usuario = document.getElementById("fecha_final_usuario");
+
             // Al cambiar la fecha de inicio, actualizamos el mínimo de la fecha final
             fechaInicio.addEventListener("change", function() {
                 fechaFinal.min = fechaInicio.value;
@@ -255,6 +275,23 @@
             fechaFinal.addEventListener("change", function() {
                 fechaInicio.max = fechaFinal.value;
             });
+
+
+            // Al cambiar la fecha de inicio, actualizamos el mínimo de la fecha final
+            fecha_inicio_usuario.addEventListener("change", function() {
+                fecha_final_usuario.min = fecha_inicio_usuario.value;
+            });
+
+            // Al cambiar la fecha final, actualizamos el máximo de la fecha de inicio
+            fecha_final_usuario.addEventListener("change", function() {
+                fecha_inicio_usuario.max = fecha_final_usuario.value;
+            });
+
+        });
+
+
+        document.getElementById("listar_turnos").addEventListener("change", function() {
+            document.getElementById("listar_turnos_hidden").disabled = this.checked;
         });
     </script>
     <script src="{{ asset('js/reporte/reporte.js') }}" type="module"></script>

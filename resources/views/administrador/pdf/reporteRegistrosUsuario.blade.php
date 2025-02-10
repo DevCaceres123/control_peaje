@@ -246,16 +246,16 @@
                     @endforeach
 
                     <h3 class="titulo">
-                        {{ $turno_info['nombreEncargado']['nombres'] }}
-                        {{ $turno_info['nombreEncargado']['apellidos'] }}
-
+                        {{ $turno_info['nombreEncargado']['nombres'] ?? 'N/A' }}
+                        {{ $turno_info['nombreEncargado']['apellidos'] ?? 'N/A' }}
+                        
                         <b class="total_dia">Total: {{ $totalTurno }} Bs</b>
                     </h3>
                     <p class="entrada">Entrada: {{ $turno_info['entrada'] }}</p>
                     <p class="salida">Salida: {{ $turno_info['salida'] }}</p>
 
                     <p class="puesto">
-                        <b>{{ $turno_info['puesto']['nombre'] }}</b>
+                        <b>{{ $turno_info['puesto']['nombre'] ?? 'Sin puesto' }}</b>
                     </p>
 
 

@@ -181,7 +181,6 @@ class Controlador_reporte extends Controller
                 $puestos_ultimoRegistro[] = $this->verificarFechasTurno($request->fecha_inicio, $request->fecha_final, $puesto);
             }
 
-            
             foreach ($puestos_ultimoRegistro as $value) {
                 $registros = $this->obtenerRegistrosPuesto($value['fecha_mas_corta'], $value['fecha_mas_alta'], $value['puesto_id']);
 
@@ -254,73 +253,56 @@ class Controlador_reporte extends Controller
         }
     }
 
-    
-   
-    
     public function verificarFechasTurno($fecha_inicio, $fecha_final, $puesto)
     {
         // Asegurar que las fechas sean instancias de Carbon antes de formatearlas
         $fecha_inicio = Carbon::parse($fecha_inicio);
         $fecha_final = Carbon::parse($fecha_final);
-    
+
         // Obtener la fecha más corta dentro de la fecha inicio
-        $fecha_mas_corta = DB::table('historial_puesto')
-            ->where('puesto_id', $puesto)
-            ->whereDate('created_at', $fecha_inicio->format('Y-m-d'))
-            ->min('created_at');
-    
+        $fecha_mas_corta = DB::table('historial_puesto')->where('puesto_id', $puesto)->whereDate('created_at', $fecha_inicio->format('Y-m-d'))->min('created_at');
+
         // Obtener la fecha más alta dentro de la fecha final
-        $fecha_mas_alta = DB::table('historial_puesto')
-            ->where('puesto_id', $puesto)
-            ->whereDate('created_at', $fecha_final->format('Y-m-d'))
-            ->max('updated_at');
-    
+        $fecha_mas_alta = DB::table('historial_puesto')->where('puesto_id', $puesto)->whereDate('created_at', $fecha_final->format('Y-m-d'))->max('updated_at');
+
         // Si no hay una fecha más corta, buscar la primera fecha con registros en el rango ascendente
         if (!$fecha_mas_corta) {
             $fecha_actual = clone $fecha_inicio; // Clonar para evitar modificar la original
-    
+
             while ($fecha_actual->lte($fecha_final)) {
-                $registro = DB::table('historial_puesto')
-                    ->where('puesto_id', $puesto)
-                    ->whereDate('created_at', $fecha_actual->format('Y-m-d'))
-                    ->min('created_at');
-    
+                $registro = DB::table('historial_puesto')->where('puesto_id', $puesto)->whereDate('created_at', $fecha_actual->format('Y-m-d'))->min('created_at');
+
                 if ($registro) {
                     $fecha_mas_corta = $registro;
                     break;
                 }
-    
+
                 $fecha_actual->addDay(); // Avanzar un día
             }
         }
-    
+
         // Si no hay una fecha más alta, buscar la última fecha con registros en el rango descendente
         if (!$fecha_mas_alta) {
             $fecha_actual = clone $fecha_final; // Clonar para evitar modificar la original
-    
+
             while ($fecha_actual->gte($fecha_inicio)) {
-                $registro = DB::table('historial_puesto')
-                    ->where('puesto_id', $puesto)
-                    ->whereDate('created_at', $fecha_actual->format('Y-m-d'))
-                    ->max('updated_at');
-    
+                $registro = DB::table('historial_puesto')->where('puesto_id', $puesto)->whereDate('created_at', $fecha_actual->format('Y-m-d'))->max('updated_at');
+
                 if ($registro) {
                     $fecha_mas_alta = $registro;
                     break;
                 }
-    
+
                 $fecha_actual->subDay(); // Retroceder un día
             }
         }
-    
+
         return [
             'puesto_id' => $puesto,
             'fecha_mas_corta' => $fecha_mas_corta, // Ya está formateada
             'fecha_mas_alta' => $fecha_mas_alta, // Ya está formateada
         ];
     }
-    
-    
 
     // Se obtiene los registros de un puestos en un rango de fechas
     public function obtenerRegistrosPuesto($fecha_inicio, $fecha_fin = null, $puesto_id)
@@ -346,16 +328,19 @@ class Controlador_reporte extends Controller
     public function reportes_usuario(Request $request)
     {
         try {
+           
             $validatedData = $request->validate([
-                'fecha_inicio_usuario' => 'required|date',
+                'fecha_inicio_usuario' => 'required|date|before_or_equal:fecha_final_usuario',
+                'fecha_final_usuario' => 'required|date|after_or_equal:fecha_inicio_usuario',
                 'encargados_puesto' => 'required|exists:users,id',
             ]);
 
-            $puestos_ultimoRegistro = [];
             $registros = [];
             foreach ($request->encargados_puesto as $key => $value) {
-                $registros[] = $this->generarReporteUsuario($value, $request->fecha_inicio_usuario);
+                $registros[] = $this->generarReporteUsuario($value, $request->fecha_inicio_usuario, $request->fecha_final_usuario, $request->listar_turnos);
             }
+
+           
 
             $nombreCompletoUsuario = auth()
                 ->user()
@@ -374,50 +359,92 @@ class Controlador_reporte extends Controller
         }
     }
 
-    public function generarReporteUsuario($usuario_actual, $fecha)
+    public function generarReporteUsuario($usuario_actual, $fecha_inicio, $fecha_final, $listar_turnos = null)
     {
-        $fecha_actual = Carbon::parse($fecha);
-        $turnos = $this->obtenerTurno($usuario_actual, $fecha_actual);
+        $fecha_inicio = Carbon::parse($fecha_inicio);
+        $fecha_final = Carbon::parse($fecha_final);
+        $turnos = $this->obtenerTurno($usuario_actual, $fecha_inicio, $fecha_final);
         $nombreCompletoUsuario = User::select('id', 'nombres', 'apellidos')->where('id', $usuario_actual)->first();
-
-        // Arreglo para almacenar los registros por turno
+    
+        // Arreglo para almacenar los registros
         $registros_por_turno = [];
-
-        foreach ($turnos as $turno) {
-            $entrada = $turno->created_at;
-            $salida = $turno->updated_at;
-
-            // Obtener los registros del historial para este turno
-            $registros_turno = HistorialRegistros::select('precio')
-                ->where('usuario_id', '=', $usuario_actual)
-                ->whereBetween('created_at', [$entrada, $salida])
-                ->get();
-
-            // Agrupar registros por precio
-            $registros_agrupados = $registros_turno->groupBy('precio')->map(function ($grupo) {
-                return [
-                    'cantidad' => $grupo->count(), // Número de transacciones
-                    'total' => $grupo->sum('precio'), // Suma total de ese precio
+    
+        if ($listar_turnos != null) {
+         
+            foreach ($turnos as $turno) {
+                $entrada = $turno->created_at;
+                $salida = $turno->updated_at;
+    
+                // Obtener registros del historial dentro del turno
+                $registros_turno = HistorialRegistros::select('precio')
+                    ->where('usuario_id', '=', $usuario_actual)
+                    ->whereBetween('created_at', [$entrada, $salida])
+                    ->get();
+    
+                // Agrupar registros por precio
+                $registros_agrupados = $registros_turno->groupBy('precio')->map(function ($grupo) {
+                    return [
+                        'cantidad' => $grupo->count(), 
+                        'total' => $grupo->sum('precio'),
+                    ];
+                });
+    
+                // Almacenar los registros por turno
+                $registros_por_turno[] = [
+                    'nombreEncargado' => $nombreCompletoUsuario,
+                    'puesto' => Puesto::select('id', 'nombre')->where('id', $turno->puesto_id)->first(),
+                    'entrada' => Carbon::parse($turno->created_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
+                    'salida' => Carbon::parse($turno->updated_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
+                   // 'registros' => $registros_turno,
+                    'registros_agrupados' => $registros_agrupados,
                 ];
-            });
-
-            // Almacenar los registros por turno
-            $registros_por_turno[] = [
-                'nombreEncargado' => $nombreCompletoUsuario,
-                'puesto' => Puesto::select('id', 'nombre')->where('id', $turno->puesto_id)->first(),
-                'entrada' => Carbon::parse($turno->created_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
-                'salida' => Carbon::parse($turno->updated_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
-                'registros' => $registros_turno, // Registros de historial
-                'registros_agrupados' => $registros_agrupados,
-            ];
+            }
+        } else {
+            // PROCESO UNIFICADO (Sin turnos, uniendo todo en un solo resultado)
+    
+           
+                // Determinar el rango completo de fechas (entrada más antigua y salida más reciente)
+                $fecha_entrada_min = $turnos->min('created_at');
+                $fecha_salida_max = $turnos->max('updated_at');
+    
+                // Obtener todos los registros dentro del rango completo
+                $registros_turno = HistorialRegistros::select('precio')
+                    ->where('usuario_id', '=', $usuario_actual)
+                    ->whereBetween('created_at', [$fecha_entrada_min, $fecha_salida_max])
+                    ->get();
+    
+                // Agrupar registros por precio
+                $registros_agrupados = $registros_turno->groupBy('precio')->map(function ($grupo) {
+                    return [
+                        'cantidad' => $grupo->count(),
+                        'total' => $grupo->sum('precio'),
+                    ];
+                });
+    
+                // Guardar todo en un solo conjunto de datos sin turnos
+                $registros_por_turno[] = [
+                    'nombreEncargado' => $nombreCompletoUsuario,
+                    'puesto' => null,
+                    'entrada' => Carbon::parse($fecha_entrada_min)->translatedFormat('d \d\e F \d\e Y H:i:s '),
+                    'salida' => Carbon::parse($fecha_salida_max)->translatedFormat('d \d\e F \d\e Y H:i:s '),
+                   // 'registros' => $registros_turno,
+                    'registros_agrupados' => $registros_agrupados,
+                ];
+            
         }
-
+    
         return $registros_por_turno;
     }
-
-    public function obtenerTurno($id_usuario, $fecha_actual)
+    
+    public function obtenerTurno($id_usuario, $fecha_inicio, $fecha_fin)
     {
-        return DB::table('historial_puesto')->where('usuario_id', $id_usuario)->whereDate('created_at', $fecha_actual)->get();
+        $fecha_inicio = Carbon::parse($fecha_inicio)->startOfDay(); // 2025-01-07 00:00:00
+        $fecha_fin = Carbon::parse($fecha_fin)->endOfDay(); // 2025-01-07 23:59:59
+
+        return DB::table('historial_puesto')
+            ->where('usuario_id', $id_usuario)
+            ->whereBetween('created_at', [$fecha_inicio, $fecha_fin])
+            ->get();
     }
     /**
      * Remove the specified resource from storage.
