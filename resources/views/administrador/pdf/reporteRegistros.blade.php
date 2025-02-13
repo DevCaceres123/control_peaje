@@ -11,19 +11,21 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+
         }
 
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
-            color: #333;
+            padding: 45px;
         }
 
         .container_boleta {
-            padding: 15px;
-            border: 1px solid #8b5050;
+            width: 100%;
+            height: auto;
+
             border-radius: 8px;
             position: relative;
+
         }
 
         .info_empresa {
@@ -102,19 +104,34 @@
             margin-top: 2px;
         }
 
+
+        .page-break {
+            page-break-before: always;
+            /* Fuerza un salto de página */
+        }
+
+
+
         .tabla {
-            width: 70%;
+            width: 60%;
+            height: 100vh;
+
             margin: auto;
             margin-top: 20px;
             border-collapse: collapse;
+            margin-bottom: 10px;
+
+
         }
+
 
         .tabla th,
         .tabla td {
             border: 1px solid #333;
-            padding: 8px;
+            padding: 4px;
             text-align: center;
             font-size: 12px;
+
         }
 
         .tabla th {
@@ -123,52 +140,50 @@
             font-weight: bold;
         }
 
-        .totalBoletas {
-            width: 100%;
-            position: relative;
-            margin-top: 12px;
+        .ley {
+            margin-top: 5px;
+            font-size: 10px;
+            text-align: center;
         }
 
-        .totalBoletas .inasitencia {
-            position: absolute;
-            top: 0;
+        ley p {
+            margin-top: 3px;
+            text-align: center;
+        }
+
+        .ley .titulo_creacion {
+            text-align: center;
+            font-weight: 900;
+
+        }
+
+        @page {
+            margin: 50px 25px;
+        }
+
+        @page :first {
+            margin-top: 10px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
             left: 0;
+            width: 100%;
+            height: 12px;
 
-            margin-top: 20px;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 8px;
+            text-align: center;
+
         }
 
-
-        .totalBoletas .observados {
+        .footer p {
             position: absolute;
+            right: 12px;
             top: 0;
-            right: 50%;
-            left: 50%;
-            margin-top: 20px;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center
-        }
 
-        .totalBoletas .asistencia {
-            position: absolute;
-            top: 0;
-            right: 0;
-
-            margin-top: 20px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .ley13 {
-            background-color: #c01c28;
-            color: wheat;
-        }
-
-        .ley64 {
-            background-color: #2b8a3e;
-            color: wheat;
         }
     </style>
 </head>
@@ -178,7 +193,8 @@
         <!-- Información de la empresa -->
         <div class="info_empresa">
             <h2>GOBIERNO AUTÓNOMO MUNICIPAL DE CARANAVI</h2>
-            <h3>Direccion de Recaudaciones</h3>
+            <h4>SECRETARIA MUNICIPAL ADMINISTRATIVA FINANCIERA</h4>
+            <h4>Direccion de Recaudaciones</h4>
             <p>Reporte Generado: {{ now()->format('d-m-Y H:i:s') }}</p>
             <img src="assets/logo-caranavi.webp" alt="Logo" width="90" height="95">
         </div>
@@ -214,20 +230,15 @@
         @endphp
 
 
+        <!-- Tabla Ley 13 -->
+
         <table class="tabla">
             <thead>
                 <tr>
                     <th>Nº</th>
-                    @if ($ley13->count() > 0)
-                        <th>Ley 13/2021</th>
-                        <th>Cantidad</th>
-                        <th>Importe</th>
-                    @endif
-                    @if ($ley61->count() > 0)
-                        <th>Ley 61/2024</th>
-                        <th>Cantidad</th>
-                        <th>Importe</th>
-                    @endif
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Importe</th>
                 </tr>
             </thead>
             <tbody>
@@ -235,89 +246,136 @@
                     $cont = 1;
                     $cantidad_total_ley13 = 0;
                     $costo_total_ley13 = 0;
-                    $cantidad_total_ley61 = 0;
-                    $costo_total_ley61 = 0;
-
-                    $maxFilas = max($ley13->count(), $ley61->count());
                 @endphp
 
-                @for ($i = 0; $i < $maxFilas; $i++)
+                @foreach ($ley13 as $registro13)
                     <tr>
                         <td>{{ $cont++ }}</td>
-
-                        @php
-                            $registro13 = $ley13->values()->get($i);
-                            $registro61 = $ley61->values()->get($i);
-                        @endphp
-
-                        @if ($ley13->count() > 0)
-                            <td>{{ $registro13 ? number_format($registro13['precio']) . ' Bs' : '' }}</td>
-                            <td>{{ $registro13 ? $registro13['cantidad'] : '' }}</td>
-                            <td>
-                                @php
-                                    $importe13 = $registro13 ? $registro13['total'] : 0;
-                                    $cantidad_total_ley13 += $registro13 ? $registro13['cantidad'] : 0;
-                                    $costo_total_ley13 += $importe13;
-                                @endphp
-                                {{ $registro13 ? number_format($importe13) . ' Bs' : '' }}
-                            </td>
-                        @endif
-
-                        @if ($ley61->count() > 0)
-                            <td>{{ $registro61 ? number_format($registro61['precio']) . ' Bs' : '' }}</td>
-                            <td>{{ $registro61 ? $registro61['cantidad'] : '' }}</td>
-                            <td>
-                                @php
-                                    $importe61 = $registro61 ? $registro61['total'] : 0;
-                                    $cantidad_total_ley61 += $registro61 ? $registro61['cantidad'] : 0;
-                                    $costo_total_ley61 += $importe61;
-                                @endphp
-                                {{ $registro61 ? number_format($importe61) . ' Bs' : '' }}
-                            </td>
-                        @endif
+                        <td>{{ number_format($registro13['precio']) }} Bs</td>
+                        <td>{{ $registro13['cantidad'] }}</td>
+                        <td>
+                            @php
+                                $importe13 = $registro13['total'];
+                                $cantidad_total_ley13 += $registro13['cantidad'];
+                                $costo_total_ley13 += $importe13;
+                            @endphp
+                            {{ number_format($importe13) }} Bs
+                        </td>
                     </tr>
-                @endfor
+                @endforeach
 
-                <!-- Fila de totales por ley -->
+                <!-- Totales Ley 13 -->
                 <tr>
                     <td></td>
-                    @if ($ley13->count() > 0)
-                        <td colspan="2" class="ley13"><strong>{{ $cantidad_total_ley13 }} Registros</strong></td>
-                        <td class="ley13"><strong>{{ number_format($costo_total_ley13, 2) }} Bs</strong></td>
-                    @endif
-                    @if ($ley61->count() > 0)
-                        <td colspan="2" class="ley64"><strong>{{ $cantidad_total_ley61 }} Registros</strong></td>
-                        <td class="ley64"><strong>{{ number_format($costo_total_ley61, 2) }} Bs</strong></td>
-                    @endif
-                </tr>
-
-                <!-- Fila total de cantidad -->
-                <tr>
-                    <td colspan="{{ $ley13->count() > 0 && $ley61->count() > 0 ? 3 : 2 }}" style="text-align: right;">
-                        <strong>Total Registros:</strong></td>
-                    <td colspan="{{ $ley13->count() > 0 && $ley61->count() > 0 ? 4 : 2 }}"
-                        style="text-align: center; background-color: #252525; color: #fff;">
-                        <strong>{{ $cantidad_total_ley13 + $cantidad_total_ley61 }} Registros</strong>
-                    </td>
-                </tr>
-
-                <!-- Fila del importe total -->
-                <tr>
-                    <td colspan="{{ $ley13->count() > 0 && $ley61->count() > 0 ? 3 : 2 }}" style="text-align: right;">
-                        <strong>Importe Total:</strong></td>
-                    <td colspan="{{ $ley13->count() > 0 && $ley61->count() > 0 ? 4 : 2 }}"
-                        style="text-align: center; background-color: #080625; color: #ddd">
-                        <strong>{{ number_format($costo_total_ley13 + $costo_total_ley61, 2) }} Bs</strong>
-                    </td>
+                    <td colspan="2"><strong>{{ $cantidad_total_ley13 }} Registros</strong></td>
+                    <td><strong>{{ number_format($costo_total_ley13, 2) }} Bs</strong></td>
                 </tr>
             </tbody>
         </table>
+        <div class="ley">
+            <p class="titulo_creacion">LEY AUTÓNOMA MUNICIPAL N.º 13/2021</p>
+            <p>LEY MUNICIPAL DE TASA DE RODAJE Y NORMATIVA DE INGRESO DE VEHÍCULOS DE TRANSPORTE, RURAL E
+                INTERPROVINCIAL DE CARGA Y DESCARGA</p>
+        </div>
+        <!-- Salto de página para la segunda tabla -->
+        @php $numPagina = 1; @endphp
+
+        <div class="footer">
+            Página {{ $numPagina }} de 2
+            <p>Ley 13/2021</p>
+        </div>
+
+        <div class="page-break"></div>
+        @php $numPagina++; @endphp
 
 
+        <!-- Información de la empresa -->
+        <div class="info_empresa">
+            <h2>GOBIERNO AUTÓNOMO MUNICIPAL DE CARANAVI</h2>
+            <h4>SECRETARIA MUNICIPAL ADMINISTRATIVA FINANCIERA</h4>
+            <h4>Direccion de Recaudaciones</h4>
+            <p>Reporte Generado: {{ now()->format('d-m-Y H:i:s') }}</p>
+            <img src="assets/logo-caranavi.webp" alt="Logo" width="90" height="95">
+        </div>
 
+        <!-- Detalles de la reunión -->
+        <div class="detalle_reporte">
+            <p class="encargado">
+                <b>Usuario: </b>
+                {{ $nombreCompletoUsuario['nombres'] ?? 'N/A' }}
+                {{ $nombreCompletoUsuario['apellidos'] ?? 'N/A' }}
+            </p>
+
+            <hr>
+
+        </div>
+
+        <p class="puesto">
+
+            @foreach ($puestos as $puesto)
+                <b> {{ $puesto->nombre ?? 'Sin asignar' }}</b>
+            @endforeach
+
+        </p>
+
+        <h3 class="titulo">REPORTE DE REGISTROS</h3>
+        <p class="fecha_generacion">({{ $fecha_inicio }} - {{ $fecha_fin }})</p>
+        <!-- Tabla Ley 61 -->
+
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>Nº</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Importe</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                    $cont = 1;
+                    $cantidad_total_ley61 = 0;
+                    $costo_total_ley61 = 0;
+                @endphp
+
+                @foreach ($ley61 as $registro61)
+                    <tr>
+                        <td>{{ $cont++ }}</td>
+                        <td>{{ number_format($registro61['precio']) }} Bs</td>
+                        <td>{{ $registro61['cantidad'] }}</td>
+                        <td>
+                            @php
+                                $importe61 = $registro61['total'];
+                                $cantidad_total_ley61 += $registro61['cantidad'];
+                                $costo_total_ley61 += $importe61;
+                            @endphp
+                            {{ number_format($importe61) }} Bs
+                        </td>
+                    </tr>
+                @endforeach
+
+                <!-- Totales Ley 61 -->
+                <tr>
+                    <td></td>
+                    <td colspan="2"><strong>{{ $cantidad_total_ley61 }} Registros</strong></td>
+                    <td><strong>{{ number_format($costo_total_ley61, 2) }} Bs</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="ley">
+            <p class="titulo_creacion">LEY AUTÓNOMA MUNICIPAL N.º 61/2024</p>
+            <p>LEY MUNICIPAL DE CREACION DE LA TASA DE RODAJE-PEAJE DEL GOBIERNO AUTÓNOMO
+                MUNICIPAL DE CARANAVI</p>
+        </div>
 
 
     </div>
+
+    <div class="footer">
+        Página {{ $numPagina }} de 2
+        <p>Ley 61/2024</p>
+    </div>
+
 </body>
 
 </html>
