@@ -15,13 +15,13 @@
 
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
+            padding: 45px;
             color: #333;
         }
 
         .container_boleta {
             padding: 15px;
-            border: 1px solid #8b5050;
+
             border-radius: 8px;
             position: relative;
         }
@@ -79,6 +79,14 @@
             padding: 5px 8px;
             border-radius: 10px;
             font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .fecha_generacion {
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-top: 2px;
         }
 
         .detalle_reporte hr {
@@ -111,13 +119,19 @@
             margin-top: 18px;
         }
 
+        .contenedor_tablas {
+            width: 100%;
+            height: 30vh;
+            margin: auto;
+        }
+
         .tabla {
             width: 60%;
             margin: auto;
             margin-top: 20px;
             border-collapse: collapse;
             margin-bottom: 30px;
-
+            page-break-inside: avoid;
 
         }
 
@@ -200,9 +214,27 @@
             top: 0px;
             right: 0px;
             padding: 4px;
-            
-            border:1px solid #080625;
+
+            border: 1px solid #080625;
             border-top: none;
+            font-size: 12px;
+        }
+
+        .page-break {
+            page-break-before: always;
+            /* Fuerza un salto de página */
+        }
+
+        @page {
+            margin: 50px 25px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0px;
+            left: 0px;
+            width: 100%;
+            text-align: center;
             font-size: 12px;
         }
     </style>
@@ -213,7 +245,8 @@
         <!-- Información de la empresa -->
         <div class="info_empresa">
             <h2>GOBIERNO AUTÓNOMO MUNICIPAL DE CARANAVI</h2>
-            <h3>Direccion de Recaudaciones</h3>
+            <h4>SECRETARIA MUNICIPAL ADMINISTRATIVA FINANCIERA</h4>
+            <h4>Direccion de Recaudaciones</h4>
             <p>Reporte Generado: {{ now()->format('d-m-Y H:i:s') }}</p>
             <img src="assets/logo-caranavi.webp" alt="Logo" width="90" height="95">
         </div>
@@ -233,73 +266,188 @@
         </div>
         <?php
         $totalTurno = 0;
+        $contadorTabla = 0;
+        $contadorTablasGRandes = 0;
+        $usuarioAnterior = null; // Variable para rastrear el usuario anterior
+        $contadorHojas = 0;
         ?>
 
-
         {{-- TABLA DE LOS REGISTROS --}}
-
-        @foreach ($registros as $registro)
-            @foreach ($registro as $turno_info)
-                @if (count($turno_info['registros_agrupados']) > 0)
-                    @foreach ($turno_info['registros_agrupados'] as $precio => $detalle)
-                        <?php $totalTurno += $detalle['total']; ?>
-                    @endforeach
-
-                    <h3 class="titulo">
-                        {{ $turno_info['nombreEncargado']['nombres'] ?? 'N/A' }}
-                        {{ $turno_info['nombreEncargado']['apellidos'] ?? 'N/A' }}
+        @if ($listarTurno != null)
+            @foreach ($registros as $registro)
+                @foreach ($registro as $index => $turno_info)
+                    @if (count($turno_info['registros_agrupados']) > 0)
+                        <?php
+                        $cantidadRegistros = count($turno_info['registros_agrupados']);
                         
-                        <b class="total_dia">Total: {{ $totalTurno }} Bs</b>
-                    </h3>
-                    <p class="entrada">Entrada: {{ $turno_info['entrada'] }}</p>
-                    <p class="salida">Salida: {{ $turno_info['salida'] }}</p>
+                        // Si la tabla tiene 5 o más registros, contarla como "grande"
+                        if ($cantidadRegistros >= 5) {
+                            $contadorTablasGRandes++;
+                        }
+                        
+                        // Sumar total del turno
+                        foreach ($turno_info['registros_agrupados'] as $precio => $detalle) {
+                            $totalTurno += $detalle['total'];
+                        }
+                        ?>
 
-                    <p class="puesto">
-                        <b>{{ $turno_info['puesto']['nombre'] ?? 'Sin puesto' }}</b>
-                    </p>
-
-
-
-
-                    <table class="tabla">
-                        <thead>
-                            <tr>
-                                <th>Nº</th>
-                                <th>Precio</th>
-                                <th>Cantidad</th>
-                                <th>Importe</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                        {{-- SALTO DE PÁGINA CUANDO CAMBIA EL USUARIO (evita doble salto) --}}
+                        @if ($usuarioAnterior !== null && $usuarioAnterior !== $turno_info['nombreEncargado']['id'])
+                            <div class="footer">
+                                <?php
+                                $contadorHojas++;
+                                
+                                ?>
+                                Página. {{ $contadorHojas }}
+                            </div>
+                            <div class="page-break"></div>
+                            <hr>
                             <?php
-                            $cont = 1;
-                            $costo_total = 0;
-                            $cantidad = 0;
-                            
+                            $contadorTabla = 0;
+                            $contadorTablasGRandes = 0;
                             ?>
+                        @else
+                            {{-- SALTO DE PÁGINA SI HAY 2 TABLAS GRANDES --}}
+                            @if ($contadorTablasGRandes == 2)
+                                <div class="footer">
+                                    <?php
+                                    $contadorHojas++;
+                                    
+                                    ?>
+                                    Página. {{ $contadorHojas }}
+                                </div>
+                                <div class="page-break"></div>
+                                <?php
+                                $contadorTabla = 0;
+                                $contadorTablasGRandes = 0;
+                                ?>
+                            @endif
 
-                            @foreach ($turno_info['registros_agrupados'] as $precio => $detalle)
-                                <tr>
-                                    <td>{{ $cont++ }}</td>
-                                    <td>{{ $precio }} Bs</td>
-                                    <td>{{ $detalle['cantidad'] }}</td>
-                                    <td>{{ $detalle['total'] }} Bs</td>
-                                    {{ $cantidad = $cantidad + $detalle['cantidad'] }}
-                                    {{ $costo_total = $costo_total + $detalle['total'] }}
-                                </tr>
-                            @endforeach
-                            <tr>
-                                <td colspan="2" style="text-align: right;"></td>
-                                <td style="text-center: right;"><b>{{ $cantidad }} Registros </b></td>
-                                <td style="text-center: right;"><b>TOTAL: {{ $costo_total }} (Bs) </b></td>
+                            {{-- SALTO DE PÁGINA SI HAY 3 TABLAS PEQUEÑAS (solo si no hay cambio de usuario) --}}
+                            @if ($contadorTabla == 3)
+                                <div class="footer">
+                                    <?php
+                                    $contadorHojas++;
+                                    
+                                    ?>
+                                    Página. {{ $contadorHojas }}
+                                </div>
+                                <div class="page-break"></div>
+                                <?php
+                                $contadorTabla = 0;
+                                $contadorTablasGRandes = 0;
+                                ?>
+                            @endif
+                        @endif
 
-                            </tr>
-                        </tbody>
-                    </table>
-                @endif
+                        {{-- Actualizamos el usuario anterior --}}
+                        <?php $usuarioAnterior = $turno_info['nombreEncargado']['id']; ?>
+
+                        <div class="contenedor_tablas">
+                            <h3 class="titulo">
+                                {{ $turno_info['nombreEncargado']['nombres'] ?? 'N/A' }}
+                                {{ $turno_info['nombreEncargado']['apellidos'] ?? 'N/A' }}
+                                <b class="total_dia">Total: {{ $totalTurno }} Bs</b>
+                            </h3>
+                            <p class="entrada">Entrada: {{ $turno_info['entrada'] }}</p>
+                            <p class="salida">Salida: {{ $turno_info['salida'] }}</p>
+                            <p class="puesto">
+                                <b>{{ $turno_info['puesto']['nombre'] ?? 'Sin puesto' }}</b>
+                            </p>
+
+                            <table class="tabla">
+                                <thead>
+                                    <tr>
+                                        <th>Nº</th>
+                                        <th>Precio</th>
+                                        <th>Cantidad</th>
+                                        <th>Importe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $cont = 1;
+                                    $costo_total = 0;
+                                    $cantidad = 0;
+                                    ?>
+                                    @foreach ($turno_info['registros_agrupados'] as $precio => $detalle)
+                                        <tr>
+                                            <td>{{ $cont++ }}</td>
+                                            <td>{{ $precio }} Bs</td>
+                                            <td>{{ $detalle['cantidad'] }}</td>
+                                            <td>{{ $detalle['total'] }} Bs</td>
+                                            <?php
+                                            $cantidad += $detalle['cantidad'];
+                                            $costo_total += $detalle['total'];
+                                            ?>
+                                        </tr>
+                                    @endforeach
+                                    <tr>
+                                        <td colspan="2" style="text-align: right;"></td>
+                                        <td style="text-align: center;"><b>{{ $cantidad }} Registros </b></td>
+                                        <td style="text-align: center;"><b>TOTAL: {{ $costo_total }} Bs </b></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <?php $contadorTabla++; ?>
+                    @endif
+                @endforeach
             @endforeach
-        @endforeach
+        @else
+            <p class="puesto">
+                @foreach ($usuarios as $usuario)
+                    <b>{{ $usuario ?? 'N/A' }}</b>
+                @endforeach
+            </p>
 
+            <p class="fecha_generacion">({{ $fecha_inicio }} - {{ $fecha_fin }})</p>
+
+
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>Nº</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Importe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $cont = 1;
+                    $costo_total = 0;
+                    $cantidad = 0;
+                    ?>
+
+                    @foreach ($registros as $key => $registro)
+                        <tr>
+                            <td>{{ $cont++ }}</td>
+                            <td>{{ $key }} Bs</td>
+                            <td>{{ $registro['cantidad'] }}</td>
+                            <td>{{ $registro['total'] }} Bs</td>
+                            {{ $cantidad = $cantidad + $registro['cantidad'] }}
+                            {{ $costo_total = $costo_total + $registro['total'] }}
+                        </tr>
+                    @endforeach
+                    <tr>
+                        <td colspan="2" style="text-align: right;"></td>
+                        <td style="text-center: right;"><b>{{ $cantidad }} Registros </b></td>
+                        <td style="text-center: right;"><b>TOTAL: {{ $costo_total }} (Bs) </b></td>
+
+                    </tr>
+                </tbody>
+            </table>
+
+        @endif
+        <div class="footer">
+            <?php
+            $contadorHojas++;            
+            ?>
+            Página. {{ $contadorHojas }}
+
+        </div>
     </div>
 </body>
 

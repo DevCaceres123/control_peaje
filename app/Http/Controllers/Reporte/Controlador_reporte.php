@@ -11,8 +11,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Exception;
 use Carbon\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf; // Asegúrate de importar esta clase
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
+
 class Controlador_reporte extends Controller
 {
     public $mensaje = [];
@@ -328,7 +329,6 @@ class Controlador_reporte extends Controller
     public function reportes_usuario(Request $request)
     {
         try {
-           
             $validatedData = $request->validate([
                 'fecha_inicio_usuario' => 'required|date|before_or_equal:fecha_final_usuario',
                 'fecha_final_usuario' => 'required|date|after_or_equal:fecha_inicio_usuario',
@@ -336,17 +336,46 @@ class Controlador_reporte extends Controller
             ]);
 
             $registros = [];
+            $usuarios = [];
             foreach ($request->encargados_puesto as $key => $value) {
                 $registros[] = $this->generarReporteUsuario($value, $request->fecha_inicio_usuario, $request->fecha_final_usuario, $request->listar_turnos);
             }
 
-           
+            // si no queremos que se listen los turnos se sumaran todas las cantidades obtenidas por cada usuario
+
+            if ($request->listar_turnos == null) {
+                $resultado = [];
+
+                foreach ($registros as $grupo) {
+                    foreach ($grupo as $registro) {
+                        $usuarios[] = $registro['nombreEncargado']['nombres'] . ' ' . $registro['nombreEncargado']['apellidos'];
+
+                        foreach ($registro['registros_agrupados'] as $monto => $valores) {
+                            if (!isset($resultado[$monto])) {
+                                $resultado[$monto] = [
+                                    'cantidad' => 0,
+                                    'total' => 0,
+                                ];
+                            }
+
+                            $resultado[$monto]['cantidad'] += $valores['cantidad'];
+                            $resultado[$monto]['total'] += $valores['total'];
+                        }
+                    }
+                }
+
+                $registros = $resultado;
+            }
+
+            $fecha_inicio = Carbon::parse($request->fecha_inicio_usuario)->translatedFormat('d \d\e F \d\e Y');
+            $fecha_fin = Carbon::parse($request->fecha_final_usuario)->translatedFormat('d \d\e F \d\e Y');
+            $listarTurno = $request->listar_turnos;
 
             $nombreCompletoUsuario = auth()
                 ->user()
                 ->only(['nombres', 'apellidos']);
 
-            $pdf = Pdf::loadView('administrador/pdf/reporteRegistrosUsuario', compact('registros', 'nombreCompletoUsuario'));
+            $pdf = Pdf::loadView('administrador/pdf/reporteRegistrosUsuario', compact('registros', 'nombreCompletoUsuario', 'listarTurno', 'usuarios', 'fecha_inicio', 'fecha_fin'));
 
             // Obtener el contenido binario del PDF y convertirlo a Base64
             $reportebase64 = base64_encode($pdf->output());
@@ -365,54 +394,21 @@ class Controlador_reporte extends Controller
         $fecha_final = Carbon::parse($fecha_final);
         $turnos = $this->obtenerTurno($usuario_actual, $fecha_inicio, $fecha_final);
         $nombreCompletoUsuario = User::select('id', 'nombres', 'apellidos')->where('id', $usuario_actual)->first();
-    
+
         // Arreglo para almacenar los registros
         $registros_por_turno = [];
-    
+
         if ($listar_turnos != null) {
-         
             foreach ($turnos as $turno) {
                 $entrada = $turno->created_at;
                 $salida = $turno->updated_at;
-    
+
                 // Obtener registros del historial dentro del turno
                 $registros_turno = HistorialRegistros::select('precio')
                     ->where('usuario_id', '=', $usuario_actual)
                     ->whereBetween('created_at', [$entrada, $salida])
                     ->get();
-    
-                // Agrupar registros por precio
-                $registros_agrupados = $registros_turno->groupBy('precio')->map(function ($grupo) {
-                    return [
-                        'cantidad' => $grupo->count(), 
-                        'total' => $grupo->sum('precio'),
-                    ];
-                });
-    
-                // Almacenar los registros por turno
-                $registros_por_turno[] = [
-                    'nombreEncargado' => $nombreCompletoUsuario,
-                    'puesto' => Puesto::select('id', 'nombre')->where('id', $turno->puesto_id)->first(),
-                    'entrada' => Carbon::parse($turno->created_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
-                    'salida' => Carbon::parse($turno->updated_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
-                   // 'registros' => $registros_turno,
-                    'registros_agrupados' => $registros_agrupados,
-                ];
-            }
-        } else {
-            // PROCESO UNIFICADO (Sin turnos, uniendo todo en un solo resultado)
-    
-           
-                // Determinar el rango completo de fechas (entrada más antigua y salida más reciente)
-                $fecha_entrada_min = $turnos->min('created_at');
-                $fecha_salida_max = $turnos->max('updated_at');
-    
-                // Obtener todos los registros dentro del rango completo
-                $registros_turno = HistorialRegistros::select('precio')
-                    ->where('usuario_id', '=', $usuario_actual)
-                    ->whereBetween('created_at', [$fecha_entrada_min, $fecha_salida_max])
-                    ->get();
-    
+
                 // Agrupar registros por precio
                 $registros_agrupados = $registros_turno->groupBy('precio')->map(function ($grupo) {
                     return [
@@ -420,22 +416,52 @@ class Controlador_reporte extends Controller
                         'total' => $grupo->sum('precio'),
                     ];
                 });
-    
-                // Guardar todo en un solo conjunto de datos sin turnos
+
+                // Almacenar los registros por turno
                 $registros_por_turno[] = [
                     'nombreEncargado' => $nombreCompletoUsuario,
-                    'puesto' => null,
-                    'entrada' => Carbon::parse($fecha_entrada_min)->translatedFormat('d \d\e F \d\e Y H:i:s '),
-                    'salida' => Carbon::parse($fecha_salida_max)->translatedFormat('d \d\e F \d\e Y H:i:s '),
-                   // 'registros' => $registros_turno,
+                    'puesto' => Puesto::select('id', 'nombre')->where('id', $turno->puesto_id)->first(),
+                    'entrada' => Carbon::parse($turno->created_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
+                    'salida' => Carbon::parse($turno->updated_at)->translatedFormat('d \d\e F \d\e Y H:i:s '),
+                    // 'registros' => $registros_turno,
                     'registros_agrupados' => $registros_agrupados,
                 ];
-            
+            }
+        } else {
+            // PROCESO UNIFICADO (Sin turnos, uniendo todo en un solo resultado)
+
+            // Determinar el rango completo de fechas (entrada más antigua y salida más reciente)
+            $fecha_entrada_min = $turnos->min('created_at');
+            $fecha_salida_max = $turnos->max('updated_at');
+
+            // Obtener todos los registros dentro del rango completo
+            $registros_turno = HistorialRegistros::select('precio')
+                ->where('usuario_id', '=', $usuario_actual)
+                ->whereBetween('created_at', [$fecha_entrada_min, $fecha_salida_max])
+                ->get();
+
+            // Agrupar registros por precio
+            $registros_agrupados = $registros_turno->groupBy('precio')->map(function ($grupo) {
+                return [
+                    'cantidad' => $grupo->count(),
+                    'total' => $grupo->sum('precio'),
+                ];
+            });
+
+            // Guardar todo en un solo conjunto de datos sin turnos
+            $registros_por_turno[] = [
+                'nombreEncargado' => $nombreCompletoUsuario,
+                'puesto' => null,
+                'entrada' => Carbon::parse($fecha_entrada_min)->translatedFormat('d \d\e F \d\e Y H:i:s '),
+                'salida' => Carbon::parse($fecha_salida_max)->translatedFormat('d \d\e F \d\e Y H:i:s '),
+                // 'registros' => $registros_turno,
+                'registros_agrupados' => $registros_agrupados,
+            ];
         }
-    
+
         return $registros_por_turno;
     }
-    
+
     public function obtenerTurno($id_usuario, $fecha_inicio, $fecha_fin)
     {
         $fecha_inicio = Carbon::parse($fecha_inicio)->startOfDay(); // 2025-01-07 00:00:00
