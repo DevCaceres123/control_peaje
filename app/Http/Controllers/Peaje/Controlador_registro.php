@@ -694,7 +694,7 @@ class Controlador_registro extends Controller
             $salida = $turno->updated_at;
 
             // Obtener los registros del historial para este turno
-            $registros_turno = HistorialRegistros::select('precio', 'placa', 'ci', 'num_aprobados', 'created_at')
+            $registros_turno = HistorialRegistros::select('id','precio', 'placa', 'ci', 'num_aprobados', 'created_at')
                 ->where('usuario_id', '=', $usuario_actual)
                 ->whereBetween('created_at', [$entrada, $salida])
                 ->get();
@@ -708,6 +708,13 @@ class Controlador_registro extends Controller
                 ];
             });
 
+            $registros_eliminados=DB::table('historial_registros')
+              ->select('precio', 'deleted_at')
+              ->where('usuario_id', $usuario_actual)
+               ->whereBetween('created_at', [$entrada, $salida])
+               ->whereNotNull('deleted_at') // Filtrar solo los eliminados
+              ->get();
+            
             // Almacenar los registros por turno
             $registros_por_turno[] = [
                 'puesto' => Puesto::find($turno->puesto_id),
@@ -715,10 +722,9 @@ class Controlador_registro extends Controller
                 'salida' => Carbon::parse($turno->updated_at)->translatedFormat('l, d \d\e F \d\e Y H:i:s '),
                 'registros' => $registros_turno,  // Registros de historial
                 'registros_agrupados' => $registros_agrupados,
-
+                'registros_eliminados' => $registros_eliminados,
             ];
         }
-
 
 
         // listar los registros eliminados
@@ -729,6 +735,9 @@ class Controlador_registro extends Controller
             ->whereDate('delete_tarifas.created_at', "=", $fecha_actual)
             ->get();
 
+        
+
+      
 
         $pdf = Pdf::loadView('administrador/pdf/reporteRegistroDiario', compact('registros_por_turno', 'nombreCompletoUsuario', 'registros_eliminados'));
         return $pdf->stream();
