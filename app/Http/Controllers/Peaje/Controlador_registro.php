@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use function Laravel\Prompts\select;
 use function PHPUnit\Framework\isNumeric;
-
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf; // Asegúrate de importar esta clase
 use Exception;
 use Hamcrest\Type\IsNumeric;
@@ -73,6 +73,7 @@ class Controlador_registro extends Controller
     // Generar QR para resivo
     public function generar_qr(Request $request)
     {
+        $tarifa = null;
         try {
             $validatedData = $request->validate([
                 'id_tarifa' => 'required|exists:tarifas,id',
@@ -131,6 +132,12 @@ class Controlador_registro extends Controller
             return response()->json($this->mensaje, 200);
         } catch (Exception $e) {
             DB::rollBack();
+              // Log de error solo si ocurre una excepción
+            Log::error('Error al generar QR', [
+                'error_message' => $e->getMessage(),
+                'user_id' => auth()->user()->only(['nombres', 'apellidos']), // Usuario que causó el error
+                'tarifa_id' => $tarifa ? $tarifa->precio : 'No disponible', // Tarifa asociada al error
+          ]);
             $this->mensaje("error", "Error " . $e->getMessage());
 
             return response()->json($this->mensaje, 200);
@@ -235,6 +242,7 @@ class Controlador_registro extends Controller
     //GENERAR QR CON DATOS DEL VEHICULO O PERSONA
     public function store(RegistroPeajeRequest $request)
     {
+        $tarifa = null;
         try {
             $validatedData = $request->validate([
                 'id_tarifa' => 'required|exists:tarifas,id',
@@ -301,6 +309,12 @@ class Controlador_registro extends Controller
         } catch (Exception $e) {
 
             DB::rollBack();
+                  // Log de error solo si ocurre una excepción
+                Log::error('Error al generar QR', [
+                    'error_message' => $e->getMessage(),
+                    'user_id' => auth()->user()->only(['nombres', 'apellidos']), // Usuario que causó el error
+                    'tarifa_id' => $tarifa ? $tarifa->precio : 'No disponible', // Tarifa asociada al error
+                ]);
             $this->mensaje("error", "Error " . $e->getMessage());
 
             return response()->json($this->mensaje, 200);
@@ -839,6 +853,12 @@ class Controlador_registro extends Controller
 
         } catch (Exception $e) {
             DB::rollBack();
+                  // Log de error solo si ocurre una excepción
+                Log::error('Error al generar QR', [
+                    'error_message' => $e->getMessage(),
+                    'user_id' => auth()->user()->only(['nombres', 'apellidos']), // Usuario que causó el error
+                    'tarifa_id' => $request->id_precios, // Tarifa asociada al error
+                ]);
             $this->mensaje("error", "Error " . $e->getMessage());
 
             return response()->json($this->mensaje, 200);
@@ -905,6 +925,12 @@ class Controlador_registro extends Controller
             ];
         } catch (Exception $e) {
             DB::rollBack();
+                  // Log de error solo si ocurre una excepción
+                Log::error('Error al generar QR', [
+                    'error_message' => $e->getMessage(),
+                    'user_id' => auth()->user()->only(['nombres', 'apellidos']), // Usuario que causó el error
+                    'tarifa_id' => $tarifa ? $tarifa->precio : 'No disponible', // Tarifa asociada al error
+                ]);
             return   [
                 'tipo' => "error",
                 'mensaje' => $e->getMessage()
