@@ -202,6 +202,23 @@
             page-break-before: always;
             /* Fuerza un salto de página */
         }
+
+
+        .footer {
+            position: fixed;
+            bottom: 0px;
+            left: 0px;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .footer p {
+            position: absolute;
+            right: 12px;
+            top: 0;
+
+        }
     </style>
 </head>
 
@@ -214,6 +231,7 @@
     $ley61 = [];
     $ley13Eliminados = [];
     $ley61Eliminados = [];
+    $contadorHojas = 0;
     ?>
 
 
@@ -362,9 +380,17 @@
                         Aclaracion de firma
                     </p>
                 </div>
+                <div class="footer">
+                    <?php
+                    $contadorHojas++;
+                    ?>
+                    Página. {{ $contadorHojas }}
+                    <p>Ley 13/2021</p>
 
+                </div>
 
             </div>
+
 
             <div class="page-break"></div>
 
@@ -483,6 +509,13 @@
                     <p class="aclaracionFirma">
                         Aclaracion de firma
                     </p>
+                </div>
+                <div class="footer">
+                    <?php
+                    $contadorHojas++;
+                    ?>
+                    Página. {{ $contadorHojas }}
+                    <p>Ley 61/2024</p>
                 </div>
             </div>
             @if (!$loop->last)
