@@ -281,7 +281,7 @@
         @php $numPagina = 1; @endphp
 
         <div class="footer">
-            Página {{ $numPagina }} de 2
+            {{-- Página {{ $numPagina }} de 2 --}}
             <p>Ley 13/2021</p>
         </div>
 
@@ -372,7 +372,7 @@
     </div>
 
     <div class="footer">
-        Página {{ $numPagina }} de 2
+        {{-- Página {{ $numPagina }} de 2 --}}
         <p>Ley 61/2024</p>
     </div>
 

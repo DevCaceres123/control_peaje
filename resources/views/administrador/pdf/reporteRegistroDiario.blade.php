@@ -205,18 +205,16 @@
 
 
         .footer {
+           
+        }
+
+        .footer p {
             position: fixed;
             bottom: 0px;
             left: 0px;
             width: 100%;
             text-align: center;
             font-size: 14px;
-        }
-
-        .footer p {
-            position: absolute;
-            right: 12px;
-            top: 0;
 
         }
     </style>
@@ -381,10 +379,10 @@
                     </p>
                 </div>
                 <div class="footer">
-                    <?php
+                    {{-- <?php
                     $contadorHojas++;
                     ?>
-                    Página. {{ $contadorHojas }}
+                    Página. {{ $contadorHojas }} --}}
                     <p>Ley 13/2021</p>
 
                 </div>
@@ -511,10 +509,10 @@
                     </p>
                 </div>
                 <div class="footer">
-                    <?php
+                    {{-- <?php
                     $contadorHojas++;
                     ?>
-                    Página. {{ $contadorHojas }}
+                    Página. {{ $contadorHojas }} --}}
                     <p>Ley 61/2024</p>
                 </div>
             </div>

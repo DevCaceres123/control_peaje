@@ -237,6 +237,23 @@
             text-align: center;
             font-size: 12px;
         }
+
+        .ley {
+            margin-top: 5px;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        ley p {
+            margin-top: 3px;
+            text-align: center;
+        }
+
+        .ley .titulo_creacion {
+            text-align: center;
+            font-weight: 900;
+
+        }
     </style>
 </head>
 
@@ -419,9 +436,14 @@
                     $cont = 1;
                     $costo_total = 0;
                     $cantidad = 0;
+                    
+                    // Filtramos los registros por ley
+                    $ley13 = collect($registros)->only([50, 100, 500, 1000]);
                     ?>
 
-                    @foreach ($registros as $key => $registro)
+
+
+                    @foreach ($ley13 as $key => $registro)
                         <tr>
                             <td>{{ $cont++ }}</td>
                             <td>{{ $key }} Bs</td>
@@ -438,14 +460,109 @@
 
                     </tr>
                 </tbody>
+
             </table>
+
+
+            <div class="ley">
+                <p class="titulo_creacion">LEY AUTÓNOMA MUNICIPAL N.º 13/2021</p>
+                <p>LEY MUNICIPAL DE TASA DE RODAJE Y NORMATIVA DE INGRESO DE VEHÍCULOS DE TRANSPORTE, RURAL E
+                    INTERPROVINCIAL DE CARGA Y DESCARGA</p>
+            </div>
+
+            <div class="footer">
+                {{-- <?php
+                $contadorHojas++;
+                ?>
+                Página. {{ $contadorHojas }} --}}
+
+                <p>Ley 13/2021</p>
+
+            </div>
+            <div class="page-break"></div>
+
+            <!-- Información de la empresa -->
+            <div class="info_empresa">
+                <h2>GOBIERNO AUTÓNOMO MUNICIPAL DE CARANAVI</h2>
+                <h4>SECRETARIA MUNICIPAL ADMINISTRATIVA FINANCIERA</h4>
+                <h4>Direccion de Recaudaciones</h4>
+                <p>Reporte Generado: {{ now()->format('d-m-Y H:i:s') }}</p>
+                <img src="assets/logo-caranavi.webp" alt="Logo" width="90" height="95">
+            </div>
+
+            <!-- Detalles de la reunión -->
+            <div class="detalle_reporte">
+                <p class="encargado">
+                    <b>Encargado: </b>
+                    {{ $nombreCompletoUsuario['nombres'] ?? 'N/A' }}
+                    {{ $nombreCompletoUsuario['apellidos'] ?? 'N/A' }}
+                </p>
+
+
+
+                <hr>
+
+            </div>
+            <p class="puesto">
+                @foreach ($usuarios as $usuario)
+                    <b>{{ $usuario ?? 'N/A' }}</b>
+                @endforeach
+            </p>
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>Nº</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Importe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $cont = 1;
+                    $costo_total = 0;
+                    $cantidad = 0;
+                    
+                    // Filtramos los registros por ley
+                    $ley61 = collect($registros)->only([2, 4, 6, 8, 10, 12, 14]);
+                    ?>
+
+
+
+                    @foreach ($ley61 as $key => $registro)
+                        <tr>
+                            <td>{{ $cont++ }}</td>
+                            <td>{{ $key }} Bs</td>
+                            <td>{{ $registro['cantidad'] }}</td>
+                            <td>{{ $registro['total'] }} Bs</td>
+                            {{ $cantidad = $cantidad + $registro['cantidad'] }}
+                            {{ $costo_total = $costo_total + $registro['total'] }}
+                        </tr>
+                    @endforeach
+                    <tr>
+                        <td colspan="2" style="text-align: right;"></td>
+                        <td style="text-center: right;"><b>{{ $cantidad }} Registros </b></td>
+                        <td style="text-center: right;"><b>TOTAL: {{ $costo_total }} (Bs) </b></td>
+
+                    </tr>
+                </tbody>
+
+            </table>
+
+            <div class="ley">
+                <p class="titulo_creacion">LEY AUTÓNOMA MUNICIPAL N.º 61/2024</p>
+                <p>LEY MUNICIPAL DE CREACION DE LA TASA DE RODAJE-PEAJE DEL GOBIERNO AUTÓNOMO
+                    MUNICIPAL DE CARANAVI</p>
+            </div>
 
         @endif
         <div class="footer">
-            <?php
-            $contadorHojas++;            
+            {{-- <?php
+            $contadorHojas++;
             ?>
-            Página. {{ $contadorHojas }}
+            Página. {{ $contadorHojas }} --}}
+
+            <p>Ley 61/2024</p>
 
         </div>
     </div>
