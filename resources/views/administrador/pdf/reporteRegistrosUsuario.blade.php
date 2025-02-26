@@ -411,6 +411,15 @@
                         <?php $contadorTabla++; ?>
                     @endif
                 @endforeach
+                @if ($loop->last)
+                    <div class="footer">
+                        <?php
+                        $contadorHojas++;
+                        
+                        ?>
+                        Página. {{ $contadorHojas }}
+                    </div>
+                @endif
             @endforeach
         @else
             <p class="puesto">
@@ -555,16 +564,17 @@
                     MUNICIPAL DE CARANAVI</p>
             </div>
 
+            <div class="footer">
+                {{-- <?php
+                $contadorHojas++;
+                ?>
+                Página. {{ $contadorHojas }} --}}
+
+                <p>Ley 61/2024</p>
+
+            </div>
         @endif
-        <div class="footer">
-            {{-- <?php
-            $contadorHojas++;
-            ?>
-            Página. {{ $contadorHojas }} --}}
 
-            <p>Ley 61/2024</p>
-
-        </div>
     </div>
 </body>
 
