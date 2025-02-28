@@ -517,6 +517,8 @@
                     <b>{{ $usuario ?? 'N/A' }}</b>
                 @endforeach
             </p>
+
+            <p class="fecha_generacion">({{ $fecha_inicio }} - {{ $fecha_fin }})</p>
             <table class="tabla">
                 <thead>
                     <tr>
