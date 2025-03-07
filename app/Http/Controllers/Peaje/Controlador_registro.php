@@ -25,6 +25,7 @@ use Exception;
 use Hamcrest\Type\IsNumeric;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Hashids\Hashids; // libreria para encriptar y descencriptar
+use PhpParser\Node\Expr\Cast\String_;
 
 class Controlador_registro extends Controller
 {
@@ -102,7 +103,7 @@ class Controlador_registro extends Controller
             $registro->save();
 
             $cod_qr_unico = $this->encrypt($registro->id);
-
+           
             $nuevo_Qr = $this->generar_qrReporte($cod_qr_unico);
 
             // se obtiene el pdf en base 64
@@ -125,9 +126,16 @@ class Controlador_registro extends Controller
 
             $this->guardarHistorialRegistro($cod_qr_unico, $puesto->nombre, $tarifa->precio, null, null, json_encode($data), $registro->id);
 
+
+            $respuesta=[
+                'cod_qr_unico'=>$cod_qr_unico,
+                'resultado'=>$resultado,
+            ];
+
+
             DB::commit();
             // Retornar el PDF para su visualización
-            $this->mensaje("exito", $resultado);
+            $this->mensaje("exito", $respuesta);
 
             return response()->json($this->mensaje, 200);
         } catch (Exception $e) {
@@ -144,6 +152,72 @@ class Controlador_registro extends Controller
         }
     }
 
+
+    // actualizar la boleta a imprimido
+
+    public function marcarBoletaImpresa($CodigoQr){
+       
+        try {
+    
+               
+            DB::beginTransaction();
+    
+            $boleta = HistorialRegistros::where('cod_qr', $CodigoQr)->first();
+            if (!$boleta) {
+
+                throw new Exception("Error la Boleta no existe");                
+            }
+            
+             // Actualizar el estado de impresión
+            $boleta->estado_impresion = "impreso";  // Cambia según tu lógica de estados
+            $boleta->save(); // Guardar cambios en la base de datos
+    
+            DB::commit();
+    
+
+            
+            $this->mensaje('exito', "Impreso Correctamente");
+
+            return response()->json($this->mensaje, 200);
+        } catch (Exception $e) {
+    
+            DB::rollBack();
+            $this->mensaje("error", "Error " . $e->getMessage());
+    
+            return response()->json($this->mensaje, 200);
+        }
+        
+    }
+
+    // verificamos si existen boletas que no se hayan imprimido
+    
+    public function verificarBoletasNoimpresas() {
+        $usuario_actual = auth()->user()->id;
+    
+        $boletas = HistorialRegistros::select('id', 'nombre_usuario', 'precio', 'created_at','cod_qr')
+            ->where('estado_impresion', 'pendiente')
+            ->where('usuario_id', $usuario_actual)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $boletas = $boletas->map(function ($registro) {
+            return [
+                'id' =>  $registro->id,
+                'cod_qr' => $registro->cod_qr,
+                'nombre_usuario' => $registro->nombre_usuario,
+                'precio' => $registro->precio,
+                'created_at' => Carbon::parse($registro->created_at)
+                    ->locale('es')
+                    ->translatedFormat('d/m/Y H:i:s'), // Incluye hora y minuto
+            ];
+        });
+    
+        return response()->json($boletas);
+    }
+    
+    
+    
+    
 
     public function obtenerPuesto($fecha_actual, $usuario_actual)
     {
@@ -302,9 +376,15 @@ class Controlador_registro extends Controller
 
             $this->guardarHistorialRegistro($cod_qr_unico, $puesto->nombre, $tarifa->precio, $vehiculo->placa, $persona->ci,  json_encode($data), $id_registro);
 
+
             DB::commit();
 
-            $this->mensaje('exito', $resultado);
+
+            $respuesta=[
+                'cod_qr_unico'=>$cod_qr_unico,
+                'resultado'=>$resultado,
+            ];
+            $this->mensaje('exito', $respuesta);
             return response()->json($this->mensaje, 200);
         } catch (Exception $e) {
 
@@ -440,6 +520,7 @@ class Controlador_registro extends Controller
 
         $registro_historial->usuario_id = auth()->user()->id;
         $registro_historial->registro_id = $registroId;
+        $registro_historial->estado_impresion = 'pendiente';
 
         $registro_historial->save();
     }
@@ -800,7 +881,7 @@ class Controlador_registro extends Controller
             // Genera el QR
             $qr_unico = $this->generar_qrReporte($nuevoQr);
 
-            // Genera el reporte en PDF (asumo que retorna una cadena base64)
+            // Genera el reporte en PDF 
             $reporteBase64 = $this->generar_ReportePdf($tarifa, $qr_unico, $fechaActual, $puesto, $vehiculo);
 
             // Responde con éxito
@@ -842,7 +923,11 @@ class Controlador_registro extends Controller
                 $resultado = $this->generar_boletas_masivamente($request->id_precios);
 
                 if ($resultado['tipo'] === "exito") {
-                    $arrayBoletas[$i] = $resultado['mensaje'];
+                    $arrayBoletas[$i] = [
+                        $resultado['mensaje'],
+                        $resultado['qrcod'],
+                    ];
+                   
                 }
             }
 
@@ -865,7 +950,7 @@ class Controlador_registro extends Controller
         }
     }
 
-
+    // registra y devuelve las boletas en base 64
     public function generar_boletas_masivamente($id_precio)
     {
         try {
@@ -921,7 +1006,8 @@ class Controlador_registro extends Controller
             // Retornar el PDF para su visualización
             return   [
                 'tipo' => "exito",
-                'mensaje' => $resultado
+                'mensaje' => $resultado,
+                'qrcod'=>$cod_qr_unico,
             ];
         } catch (Exception $e) {
             DB::rollBack();

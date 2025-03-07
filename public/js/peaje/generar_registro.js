@@ -73,7 +73,7 @@ $('#nuevo_registro').submit(function (e) {
         vaciar_formulario("nuevo_registro");
 
 
-        let pdfUrl = generarURlBlob(response.mensaje);
+        let pdfUrl = generarURlBlob(response.mensaje.resultado);
 
         // Cargar el PDF en el iframe
         const iframe = document.getElementById('pdf-iframe');
@@ -90,6 +90,7 @@ $('#nuevo_registro').submit(function (e) {
         iframe.onload = () => {
             iframe.contentWindow.focus();
             iframe.contentWindow.print(); // Disparar impresión automática desde el iframe
+            marcarBoletaImpresa(response.mensaje.cod_qr_unico);
         };
 
         $("#btn-nuevoRegistro").prop("disabled", false);
@@ -129,7 +130,7 @@ $('#btn-generarQr').click(function (e) {
         vaciar_formulario("nuevo_registro");
         const iframe = document.getElementById('pdf-iframe');
 
-        let pdfUrl = generarURlBlob(response.mensaje);
+        let pdfUrl = generarURlBlob(response.mensaje['resultado']);
         iframe.src = pdfUrl;
         // activar ventana del generado de pdf
         $('#pdf-container').css('display', 'block');
@@ -146,11 +147,24 @@ $('#btn-generarQr').click(function (e) {
         iframe.onload = () => {
             iframe.contentWindow.focus();
             iframe.contentWindow.print(); // Disparar impresión automática desde el iframe
+            // 🔹 Después de imprimir, marcar la boleta como impresa
+            marcarBoletaImpresa(response.mensaje['cod_qr_unico']);
         };
     })
 
 })
 
+
+function marcarBoletaImpresa(QrCodigo) {
+    fetch("marcarBoletaImpresa/" + QrCodigo, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+        },
+        body: JSON.stringify({})
+    });
+}
 
 
 
@@ -241,12 +255,16 @@ $('#generar_boletas').submit(function (e) {
                 $('#nuevo_registro').css('display', 'none'); // no mostrar formulario
 
 
-
+                console.log(response);
 
                 // Convertir las URLs de respuesta
                 response.mensaje.forEach(element => {
-                    pdfUrl = generarURlBlob(element);
-                    colaDeImpresion.push(pdfUrl);
+                    pdfUrl = generarURlBlob(element[0]);
+                    let nuevoDocumento = {
+                        pdfUrl: pdfUrl,
+                        qrcod: element[1]
+                    };
+                    colaDeImpresion.push(nuevoDocumento);
                 });
 
                 $('#numero_boletas').text(colaDeImpresion.length);
@@ -257,7 +275,7 @@ $('#generar_boletas').submit(function (e) {
                 // Imprimir una por una
                 for (let i = 0; i < colaDeImpresion.length; i++) {
                     
-                    let pdfUrl = colaDeImpresion[i];
+                    let pdfUrl = colaDeImpresion[i]['pdfUrl'];
                     const iframe = document.createElement('iframe');
                     iframe.style.display = 'none';
                     iframe.src = pdfUrl;
@@ -270,8 +288,8 @@ $('#generar_boletas').submit(function (e) {
                             setTimeout(() => {
                                 boletasRestantes--; // Reducir el contador
                                 actualizarBoletasRestantes(boletasProcesadas, boletasRestantes, totalBoletas); // Actualizar visualmente
-
-
+                                marcarBoletaImpresa(colaDeImpresion[i]['qrcod']);
+                                
                                 console.log(boletasRestantes);
                                 boletasProcesadas++;
                                 resolve(); // Resolver la promesa

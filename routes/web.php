@@ -68,11 +68,16 @@ Route::prefix('/admin')->middleware([Autenticados::class])->group(function () {
         Route::get('/ver_registros', 'ver_registros')->name('peaje.ver_registros');
         Route::get('/listar_registro', 'listar_registro');
         // SE GENERA LA BOLETA DE UN REGISTRO
-        Route::get('/reporte/{id_registro}', 'generar_boleta');
+        Route::get('/reporte/{id_registro}', 'generar_boleta')->name('peaje.generar_reporte');
 
         Route::get('/reporteDiario', 'reporteDiario')->name('peaje.reporte_diario');
 
         Route::post('generar_varias_boletas', "generar_varias_boletas");
+
+        Route::put('marcarBoletaImpresa/{id}','marcarBoletaImpresa');
+
+        Route::get('verificarBoletasNoimpresas', 'verificarBoletasNoimpresas')->name('peaje.verificar_boleta');
+       
 
     });
 
