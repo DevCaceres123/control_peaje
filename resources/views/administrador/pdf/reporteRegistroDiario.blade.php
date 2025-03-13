@@ -543,7 +543,7 @@
     {{-- en caso de que el usuario por error haya genrado varios turnos solo se mostrara el que tenga registros --}}
     @if (count($registros_por_turno) > 1)
         @foreach ($registros_por_turno as $turno_info)
-            {{ count($registros_por_turno) }}
+        
             @if (count($turno_info['registros_agrupados']) > 0)
                 @php
                     $ley13 = collect($turno_info['registros_agrupados'])->only([50, 100, 500, 1000]); // Filtrar solo las claves que necesitamos
