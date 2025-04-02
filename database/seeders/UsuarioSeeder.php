@@ -123,10 +123,10 @@ class UsuarioSeeder extends Seeder
 
         $usuario8 = new User();
         $usuario8->usuario = '123456789';
-        $usuario8->password = Hash::make('123456789_freddy');
+        $usuario8->password = Hash::make('admin');
         $usuario8->ci = '123456789';
-        $usuario8->nombres = 'Freddy';
-        $usuario8->apellidos = 'Barra';
+        $usuario8->nombres = 'Michael Manuel';
+        $usuario8->apellidos = 'Caceres Quina';
         $usuario8->estado = 'activo';
         $usuario8->email = 'freddy@gmail.com';
         $usuario8->save();
