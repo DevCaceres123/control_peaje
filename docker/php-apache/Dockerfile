@@ -31,9 +31,6 @@ RUN docker-php-ext-install \
 # Activar mod_rewrite (Laravel)
 RUN a2enmod rewrite
 
-# Instalar dependencias de composer 
-RUN composer install
-
 # Configurar zona horaria
 ENV TZ=America/La_Paz
 
