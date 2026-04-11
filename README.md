@@ -12,6 +12,17 @@ Antes de comenzar, asegúrate de tener instalado:
 * Docker (Docker Desktop o Docker Engine)
 * Docker Compose
 
+
+******IMPORTANTE *******
+
+"sudo usermod -aG docker $USER"  /// $USER es tu usuario, este comando nos servira para tener acceso a docker sin ser usaurio root, ejecutarlo si se usa linux.
+
+
+"git config --global core.fileMode false" // ejecuta este comando para no tener problema con la configuracion de permisos que dara docker,  ejecuta este comando ya sea linux o windows.
+
+
+"sudo chown -R usuario:grupo ."  //  si tienes probelmas con los permisos ejecuta este comando, solo si estas usando linux.
+
 ---
 
 ## 📥 Instalación del proyecto
@@ -23,7 +34,31 @@ cd mi-proyecto
 
 ---
 
-### 2. Levantar los contenedores
+### 2. Configurar variables de entorno
+
+//windows
+
+hacer una copia del archivo .env.example y poner el nuevo nombre como ".env"
+
+//linux
+```bash
+cp .env.example .env
+```
+
+Edita el archivo `.env` y cambia estas configuraciones
+
+HASHIDS_SALT // esta variable es para la clave unica que se genera para los QR
+DB_CONNECTION=mysql // mysql como base de datos
+DB_HOST=mariadb  // seleccionamos el host que usaremos en nuestro caso de llama mariadb
+DB_PORT=3306 // seleccionamos el puerto con el que usaremos la base de datos
+DB_DATABASE // nombre de la base de datos
+DB_USERNAME= // usuario de la base de datos
+DB_PASSWORD=// contrasenia
+DB_ROOT_PASSWORD= // esta es la contraenia root recurda no compartirlo con nadie
+
+---
+
+### 3. Levantar los contenedores
 
 docker compose up -d --build
 
@@ -35,29 +70,20 @@ Esto iniciará los servicios necesarios:
 
 ---
 
-### 3. Instalar dependencias de Laravel
-
-docker compose exec app composer install
-
----
-
-### 4. Configurar variables de entorno
-
-```bash
-cp .env.example .env
-```
-
-Edita el archivo `.env` si necesitas ajustar configuraciones.
-
----
-
-### 5. Generar la clave de la aplicación
+### 4. Generar la clave de la aplicación
 
 ```bash
 docker compose exec app php artisan key:generate
 ```
 
 ---
+
+### 5. Instalar dependencias de Laravel
+
+docker compose exec app composer install
+
+---
+
 
 ### 6. Ejecutar migraciones
 
@@ -75,38 +101,22 @@ Una vez completados los pasos anteriores, puedes acceder al proyecto en:
 http://localhost:8080
 ```
 
+¡Listo! 🎉 Ahora puedes empezar a trabajar en el sistema🚀
+
 ---
 
 ## 🔄 Flujo de trabajo diario
 
-Cada vez que actualices el proyecto:
+Cada vez que haya actualizaciones en el proyecto:
 
 ```bash
-git pull
+git pull origin  {nombre de rama}
 docker compose exec app composer install
 docker compose exec app php artisan migrate
 ```
 
 ---
 
-## 📁 Estructura relevante
-
-```
-mi-proyecto/
-│
-├── docker/
-│   ├── php-apache/
-│   │   ├── Dockerfile
-│   │   ├── apache.conf
-│   │   ├── php.ini
-│   │   └── entrypoint.sh
-│
-├── docker-compose.yml
-├── .env
-└── ...
-```
-
----
 
 ## 🛠️ Comandos útiles
 
@@ -119,13 +129,13 @@ docker compose ps
 ### Detener contenedores
 
 ```bash
-docker compose down
+docker compose stop 
 ```
 
 ### Reconstruir contenedores
 
 ```bash
-docker compose up -d --build
+docker compose up -d --build -v // nota agregar el -v si se quiere eliminar tambien eliminar la base de datos
 ```
 
 ---
@@ -143,32 +153,9 @@ docker compose exec app composer install
 
 ---
 
-## 👨‍💻 Contribución
-
-1. Crear una rama desde `main`
-2. Realizar cambios
-3. Hacer commit y push
-4. Crear Pull Request
-
----
-
-## 📌 Recomendación
-
-Se recomienda seguir siempre este flujo después de actualizar el proyecto:
-
-```bash
-git pull
-docker compose exec app composer install
-docker compose exec app php artisan migrate
-```
-
----
-
 ## 🎯 Objetivo
 
 Este entorno permite que cualquier desarrollador pueda levantar el proyecto rápidamente sin preocuparse por configuraciones locales de PHP, Apache o base de datos.
 
----
 
-¡Listo! 🎉 Ahora puedes empezar a desarrollar 🚀
 
